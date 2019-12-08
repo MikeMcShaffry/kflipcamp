@@ -1,0 +1,899 @@
+/*
+available controllers:
+	- whiteControllers
+	- blackControllers
+*/
+
+
+
+/* the container */
+.audio6_html5 {
+	/*background:#0000CC;
+	padding:5px;*/
+}
+
+/*bottom div*/
+.audio6_html5_sticky_div {
+	/*border:1px solid #F00;*/
+	position:fixed;
+	z-index:99999;
+	bottom:0;
+	right:0;
+}
+
+
+.xaudioplaylist {
+	display:none;
+}
+
+/* jquery ui styles */
+.ui-slider-handle {
+	position: absolute;
+	z-index: 2;
+	display: block;
+	margin-left:-0.6em;
+	cursor: default;
+	outline: none;
+}
+
+.ui-slider-range {
+	display:block;
+	width:100%;
+	height:100%;
+	left:0;
+	bottom: 0;
+	border:0 none;
+	position:absolute;
+	z-index:1;
+}
+
+.ui-progressbar {
+	/*height: 5px;*/
+}
+.ui-progressbar-value {
+	height:100%;
+}
+.readingData {
+	color:#090;
+	margin-top:40px;
+}
+
+
+
+/* whiteControllers */
+.audio6_html5.whiteControllers {
+	position: relative;
+	z-index:1;
+	font:11px Arial, Helvetica, sans-serif;
+	color:#FFF;
+	margin:0;
+	padding:0;
+}
+.audio6_html5.whiteControllers * {
+	-webkit-duration:0s !important;
+	-moz-duration:0s !important;
+	-ms-duration:0s !important;
+	-o-duration:0s !important;
+	transition-duration:0s !important;
+}
+
+.audio6_html5.whiteControllers .AudioCloseBut {
+	width:19px;
+	height:13px;
+	position:absolute;
+	right:0;
+	cursor:pointer;
+	background:url(controllers/whiteControllers/close-off.png) no-repeat;
+	/*border:1px solid #090;*/
+}
+.audio6_html5.whiteControllers .AudioCloseBut:hover {
+	background:url(controllers/whiteControllers/close-on.png) no-repeat;
+}
+
+.audio6_html5.whiteControllers .AudioOpenBut {
+	background:url(controllers/whiteControllers/open-off.png) no-repeat;
+}
+.audio6_html5.whiteControllers .AudioOpenBut:hover {
+	background:url(controllers/whiteControllers/open-on.png) no-repeat;
+}
+
+.audio6_html5.whiteControllers .AudioControls {
+	/*clear: both;*/
+	width: 100%;
+	margin:0;
+	padding:0;
+}
+
+.audio6_html5.whiteControllers .frameBehindButtons {
+	/*clear: both;*/
+	position:absolute;
+	width: 100%;
+	height:34px;
+	margin:0;
+	padding:0;
+}
+
+.audio6_html5.whiteControllers .frameBehindText {
+	/*clear: both;*/
+	position:absolute;
+	width: 100%;
+	margin:0;
+	padding:0;
+}
+
+
+.audio6_html5.whiteControllers .ximage {
+	position:absolute;
+	display:block;
+	/*width: 120px;
+	height: 120px;*/
+	border-radius: 0;
+	/*border-style:solid;
+	-webkit-border-radius: 150px;
+	-moz-border-radius: 150px;*/
+}
+
+
+
+.audio6_html5.whiteControllers .AudioFacebook {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	z-index:1;
+	width: 18px;
+	height: 18px;
+	background: url(controllers/whiteControllers/facebook-off.png) no-repeat;
+}
+.audio6_html5.whiteControllers .AudioFacebook:hover {
+    background: url(controllers/whiteControllers/facebook-on.png) no-repeat;
+}
+
+.audio6_html5.whiteControllers .AudioTwitter {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	z-index:1;
+	width: 18px;
+	height: 18px;
+	background: url(controllers/whiteControllers/twitter-off.png) no-repeat;
+}
+.audio6_html5.whiteControllers .AudioTwitter:hover {
+    background: url(controllers/whiteControllers/twitter-on.png) no-repeat;
+}
+
+
+
+/* play */
+.audio6_html5.whiteControllers .AudioPlay {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	width: 58px;
+	height: 58px;
+	background: url(controllers/whiteControllers/play-off.png) no-repeat;
+}
+.audio6_html5.whiteControllers .AudioPlay:hover {
+    background: url(controllers/whiteControllers/play-on.png) no-repeat;
+}
+
+
+/* pause */
+.audio6_html5.whiteControllers .AudioPause {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	width: 58px;
+	height: 58px;
+	background: url(controllers/whiteControllers/pause-off.png) no-repeat;
+}
+.audio6_html5.whiteControllers .AudioPause:hover {
+	background: url(controllers/whiteControllers/pause-on.png) no-repeat;
+}
+
+
+
+/*show/hide playlist */
+.audio6_html5.whiteControllers .AudioShowHidePlaylist {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	z-index:1;
+	width: 18px;
+	height: 18px;
+	background: url(controllers/whiteControllers/history-off.png) no-repeat;
+}
+.audio6_html5.whiteControllers .AudioShowHidePlaylist:hover {
+    background: url(controllers/whiteControllers/history-on.png) no-repeat;
+}
+
+
+
+
+
+
+
+/* volume button Mute & UnMute*/
+.audio6_html5.whiteControllers .VolumeButton {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	width: 18px;
+	height: 18px;
+	background: url(controllers/whiteControllers/volume-off.png) no-repeat;
+	z-index: 1;
+}
+.audio6_html5.whiteControllers .VolumeButton:hover {
+	background: url(controllers/whiteControllers/volume-on.png) no-repeat;
+}
+
+.audio6_html5.whiteControllers .VolumeButtonMuted {
+	background: url(controllers/whiteControllers/volumeMute-off.png) no-repeat;
+}
+.audio6_html5.whiteControllers .VolumeButtonMuted:hover {
+	background: url(controllers/whiteControllers/volumeMute-on.png) no-repeat;
+}
+
+/* volume slider */
+.audio6_html5.whiteControllers .VolumeSlider {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	width:70px;
+	height:4px;
+	/*background: #fff000;*/
+}
+
+.audio6_html5.whiteControllers .VolumeSlider .ui-slider-handle {
+	display:none;
+}
+
+.audio6_html5.whiteControllers .VolumeSlider .ui-slider-handle.ui-state-hover {
+	/*background: #fff000;*/
+}
+
+.audio6_html5.whiteControllers .VolumeSlider .ui-slider-range {
+	position:relative;
+	height:4px;
+	/*background: #00F; blue*/
+}
+
+
+
+
+/*song Station & Title*/
+.audio6_html5.whiteControllers .songTitle {
+	position:absolute;
+	float:left;
+	display: block;
+	overflow:hidden;
+	height:26px;/**/
+	margin:0;
+	padding:0;
+	font-weight: normal;
+	/*border:1px solid #CC6;*/
+}
+
+.audio6_html5.whiteControllers .songTitleInside {
+	position:absolute;
+	white-space: nowrap;
+	width:auto;
+	text-align:left;
+	font-family: 'PT Sans', sans-serif;
+	font-size:23px;
+	line-height:0.9em;
+	font-weight:normal;
+	/*text-transform:uppercase;*/
+}
+
+.audio6_html5.whiteControllers .songAuthor {
+	position:absolute;
+	display: block;
+	overflow:hidden;
+	height:17px;
+	margin:0;
+	padding:0;
+	line-height:1em;
+	font-family: 'PT Sans', sans-serif;
+	font-size:16px;
+	font-weight: normal;
+	/*text-transform:capitalize;*/
+	/*border:1px solid #FF0000;*/
+}
+
+
+.audio6_html5.whiteControllers .songAuthorLineSeparator {
+	position:absolute;
+	display: block;
+	height:1px;
+}
+
+
+.audio6_html5.whiteControllers .radioStation {
+	position:absolute;
+	display: block;
+	overflow:hidden;
+	margin:0;
+	padding:0;
+	height:15px;
+	font-size:13px;
+	font-family: 'PT Sans', sans-serif;
+	line-height:1;
+	font-weight: normal;
+	text-align:left;
+	/*border:1px solid #CC0000;*/
+}
+
+
+.audio6_html5.whiteControllers .historyTitle {
+	position:absolute;
+	display: block;
+	overflow:hidden;
+	margin:0;
+	padding:0;
+	font-size:15px;
+	font-family: 'PT Sans', sans-serif;
+	text-transform:uppercase;
+	height:18px;
+	color:#858585;
+	line-height:1;
+	font-weight: normal;
+	text-align:left;
+	/*border:1px solid #993;*/
+}
+
+
+
+.audio6_html5.whiteControllers .thumbsHolderWrapper {
+	position:absolute;
+	/*height:100%;*/
+	margin-top:0px;
+	overflow:hidden;
+}
+.audio6_html5.whiteControllers .thumbsHolderVisibleWrapper {
+	/*position:absolute;*/
+	position:relative;
+	height:100%;
+	overflow:hidden;
+	clear:both;/*new*/
+}
+.audio6_html5.whiteControllers .thumbsHolder {
+	position:absolute;
+	text-align:left;
+}
+/* thumbsOFF */
+.audio6_html5.whiteControllers .thumbsHolder_ThumbOFF {
+	display:block;
+	height:70px;
+	/*background:#000;*/
+	overflow:hidden;
+	border-bottom:1px solid;
+	border-bottom-color:transparent;
+	line-height:2.5em;
+}
+.audio6_html5.whiteControllers .thumbsHolder_ThumbOFF  .padding {
+	padding:4px 0px 4px 0px;
+}
+.audio6_html5.whiteControllers .thumbsHolder_ThumbOFF .titlex {
+	font-family: 'PT Sans', sans-serif;
+	letter-spacing:0.5px;
+	font-weight:normal;
+	display:inline-block;
+	font-size:18px;
+	line-height:1.5;
+	padding:0;
+	margin:0;
+	padding-bottom:0px;
+	overflow:hidden;
+	display:block;
+	border-bottom:1px solid;
+	border-bottom-color:transparent;
+}
+.audio6_html5.whiteControllers .thumbsHolder_ThumbOFF .authorx {
+	font-family: 'PT Sans', sans-serif;
+	font-weight:normal;
+	font-size:14px;
+	line-height:2;
+	padding:0;
+	margin:0;
+	overflow:hidden;
+	display:block;
+}
+
+/*.audio6_html5.whiteControllers .thumbsHolder_ThumbOFF img {
+	position:relative;
+	float:left;
+	margin-right:10px;
+	width:auto;
+	height:auto;
+	max-width: 55px;
+}*/
+
+.audio6_html5.whiteControllers .thumbsHolder_ThumbOFF .img_div {
+	position:relative;
+	background-repeat:no-repeat;
+	background-position:top center;
+	background-size:cover;
+	width: 55px;
+	height: 55px;
+	float: left;
+	margin-right: 10px;
+}
+
+
+
+/*  scroller start */
+.audio6_html5.whiteControllers .slider-vertical {
+	display:none;
+	position:absolute;
+	width:9px;
+}
+
+.audio6_html5.whiteControllers .slider-vertical.ui-slider { position: relative;}
+.audio6_html5.whiteControllers .slider-vertical.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 9px; height: 16px; cursor: pointer; background:url(controllers/whiteControllers/scrollerFaceOFF.png) 0 0 no-repeat; }
+.audio6_html5.whiteControllers .slider-vertical.ui-slider .ui-slider-handle:hover {  background:url(controllers/whiteControllers/scrollerFaceON.png) 0 0 no-repeat; }
+.audio6_html5.whiteControllers .slider-vertical.ui-slider .ui-slider-range { position: absolute; z-index: 1; display: block; border: 0; }
+
+
+.audio6_html5.whiteControllers .slider-vertical.ui-slider-vertical { width: 9px; height: 100px; }
+.audio6_html5.whiteControllers .slider-vertical.ui-slider-vertical .ui-slider-handle { left: 0px; margin-left: 0px; margin-bottom: -16px;; border: 0; }
+.audio6_html5.whiteControllers .slider-vertical.ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
+.audio6_html5.whiteControllers .slider-vertical.ui-slider-vertical .ui-slider-range-min { bottom: 0; }
+.audio6_html5.whiteControllers .slider-vertical.ui-slider-vertical .ui-slider-range-max { top: 0; }
+
+
+/* Component containers
+----------------------------------*/
+.audio6_html5.whiteControllers .slider-vertical.ui-widget-content { /*background: #ff7800;*/}
+.audio6_html5.whiteControllers .slider-vertical .ui-widget-header { /*background: #24ff00;*/ }
+
+
+/* Corner radius */
+.audio6_html5.whiteControllers .slider-vertical.ui-corner-all {}
+
+/* Interaction states
+----------------------------------
+.audio6_html5.whiteControllers .slider-vertical.ui-state-default {background: #000000; }
+.audio6_html5.whiteControllers .slider-vertical.ui-state-hover { background: #FFF000;  }
+*/
+/*  scroller end */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* blackControllers */
+.audio6_html5.blackControllers {
+	position: relative;
+	z-index:1;
+	font:11px Arial, Helvetica, sans-serif;
+	color:#FFF;
+	margin:0;
+	padding:0;
+}
+.audio6_html5.blackControllers * {
+	-webkit-duration:0s !important;
+	-moz-duration:0s !important;
+	-ms-duration:0s !important;
+	-o-duration:0s !important;
+	transition-duration:0s !important;
+}
+
+.audio6_html5.blackControllers .AudioCloseBut {
+	width:19px;
+	height:13px;
+	position:absolute;
+	right:0;
+	cursor:pointer;
+	background:url(controllers/blackControllers/close-off.png) no-repeat;
+	/*border:1px solid #090;*/
+}
+.audio6_html5.blackControllers .AudioCloseBut:hover {
+	background:url(controllers/blackControllers/close-on.png) no-repeat;
+}
+
+.audio6_html5.blackControllers .AudioOpenBut {
+	background:url(controllers/blackControllers/open-off.png) no-repeat;
+}
+.audio6_html5.blackControllers .AudioOpenBut:hover {
+	background:url(controllers/blackControllers/open-on.png) no-repeat;
+}
+
+.audio6_html5.blackControllers .AudioControls {
+	/*clear: both;*/
+	width: 100%;
+	margin:0;
+	padding:0;
+}
+
+.audio6_html5.blackControllers .frameBehindButtons {
+	/*clear: both;*/
+	position:absolute;
+	width: 100%;
+	height:34px;
+	margin:0;
+	padding:0;
+}
+
+.audio6_html5.blackControllers .frameBehindText {
+	/*clear: both;*/
+	position:absolute;
+	width: 100%;
+	margin:0;
+	padding:0;
+}
+
+
+.audio6_html5.blackControllers .ximage {
+	position:absolute;
+	display:block;
+	/*width: 120px;
+	height: 120px;*/
+	border-radius: 0;
+	/*border-style:solid;
+	-webkit-border-radius: 150px;
+	-moz-border-radius: 150px;*/
+}
+
+
+
+.audio6_html5.blackControllers .AudioFacebook {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	z-index:1;
+	width: 18px;
+	height: 18px;
+	background: url(controllers/blackControllers/facebook-off.png) no-repeat;
+}
+.audio6_html5.blackControllers .AudioFacebook:hover {
+    background: url(controllers/blackControllers/facebook-on.png) no-repeat;
+}
+
+.audio6_html5.blackControllers .AudioTwitter {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	z-index:1;
+	width: 18px;
+	height: 18px;
+	background: url(controllers/blackControllers/twitter-off.png) no-repeat;
+}
+.audio6_html5.blackControllers .AudioTwitter:hover {
+    background: url(controllers/blackControllers/twitter-on.png) no-repeat;
+}
+
+
+
+/* play */
+.audio6_html5.blackControllers .AudioPlay {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	width: 58px;
+	height: 58px;
+	background: url(controllers/blackControllers/play-off.png) no-repeat;
+}
+.audio6_html5.blackControllers .AudioPlay:hover {
+    background: url(controllers/blackControllers/play-on.png) no-repeat;
+}
+
+
+/* pause */
+.audio6_html5.blackControllers .AudioPause {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	width: 58px;
+	height: 58px;
+	background: url(controllers/blackControllers/pause-off.png) no-repeat;
+}
+.audio6_html5.blackControllers .AudioPause:hover {
+	background: url(controllers/blackControllers/pause-on.png) no-repeat;
+}
+
+
+
+/*show/hide playlist */
+.audio6_html5.blackControllers .AudioShowHidePlaylist {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	z-index:1;
+	width: 18px;
+	height: 18px;
+	background: url(controllers/blackControllers/history-off.png) no-repeat;
+}
+.audio6_html5.blackControllers .AudioShowHidePlaylist:hover {
+    background: url(controllers/blackControllers/history-on.png) no-repeat;
+}
+
+
+
+
+
+
+
+/* volume button Mute & UnMute*/
+.audio6_html5.blackControllers .VolumeButton {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	width: 18px;
+	height: 18px;
+	background: url(controllers/blackControllers/volume-off.png) no-repeat;
+	z-index: 1;
+}
+.audio6_html5.blackControllers .VolumeButton:hover {
+	background: url(controllers/blackControllers/volume-on.png) no-repeat;
+}
+
+.audio6_html5.blackControllers .VolumeButtonMuted {
+	background: url(controllers/blackControllers/volumeMute-off.png) no-repeat;
+}
+.audio6_html5.blackControllers .VolumeButtonMuted:hover {
+	background: url(controllers/blackControllers/volumeMute-on.png) no-repeat;
+}
+
+/* volume slider */
+.audio6_html5.blackControllers .VolumeSlider {
+	/*float:left;*/
+	position:absolute;
+	cursor: pointer;
+	display: block;
+	margin:0;
+	padding:0;
+	width:70px;
+	height:4px;
+	/*background: #fff000;*/
+}
+
+.audio6_html5.blackControllers .VolumeSlider .ui-slider-handle {
+	display:none;
+}
+
+.audio6_html5.blackControllers .VolumeSlider .ui-slider-handle.ui-state-hover {
+	/*background: #fff000;*/
+}
+
+.audio6_html5.blackControllers .VolumeSlider .ui-slider-range {
+	position:relative;
+	height:4px;
+	/*background: #00F; blue*/
+}
+
+
+
+
+/*song Station & Title*/
+.audio6_html5.blackControllers .songTitle {
+	position:absolute;
+	float:left;
+	display: block;
+	overflow:hidden;
+	height:26px;/**/
+	margin:0;
+	padding:0;
+	font-weight: normal;
+	/*border:1px solid #CC6;*/
+}
+
+.audio6_html5.blackControllers .songTitleInside {
+	position:absolute;
+	white-space: nowrap;
+	width:auto;
+	text-align:left;
+	font-family: 'PT Sans', sans-serif;
+	font-size:23px;
+	line-height:0.9em;
+	font-weight:normal;
+	/*text-transform:uppercase;*/
+}
+
+.audio6_html5.blackControllers .songAuthor {
+	position:absolute;
+	display: block;
+	overflow:hidden;
+	height:17px;
+	margin:0;
+	padding:0;
+	line-height:1em;
+	font-family: 'PT Sans', sans-serif;
+	font-size:16px;
+	font-weight: normal;
+	/*text-transform:capitalize;*/
+	/*border:1px solid #FF0000;*/
+}
+
+
+.audio6_html5.blackControllers .songAuthorLineSeparator {
+	position:absolute;
+	display: block;
+	height:1px;
+}
+
+
+.audio6_html5.blackControllers .radioStation {
+	position:absolute;
+	display: block;
+	overflow:hidden;
+	margin:0;
+	padding:0;
+	height:15px;
+	font-size:13px;
+	font-family: 'PT Sans', sans-serif;
+	line-height:1;
+	font-weight: normal;
+	text-align:left;
+	/*border:1px solid #CC0000;*/
+}
+
+
+.audio6_html5.blackControllers .historyTitle {
+	position:absolute;
+	display: block;
+	overflow:hidden;
+	margin:0;
+	padding:0;
+	font-size:15px;
+	font-family: 'PT Sans', sans-serif;
+	text-transform:uppercase;
+	height:18px;
+	color:#858585;
+	line-height:1;
+	font-weight: normal;
+	text-align:left;
+	/*border:1px solid #993;*/
+}
+
+
+
+.audio6_html5.blackControllers .thumbsHolderWrapper {
+	position:absolute;
+	/*height:100%;*/
+	margin-top:0px;
+	overflow:hidden;
+}
+.audio6_html5.blackControllers .thumbsHolderVisibleWrapper {
+	/*position:absolute;*/
+	position:relative;
+	height:100%;
+	overflow:hidden;
+	clear:both;/*new*/
+}
+.audio6_html5.blackControllers .thumbsHolder {
+	position:absolute;
+	text-align:left;
+}
+/* thumbsOFF */
+.audio6_html5.blackControllers .thumbsHolder_ThumbOFF {
+	display:block;
+	height:70px;
+	/*background:#000;*/
+	overflow:hidden;
+	border-bottom:1px solid;
+	border-bottom-color:transparent;
+	line-height:2.5em;
+}
+.audio6_html5.blackControllers .thumbsHolder_ThumbOFF  .padding {
+	padding:4px 0px 4px 0px;
+}
+.audio6_html5.blackControllers .thumbsHolder_ThumbOFF .titlex {
+	font-family: 'PT Sans', sans-serif;
+	letter-spacing:0.5px;
+	font-weight:normal;
+	display:inline-block;
+	font-size:18px;
+	line-height:1.5;
+	padding:0;
+	margin:0;
+	padding-bottom:0px;
+	overflow:hidden;
+	display:block;
+	border-bottom:1px solid;
+	border-bottom-color:transparent;
+}
+.audio6_html5.blackControllers .thumbsHolder_ThumbOFF .authorx {
+	font-family: 'PT Sans', sans-serif;
+	font-weight:normal;
+	font-size:14px;
+	line-height:2;
+	padding:0;
+	margin:0;
+	overflow:hidden;
+	display:block;
+}
+
+.audio6_html5.blackControllers .thumbsHolder_ThumbOFF .img_div {
+	position:relative;
+	background-repeat:no-repeat;
+	background-position:top center;
+	background-size:cover;
+	width: 55px;
+	height: 55px;
+	float: left;
+	margin-right: 10px;
+}
+
+
+/*  scroller start */
+.audio6_html5.blackControllers .slider-vertical {
+	display:none;
+	position:absolute;
+	width:9px;
+}
+
+.audio6_html5.blackControllers .slider-vertical.ui-slider { position: relative;}
+.audio6_html5.blackControllers .slider-vertical.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 9px; height: 16px; cursor: pointer; background:url(controllers/blackControllers/scrollerFaceOFF.png) 0 0 no-repeat; }
+.audio6_html5.blackControllers .slider-vertical.ui-slider .ui-slider-handle:hover {  background:url(controllers/blackControllers/scrollerFaceON.png) 0 0 no-repeat; }
+.audio6_html5.blackControllers .slider-vertical.ui-slider .ui-slider-range { position: absolute; z-index: 1; display: block; border: 0; }
+
+
+.audio6_html5.blackControllers .slider-vertical.ui-slider-vertical { width: 9px; height: 100px; }
+.audio6_html5.blackControllers .slider-vertical.ui-slider-vertical .ui-slider-handle { left: 0px; margin-left: 0px; margin-bottom: -16px;; border: 0; }
+.audio6_html5.blackControllers .slider-vertical.ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
+.audio6_html5.blackControllers .slider-vertical.ui-slider-vertical .ui-slider-range-min { bottom: 0; }
+.audio6_html5.blackControllers .slider-vertical.ui-slider-vertical .ui-slider-range-max { top: 0; }
+
+
+/* Component containers
+----------------------------------*/
+.audio6_html5.blackControllers .slider-vertical.ui-widget-content { /*background: #ff7800;*/}
+.audio6_html5.blackControllers .slider-vertical .ui-widget-header { /*background: #24ff00;*/ }
+
+
+/* Corner radius */
+.audio6_html5.blackControllers .slider-vertical.ui-corner-all {}
+
+/* Interaction states
+----------------------------------
+.audio6_html5.blackControllers .slider-vertical.ui-state-default {background: #000000; }
+.audio6_html5.blackControllers .slider-vertical.ui-state-hover { background: #FFF000;  }
+*/
+/*  scroller end */
