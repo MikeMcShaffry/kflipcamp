@@ -79,7 +79,8 @@ ul {
 	padding-left: 3%;
 	float: left;
 	padding-bottom: 2em;
-	height: 100%	
+    height: 100%;
+    text-align: center;
 }
 
 
@@ -101,6 +102,40 @@ ul {
   width: 100%;
 }
 
+
+.listener-group {
+    height: 25px;
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    background-color: rgb(54, 57, 62);
+    border-radius: 5px;
+    margin-bottom: 10px;
+
+ 
+}
+
+.listener-group .welcome {
+    font-family: 'PT Sans', sans-serif;
+    font-weight:bold;
+    font-size:17px;
+    color: #fff;
+}
+
+.listener-group .streaming {
+    font-family: 'PT Sans', sans-serif;
+    font-weight: bold;
+    font-size: 17px;
+    color: #fff;
+}
+
+.listener-group .count {
+    font-family: 'PT Sans', sans-serif;
+    font-weight:bold;
+    font-size:17px;
+    color: #fff;
+    float: right;
+}
 
 /* Login Page */
 
@@ -130,7 +165,7 @@ ul {
 .login.page .usernameInput {
   letter-spacing: 3px;
 }
-*/
+
 
 .login.page .title, .login.page .usernameInput {
   color: #000;
@@ -150,7 +185,7 @@ ul {
   margin-bottom:10px;
 }
 
-
+*/
 
 /* Chat page */
 
@@ -163,6 +198,7 @@ ul {
   /*font-size: 150%;*/
 }
 
+/*
 .inputMessage {
   font-size: 100%;
   display: none;
@@ -170,13 +206,14 @@ ul {
 
 .log {
   color: black;
-  /*font-size: 70%;*/
   margin: 5px;
   text-align: right;
 }
+    */
 
 /* Messages */
 
+/*
 .chatArea {
   height: 100%;
 }
@@ -205,9 +242,11 @@ ul {
   padding-right: 15px;
   text-align: right;
 }
+*/
 
 /* Input */
 
+/*
 .inputMessage {
   border: 2px solid #000;
   height: 60px;
@@ -219,6 +258,6 @@ ul {
   right: 0;
   margin-bottom:10px;
 }
-
+*/
 
 

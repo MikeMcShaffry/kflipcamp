@@ -74,6 +74,11 @@ $(function() {
     addMessageElement($el, options);
   }
 
+
+    const updateSchedule = (data, options) => {
+        console.log(data);
+    }
+
   // Adds the visual chat message to the message list
   const addChatMessage = (data, options) => {
     // Don't fade the message in if there is an 'X was typing'
@@ -235,6 +240,12 @@ $(function() {
     });
     addParticipantsMessage(data);
   });
+
+
+    // Whenever the server emits 'new message', update the chat body
+    socket.on('schedule', (data) => {
+        updateSchedule(data);
+    });
 
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', (data) => {
