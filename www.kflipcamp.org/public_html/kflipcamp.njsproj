@@ -18,6 +18,9 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
     <Content Include="package.json" />
+    <Content Include="public\event_calendar.css">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="Readme.md" />
     <Content Include="index.js" />
     <Content Include="index_busted.js" />
@@ -30,13 +33,13 @@
     <Content Include="lib\parent-namespace.js" />
     <Content Include="lib\socket.js" />
     <Content Include="public\index.html" />
-    <Content Include="public\audio6_html5.css" />
+    <Content Include="public\audio6_html5_kflip.css" />
     <Content Include="public\chat.css" />
     <Content Include="public\style.css" />
     <Content Include="public\kflip_background.png" />
     <Content Include="public\logo.png" />
     <Content Include="public\noimageavailable.jpg" />
-    <Content Include="public\main.js" />
+    <Content Include="public\main_event.js" />
     <Content Include="test\socket.io.js" />
     <Content Include="public\js\audio6_html5.js" />
     <Content Include="public\js\jquery.mousewheel.min.js" />
@@ -102,6 +105,12 @@
     <Folder Include="test" />
     <Folder Include="test\fixtures" />
     <Folder Include="test\support" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="events.js" />
+    <Compile Include="public\js\event_calendar.js">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->

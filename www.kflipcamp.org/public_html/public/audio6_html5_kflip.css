@@ -138,7 +138,7 @@ available controllers:
 	/*width: 120px;
 	height: 120px;*/
 	border-radius: 0;
-    object-fit: contain;
+    object-fit: scale-down;
 	/*border-style:solid;
 	-webkit-border-radius: 150px;
 	-moz-border-radius: 150px;*/
@@ -395,7 +395,7 @@ available controllers:
 /* thumbsOFF */
 .audio6_html5.whiteControllers .thumbsHolder_ThumbOFF {
 	display:block;
-	height:70px;
+	height:55px;
 	/*background:#000;*/
 	overflow:hidden;
 	border-bottom:1px solid;
@@ -410,7 +410,7 @@ available controllers:
 	letter-spacing:0.5px;
 	font-weight:normal;
 	display:inline-block;
-	font-size:18px;
+	font-size:15px;
 	line-height:1.5;
 	padding:0;
 	margin:0;
@@ -423,7 +423,7 @@ available controllers:
 .audio6_html5.whiteControllers .thumbsHolder_ThumbOFF .authorx {
 	font-family: 'PT Sans', sans-serif;
 	font-weight:normal;
-	font-size:14px;
+	font-size:10px;
 	line-height:2;
 	padding:0;
 	margin:0;
@@ -445,8 +445,8 @@ available controllers:
 	background-repeat:no-repeat;
 	background-position:top center;
 	background-size:cover;
-	width: 55px;
-	height: 55px;
+	width: 40px;
+	height: 40px;
 	float: left;
 	margin-right: 10px;
 }
@@ -569,7 +569,7 @@ available controllers:
 	/*width: 120px;
 	height: 120px;*/
 	border-radius: 0;
-    object-fit: contain;
+    object-fit: scale-down;
 	/*border-style:solid;
 	-webkit-border-radius: 150px;
 	-moz-border-radius: 150px;*/
@@ -826,7 +826,7 @@ available controllers:
 /* thumbsOFF */
 .audio6_html5.blackControllers .thumbsHolder_ThumbOFF {
 	display:block;
-	height:70px;
+	height:55px;
 	/*background:#000;*/
 	overflow:hidden;
 	border-bottom:1px solid;
@@ -841,7 +841,7 @@ available controllers:
 	letter-spacing:0.5px;
 	font-weight:normal;
 	display:inline-block;
-	font-size:18px;
+	font-size:15px;
 	line-height:1.5;
 	padding:0;
 	margin:0;
@@ -854,7 +854,7 @@ available controllers:
 .audio6_html5.blackControllers .thumbsHolder_ThumbOFF .authorx {
 	font-family: 'PT Sans', sans-serif;
 	font-weight:normal;
-	font-size:14px;
+	font-size:10px;
 	line-height:2;
 	padding:0;
 	margin:0;
