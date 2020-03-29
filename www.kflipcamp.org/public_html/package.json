@@ -25,20 +25,18 @@
     "test": "nyc mocha --reporter spec --slow 200 --bail --timeout 10000 test/socket.io.js"
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
     "debug": "~4.1.0",
     "engine.io": "~3.3.1",
     "express": "^4.17.1",
+    "googleapis": "^48.0.0",
     "has-binary2": "~1.0.2",
     "socket.io-adapter": "~1.1.0",
     "socket.io-client": "2.2.0",
     "socket.io-parser": "~3.3.0"
   },
   "devDependencies": {
-    "expect.js": "0.3.1",
-    "mocha": "^3.5.3",
-    "nyc": "^11.2.1",
-    "superagent": "^3.8.2",
-    "supertest": "^3.0.0"
+    "expect.js": "0.3.1"
   },
   "contributors": [
     {
