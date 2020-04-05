@@ -1,0 +1,10 @@
+{
+	"otto": {
+		"enabled": true,
+		"token": "NTk5MDYwNjcyODE4NzA4NDgx.XSgCuA.hmRFQsrmycFZsuggZBvHtVQHn1M",
+		"prefix" : "!",
+		"mychannelID" : "565965887287459848",		               
+		"use_nowplayingfile": false,
+		"nowplayingfile" : "C:/temp/MediaMonkey_NowPlaying.txt"
+	}
+}

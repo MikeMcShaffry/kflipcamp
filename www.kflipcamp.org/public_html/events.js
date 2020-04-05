@@ -83,9 +83,9 @@ function getEvents() {
 }
 
 
-function Start(scheduleChangeHandler) {
+function Start(_onScheduleChange) {
 
-    onScheduleChange = scheduleChangeHandler;
+    onScheduleChange = _onScheduleChange;
     if (!onScheduleChange) {
         console.log('WARNING - events.js would be more useful if there was a handler for schedule change events');
     }
