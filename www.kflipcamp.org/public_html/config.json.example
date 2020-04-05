@@ -1,0 +1,10 @@
+{
+	"otto": {
+		"enabled": false,
+		"token": "ADD YOUR DISCORD TOKEN HERE",
+		"prefix" : "!",
+		"mychannelID" : "ADD YOUR CHANNEL ID HERE",		               
+		"use_nowplayingfile": false,
+		"nowplayingfile" : "C:/temp/MediaMonkey_NowPlaying.txt"
+	}
+}
