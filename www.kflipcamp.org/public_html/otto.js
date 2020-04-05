@@ -33,7 +33,7 @@ var fs = require('fs');
 
 var oldfiledata ='oldfiledata';
 var newfiledata ='newfiledata';
-var mychannelID ; // #listener-lounge is 565965887287459848
+var mychannelID ; 
 var talk = 0 ;	// starting condition of silent
 var currentDJ = 'Now playing' ;
 var song_array = ["","","","","","","","","",""] ; // 10 element array. See https://www.w3schools.com/js/js_arrays.asp
@@ -43,13 +43,9 @@ var OutString ='Output string, used to dump the song array';
 
 let localFileNowPlayingInterval = null;						// If Otto is scanning a local MediaMonkey file, this will be set to the Interval checking it every two seconds
 
-if (config.enabled) {
-	Otto.login(config.token);
-}
-else {
-	console.log('Otto Discord integration is NOT enabled');
-}
-	// This event will run if the bot starts, and logs in, successfully.
+//
+// This event will run if the bot starts, and logs in, successfully.
+//
 Otto.on("ready", () => {
 
 	try {
@@ -61,7 +57,6 @@ Otto.on("ready", () => {
 
 		(async () => {
 			mychannelID = await Otto.channels.fetch(config.mychannelID);
-			//mychannelID = Otto.channels.get("599093293506363402");	// Bot Testing channel				// TODO CONFIGURATION - Move that to a config file
 			console.log(`Otto Logged in as ${Otto.user.tag}!`);
 			talk = 1;
 		})();
@@ -74,8 +69,9 @@ Otto.on("ready", () => {
 });
 
 
-
-  // This event will run on every single message received, from any channel or DM.
+//
+// This event will run on every single message received, from any channel or DM.
+//
 Otto.on("message", async message => {
 
 	try {
@@ -194,14 +190,6 @@ Otto.on("message", async message => {
 });	// end of on.message handling
 
 
-
-// TODO: Really should use fs.FSWatcher instead. See: https://stackoverflow.com/questions/35115444/nodejs-fs-fswatcher
-// set how often to call the nowPlaying function. Start with 2 seconds
-
-if (config.use_nowplayingfile) {
-	localFileNowPlayingInterval = setInterval(localFileNowPlaying, 2000);									
-}
-
 // Figure out if what's Now Playing has changed, update if so, then emit the currently playing info.
 function localFileNowPlaying() {
 	try {
@@ -221,7 +209,7 @@ function localFileNowPlaying() {
 					// TODO: handle the error of edit failure due to the message not actually existing anymore
 				}
 				// If I do NOT have an active message, send a new one and save it.
-				else {
+				else if (mychannelID) {
 					mychannelID.send(currentDJ + ' ' + newfiledata)
 						.then((sentMessage) => { my_message = sentMessage });
 				}
@@ -265,7 +253,7 @@ function UpdateNowPlaying(newsong) {
 					// TODO: handle the error of edit failure due to the message not actually existing anymore
 				}
 				// If I do NOT have an active message, send a new one and save it.
-				else {
+				else if (mychannelID) {
 					mychannelID.send(currentDJ + ' ' + newfiledata)
 						.then((sentMessage) => { my_message = sentMessage });
 				}
@@ -282,12 +270,34 @@ function UpdateNowPlaying(newsong) {
 		}
 	}
 	catch (err) {
-		console.log('Exception in Otto.UpdateNowPlaying - ' + err.message);
+		console.log('Exception in Otto.UpdateNowPlaying', err);
 	}
 
 }
 
+function Start() {
+	// TODO: Really should use fs.FSWatcher instead. See: https://stackoverflow.com/questions/35115444/nodejs-fs-fswatcher
+	// set how often to call the nowPlaying function. Start with 2 seconds
+	try {
+		if (config.enabled) {
+			Otto.login(config.token);
+		}
+		else {
+			console.log('Otto Discord integration is NOT enabled');
+		}
+		if (config.use_nowplayingfile) {
+			localFileNowPlayingInterval = setInterval(localFileNowPlaying, 2000);
+		}
+	}
+	catch (err) {
+		console.log('Exception in Otto.Start', err);
+	}
+
+}
+
+
 if (!module.exports.UpdateNowPlaying) {
+	module.exports.Start = Start;
 	module.exports.UpdateNowPlaying = UpdateNowPlaying;
 	module.exports.Enabled = config.enabled;
 }
