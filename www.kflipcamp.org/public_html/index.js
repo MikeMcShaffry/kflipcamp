@@ -128,6 +128,6 @@ io.on('connection',
         var currentStream = icecastInfo.GetCurrentStream();
         if (currentStream) {
             socket.emit('nowplaying', { stream: currentStream });
-            socket.emit('shoutingfire', { listeners: ShoutingFireListeners });
+            socket.emit('shoutingfire', { listeners: shoutingFireListeners });
         }
     });
