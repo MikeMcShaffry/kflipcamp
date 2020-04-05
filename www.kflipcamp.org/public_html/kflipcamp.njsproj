@@ -23,7 +23,6 @@
     </Content>
     <Content Include="Readme.md" />
     <Content Include="index.js" />
-    <Content Include="index_busted.js" />
     <Content Include="docs\API.md" />
     <Content Include="docs\emit.md" />
     <Content Include="docs\README.md" />
