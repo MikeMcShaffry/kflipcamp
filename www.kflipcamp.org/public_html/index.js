@@ -20,7 +20,7 @@ var port = process.env.PORT || 3000;
 
 
 var events = require('./events.js');
-var icecastInfo = require('./icecastInfo.js');
+var icecastInfo = require('./icecastinfo.js');
 var otto = require('./otto.js');
 
 
