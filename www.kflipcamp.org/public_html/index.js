@@ -79,6 +79,8 @@ function onShoutingFireUpdated(_shoutingFireListeners) {
 // server.listen - launches the listen port for the website
 //
 server.listen(port, () => {
+
+    otto.Start();
     events.Start(onScheduleChange);
     icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
     icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
@@ -135,3 +137,16 @@ io.on('connection',
             socket.emit('shoutingfire', { listeners: shoutingFireListeners });
         }
     });
+
+
+//
+// Avoids the process shutting down due to an unhandled promise rejection or unhandled exceptions
+//
+process.on('unhandledRejection', error => {
+    console.log('unhandledRejection', error.message);
+});
+
+
+process.on('uncaughtException', error => {
+    console.log('unchaughtException ', error.message);
+});
