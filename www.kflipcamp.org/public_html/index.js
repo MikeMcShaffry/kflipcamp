@@ -68,7 +68,9 @@ function onSomethingNewPlaying(streamInfo, listenerCount) {
     }
 }
 
-function onShoutingFireUpdated(shoutingFireListeners) {
+let shoutingFireListeners = 0;
+function onShoutingFireUpdated(_shoutingFireListeners) {
+    shoutingFireListeners = _shoutingFireListeners;
     io.emit('shoutingfire', { listeners: shoutingFireListeners });
 }
 
@@ -128,6 +130,8 @@ io.on('connection',
         var currentStream = icecastInfo.GetCurrentStream();
         if (currentStream) {
             socket.emit('nowplaying', { stream: currentStream });
+        }
+        if (shoutingFireListeners) {
             socket.emit('shoutingfire', { listeners: shoutingFireListeners });
         }
     });
