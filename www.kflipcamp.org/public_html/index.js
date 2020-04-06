@@ -7,21 +7,22 @@
 
 
 // Setup basic express server
-var express = require('express');
-var bodyParser = require("body-parser");
-var app = express();
+const express = require('express');
+const bodyParser = require("body-parser");
+const app = express();
 
-var path = require('path');
-var server = require('http').createServer(app);
+const path = require('path');
+const server = require('http').createServer(app);
 
 // Socket.io listens on port 3000 (or configured environment variable) for events like the song or DJ calendar changing
-var io = require('.')(server);
+const io = require('.')(server);
 var port = process.env.PORT || 3000;
 
 
-var events = require('./events.js');
-var icecastInfo = require('./icecastinfo.js');
-var otto = require('./otto.js');
+const events = require('./events.js');
+const icecastInfo = require('./icecastinfo.js');
+const otto = require('./otto.js');
+const library = require('./library.js');
 
 
 //
@@ -78,14 +79,21 @@ function onShoutingFireUpdated(_shoutingFireListeners) {
 //
 // server.listen - launches the listen port for the website
 //
-server.listen(port, () => {
+server.listen(port, async () => {
 
-    otto.Start();
-    events.Start(onScheduleChange);
-    icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
-    icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
+    try {
+        otto.Start();
+        events.Start(onScheduleChange);
+        icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
+        icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
+        library.Start();
 
-    console.log('Server listening at port %d', port);
+        console.log('Server listening at port %d', port);
+    }
+    catch (err) {
+        console.log('CRITICAL ERROR - Exception in server.listen', err);
+        process.exit();
+    }
 });
 
 // Routing API calls for the web site - first the static routes that serve files and directories of files
@@ -98,18 +106,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //
-// POST /makerequest
+// GET /search
 //
-app.post('/makerequest', function (req, res) {
+app.get('/search', async function (req, res) {
+    let results = [];
     try {
-        var song = req.body.song;
-        var artist = req.body.artist;   
-        console.log("Song = " + song + ", artist is " + artist);
+        if (req.body.by === 'artist') {
+            var artist = req.body.artist; 
+            results = await library.SearchByArtist(artist);
+        }
     }
     catch (err) {
-        console.log('Error detected in POST newsong: ' + err.message);
+        console.log('Error detected in POST /search: ' + err.message);
     }
-    res.end("ok");
+
+    res.end(JSON.stringify(results));
 });
 
 

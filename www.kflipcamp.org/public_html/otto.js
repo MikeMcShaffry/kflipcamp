@@ -145,8 +145,7 @@ Otto.on("message", async message => {
 
 		// Echo the available commands
 		if (command === "help") {
-			message.channel.send('!shaddap to make me shut up \n !talk starts me talking \n !intro sets the DJ "now playing" text \n !np shows the currently playing track \n !last shows the last 10 songs played.'
-			);
+			message.channel.send('!shaddap to make me shut up \n !talk starts me talking \n !intro sets the DJ "now playing" text \n !np shows the currently playing track \n !last shows the last 10 songs played.');
 			return;
 		}
 
@@ -281,18 +280,27 @@ function Start() {
 	try {
 		if (config.enabled) {
 			Otto.login(config.token);
+
+			if (config.use_nowplayingfile) {
+				localFileNowPlayingInterval = setInterval(localFileNowPlaying, 2000);
+			}
 		}
 		else {
-			console.log('Otto Discord integration is NOT enabled');
-		}
-		if (config.use_nowplayingfile) {
-			localFileNowPlayingInterval = setInterval(localFileNowPlaying, 2000);
+			console.log('Otto Discord integration is NOT enabled - check config.json');
 		}
 	}
 	catch (err) {
 		console.log('Exception in Otto.Start', err);
 	}
 
+}
+
+//
+// Running otto locally - node otto.js will execute this code and check the use_nowplayingfile config setting
+//
+if (config.use_nowplayingfile) {
+	console.log('Running Otto locally');
+	Start();
 }
 
 
