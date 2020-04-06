@@ -20,6 +20,9 @@
     <Content Include="icecastinfo.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="library.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="package.json" />
     <Content Include="public\event_calendar.css">
       <SubType>Code</SubType>
