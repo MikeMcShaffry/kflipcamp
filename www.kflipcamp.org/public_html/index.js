@@ -222,10 +222,10 @@ io.on('connection',
 // Avoids the process shutting down due to an unhandled promise rejection or unhandled exceptions
 //
 process.on('unhandledRejection', error => {
-    console.log('unhandledRejection', error.message);
+    console.log('unhandledRejection', error);
 });
 
 
 process.on('uncaughtException', error => {
-    console.log('unchaughtException ', error.message);
+    console.log('unchaughtException ', error);
 });
