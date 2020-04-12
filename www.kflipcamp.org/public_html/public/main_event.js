@@ -14,6 +14,7 @@ $(function() {
     var $eventList = $(".event-calendar");   // Google calender event-list
     var $listeners = $(".listener-group .count");
     var $streaming = $(".listener-group .streaming");
+    var $albumimage = $(".albumimage");
 
     var $heroPlayer = $(".audio6_html5"); 
 
@@ -209,11 +210,22 @@ $(function() {
             if (mustUpdateListeners) {
                 updateListeners();
             }
-            $heroPlayer.jqHandleNowPlaying(whichStreamIsBroadcasting);
+
+            if ($heroPlayer.length > 0) {
+                $heroPlayer.jqHandleNowPlaying(whichStreamIsBroadcasting);
+            }
         }
     });
 
 
+    socket.on('albuminfo', (data) => {
+
+        console.log(`New album information received - image ${data.message.image}`);
+        if ($albumimage.length > 0) {
+            $albumimage.attr("src", data.message.image);
+        }
+
+    })
 
   socket.on('disconnect', () => {
 

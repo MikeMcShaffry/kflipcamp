@@ -9,18 +9,6 @@ html {
   -webkit-font-smoothing: antialiased;
 }
 
-/**
-html, input {
-  font-family:
-    "HelveticaNeue-Light",
-    "Helvetica Neue Light",
-    "Helvetica Neue",
-    Helvetica,
-    Arial,
-    "Lucida Grande",
-    sans-serif;
-}
-*/
 
 
 html {
@@ -137,127 +125,21 @@ ul {
     float: right;
 }
 
-/* Login Page */
 
-/*
-.login.page {
-  background-color: #000;
+/* Album Art  */
+
+.albumimagearea {
+    width: 100%;
+    max-width: 435px;
+    min-width: 100px;
+    background-color: rgb(0, 0, 0);
+    float: left;
 }
 
-.login.page .form {
-  text-align: center;
-  top: 50%;
+.albumimagearea .albumimage {
+   max-height: 300px;
+   object-fit:scale-down;
 }
 
-.login.page .form .usernameInput {
-  background-color: transparent;
-  border: none;
-  border-bottom: 2px solid #fff;
-  outline: none;
-  padding-bottom: 15px;
-  text-align: center;
-}
-
-.login.page .title {
-  font-size: 200%;
-}
-
-.login.page .usernameInput {
-  letter-spacing: 3px;
-}
-
-
-.login.page .title, .login.page .usernameInput {
-  color: #000;
-  font-weight: 100;
-}
-
-
-.usernameInput {
-  border: 2px solid #0F0;
-  height: 60px;
-  left: 0;
-  outline: none;
-  width: 100%;
-  float: bottom;
-  padding-left: 10px;
-  right: 0;
-  margin-bottom:10px;
-}
-
-*/
-
-/* Chat page */
-
-.chat.page {
-}
-
-/* Font */
-
-.messages {
-  /*font-size: 150%;*/
-}
-
-/*
-.inputMessage {
-  font-size: 100%;
-  display: none;
-}
-
-.log {
-  color: black;
-  margin: 5px;
-  text-align: right;
-}
-    */
-
-/* Messages */
-
-/*
-.chatArea {
-  height: 100%;
-}
-
-.chatOverlayArea {
-	height: 100%;
-	margin:0;
-    overflow-y: scroll;
-    background-color: transparent;
-}
-
-.messages {
-  height: 100%;
-  margin: 0;
-  overflow-y: scroll;
-  padding-inline-start: 15px;
-}
-
-.message.typing .messageBody {
-  color: gray;
-}
-
-.username {
-  font-weight: 700;
-  overflow: hidden;
-  padding-right: 15px;
-  text-align: right;
-}
-*/
-
-/* Input */
-
-/*
-.inputMessage {
-  border: 2px solid #000;
-  height: 60px;
-  left: 0;
-  outline: none;
-  width: 100%;
-  float: bottom;
-  padding-left: 10px;
-  right: 0;
-  margin-bottom:10px;
-}
-*/
 
 

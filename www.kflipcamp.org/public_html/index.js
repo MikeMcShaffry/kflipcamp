@@ -43,6 +43,28 @@ function updateKflipListenerCount(listeners) {
 
 
 //
+// onAlbumInfoChange - called by the lastfm.js module whenever the album info cahnges - it emits the new album info to all connected browsers
+//
+var albumInfo = null;
+function onAlbumInfoChange(albumSummary, albumImage) {
+
+    albumInfo = { summary: albumSummary, image: albumImage };
+
+    let keys = Object.keys(io.sockets.sockets);
+
+    keys.forEach(function (key) {
+        const connectedSocket = io.sockets.sockets[key];
+        connectedSocket.emit('albuminfo',
+            {
+                username: 'KFLIP',
+                message: albumInfo
+            });
+    });
+}
+
+
+
+//
 // onScheduleChange - called by the events.js module whenever the schedule cahnges - it emits the new schedule to all connected browsers
 //
 var kflipShowString = null;
@@ -98,6 +120,7 @@ server.listen(port, async () => {
         icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
         icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
         library.Start();
+        lastfm.Start(onAlbumInfoChange);
 
         console.log('Server listening at port %d', port);
     }
@@ -174,6 +197,15 @@ io.on('connection',
                     username: 'KFLIP',
                     message: kflipShowString
                 });
+        }
+
+        if (albumInfo) {
+            socket.emit('albuminfo',
+                {
+                    username: 'KFLIP',
+                    message: albumInfo
+                });
+
         }
 
         var currentStream = icecastInfo.GetCurrentStream();
