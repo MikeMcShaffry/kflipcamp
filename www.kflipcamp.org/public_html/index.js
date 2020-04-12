@@ -23,7 +23,11 @@ const events = require('./events.js');
 const icecastInfo = require('./icecastinfo.js');
 const otto = require('./otto.js');
 const library = require('./library.js');
+const lastfm = require('./lastfm.js');
 
+
+// Stores the last title information from icecast stats - it is in the form of artist - song - album
+let title = '';
 
 //
 // updateKflipListenerCount(listeners) - emits the number of current listeners to any connected browser
@@ -61,11 +65,18 @@ function onScheduleChange(eventList) {
 
 // onSomethingNewPlaying() - called by icecastinfo.js whenever a stream change happens or something new is playing
 function onSomethingNewPlaying(streamInfo, listenerCount) {
+
+    title = streamInfo.title;
+
     console.log('Now playing: ' + streamInfo.title + ' (' + listenerCount + ') listeners');
     io.emit('nowplaying', { stream: streamInfo });
 
     if (otto.Enabled) {
         otto.UpdateNowPlaying(streamInfo.title);
+    }
+
+    if (lastfm.Enabled) {
+        lastfm.UpdateNowPlaying(streamInfo.title);
     }
 }
 
@@ -105,6 +116,30 @@ app.use('/controllers', express.static(path.join(__dirname, 'public/controllers'
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+
+//
+// GET /nowplaying/albumimage
+//
+app.get('/nowplaying/albumimage', async function (req, res) {
+    res.end(lastfm.AlbumImage);
+})
+
+//
+// GET /nowplaying/albumsummary
+//
+app.get('/nowplaying/albumsummary', async function (req, res) {
+    res.end(lastfm.AlbumSummary);
+})
+
+
+//
+// GET /nowplaying/title
+//
+app.get('/nowplaying/title', async function (req, res) {
+    res.end(title);
+})
+
+
 //
 // GET /search
 //
@@ -122,6 +157,7 @@ app.get('/search', async function (req, res) {
 
     res.end(JSON.stringify(results));
 });
+
 
 
 //
