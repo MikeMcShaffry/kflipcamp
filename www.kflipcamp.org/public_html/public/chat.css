@@ -133,6 +133,7 @@ ul {
     max-width: 435px;
     min-width: 100px;
     background-color: rgb(0, 0, 0);
+    border-radius: 5px;
     float: left;
 }
 
