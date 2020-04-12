@@ -11,8 +11,6 @@ html {
     min-width: 435px;
     display: inline-block;
     background-color: #eeeeee;
-    float: left;
-    border-radius: 5px;
 }
 
 .event-calendar-scroll {
