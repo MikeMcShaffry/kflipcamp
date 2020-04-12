@@ -5,7 +5,6 @@
   <title>KFLIP CAMP</title>
   <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700,700i" rel="stylesheet">  
   <link rel="stylesheet" href="chat.css"> 
-  <link rel="stylesheet" href="audio6_html5_kflip.css" type="text/css"> 
   <link rel="stylesheet" href="event_calendar.css" type="text/css"> 
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
@@ -40,7 +39,13 @@
 		</div>
 		<div class="content-column-right">
 
-			<div id="myradiodivcontainer" style='height:435px; width:100%;
+			<div class="albumimagearea">
+				<img class="albumimage" src="logo.png">
+			</div>
+
+			<div class="xl-trans-spacer"></div>
+
+			<div id="myradiodivcontainer" style='height:65px; width:435px;
 -webkit-border-top-left-radius: 5px;
   -webkit-border-top-right-radius: 5px;
   -webkit-border-bottom-right-radius: 5px;
@@ -54,7 +59,7 @@
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
   border: 0px none rgb(255, 255, 255);'>
-				<div style="overflow:hidden; height:0px; width:0px;"><a href="https://www.flashradio.info" title="native html internet radio player plugin">NATIVE INTERNET WEB RADIO PLAYER PLUGIN FOR SHOUTCAST, ICECAST AND RADIONOMY</a> powered by <a href="https://www.sodah.de" title="wordpress webdesign mainz">Sodah Webdesign Mainz</a></div>
+				<div style="overflow:hidden; height:0px; width:0px;"><a href="https://www.flashradio.info/" title="native html internet radio player plugin">NATIVE INTERNET WEB RADIO PLAYER PLUGIN FOR SHOUTCAST, ICECAST AND RADIONOMY</a> powered by <a href="https://www.sodah.de/" title="wordpress webdesign mainz">Sodah Webdesign Mainz</a></div>
 			</div>
 
 			<div class="xl-trans-spacer"></div>
@@ -78,45 +83,44 @@
   
 </body>
 
-    <!-- must have -->
 <script>
-$("#myradiodivcontainer").flashradio({
-	token: "eHh4L2xnbWpxZGJucS9wc2gB",
-	userinterface: "big",
-	bigcoverstyle: "square",
-	backgroundcolor: "",
-	themecolor: "#63756d", 
-	themefontcolor: "#ffffff", 
-	startvolume: "100", 
-	radioname: "", 
-	scroll: "auto", 
-	autoplay: "false", 
-	useanalyzer: "fake", 
-	analyzertype: "4", 
-	usecover: "true", 
-	usestreamcorsproxy: "false", 
-	getcoveroverradioco: "true",
-	affiliatetoken: "1000lIPN", 
-	debug: "false", 
-	ownsongtitleurl: "", 
-	radiocover: "", 
-	songgooglefontname: "", 
-	songfontname: "", 
-	titlegooglefontname: "", 
-	titlefontname: "", 
-	corsproxy: "php", 
-	streamprefix: "", 
-	mountpoint: "/kflip", 
-	radiouid: "", 
-	apikey: "",
-	radiojar: "",  
-	radioco: "",  
-	streamid: "1", 
-	streampath: "/live", 
-	streamtype: "icecast2", 
-	streamurl: "http://www.kflipcamp.org:8000", 
-	songinformationinterval: "5000", 
-});
-</script>	
+	$("#myradiodivcontainer").flashradio({
+        token: "eHh4L2xnbWpxZGJucS9wc2gB",
+		userinterface: "small",
+		bigcoverstyle: "square",
+		backgroundcolor: "",
+		themecolor: "#add4ff",
+		themefontcolor: "#ffffff",
+		startvolume: "100",
+		radioname: "KFLiP",
+		scroll: "auto",
+		autoplay: "false",
+		useanalyzer: "real",
+		analyzertype: "6",
+		usecover: "false",
+		usestreamcorsproxy: "false",
+		getcoveroverradioco: "true",
+		affiliatetoken: "1000lIPN",
+		debug: "false",
+		ownsongtitleurl: "http://www.kflipcamp.org/nowplaying/title",
+		radiocover: "",
+		songgooglefontname: "Oswald:wght@300",
+		songfontname: "Oswald",
+		titlegooglefontname: "Oswald:400",
+		titlefontname: "Oswald",
+		corsproxy: "php",
+		streamprefix: "",
+		mountpoint: "/kflip",
+		radiouid: "",
+		apikey: "",
+		radiojar: "",
+		radioco: "",
+		streamid: "1",
+		streampath: "/live",
+		streamtype: "icecast2",
+		streamurl: "http://www.kflipcamp.org:8000/",
+		songinformationinterval: "5000",
+	});
+    </script>
 
 </html>

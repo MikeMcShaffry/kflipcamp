@@ -19,10 +19,18 @@ const Strings = {
 let AlbumSummary = Strings.NoAlbumSummaryAvailable;
 let AlbumImage = config.noAlbumImageAvailable;
 
+let onAlbumInfoChange = null;
+
 //
 // Start - checks the configuration of lastfm
 //
-async function Start() {
+async function Start(_onAlbumInfoChange) {
+
+    onAlbumInfoChange = _onAlbumInfoChange;
+    if (!onAlbumInfoChange) {
+        console.log('WARNING - lastfm.js would be more useful if there was a handler for album info change events');
+    };
+
     if (config.enabled) {
         console.log('LastFm module is started')
     }
@@ -220,6 +228,9 @@ function ParseLastFmAlbumInfo(lastFmJson) {
         }
 
         console.log(`LastFM found album image for artist ${lastArtist} off ${lastAlbum}`);
+        if (onAlbumInfoChange) {
+            onAlbumInfoChange(AlbumSummary, AlbumImage);
+        }
     }
     catch (err) {
         console.log('Exception in parseLastFmAlbumInfo', err);
