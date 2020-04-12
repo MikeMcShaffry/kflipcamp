@@ -233,6 +233,8 @@ function localFileNowPlaying() {
 function UpdateNowPlaying(newsong) {
 
 	try {
+		newsong = newsong.replace('[Shouting Fire] ', '');
+
 		if (config.use_nowplayingfile) {
 			// Otto is running by scanning a local file
 			return;

@@ -41,9 +41,24 @@ async function Start(_onAlbumInfoChange) {
 // SetToUnkown() - Called when the album info is not available
 //
 function SetToUnknown() {
-    console.log(`No LastFM information for artist ${lastArtist} off ${lastAlbum}`);
-    AlbumSummary = Strings.NoAlbumSummaryAvailable;
-    AlbumImage = config.noAlbumImageAvailable;
+    console.log(`No LastFM album information for artist ${lastArtist} off ${lastAlbum}`);
+    let sendUpdate = false;
+
+    if (AlbumSummary !== Strings.NoAlbumSummaryAvailable) {
+        AlbumSummary = Strings.NoAlbumSummaryAvailable;
+        sendUpdate = true;
+    }
+
+    if (AlbumImage !== config.noAlbumImageAvailable) {
+        AlbumImage = config.noAlbumImageAvailable;
+        sendUpdate = true;
+    }
+
+    if (sendUpdate) {
+        if (onAlbumInfoChange) {
+            onAlbumInfoChange(AlbumSummary, AlbumImage);
+        }
+    }
 }
 
 //
@@ -53,27 +68,34 @@ function SetToUnknown() {
 let lastArtist = '';
 let lastAlbum = '';
 async function UpdateNowPlaying(title) {
-    if (config.enabled === false) {
-        return;
-    }
-
-    // JingleRotation script sends title string like - The Beatles - All Together Now off *The Yellow Submarine*
-    let allParts = title.match(/(.+) - (.+) off \*(.+)\*$/);
-    if (allParts.length !== 4) {
-        SetToUnknown();
-    }
-
-    lastArtist = allParts[1];
-    lastAlbum = allParts[3];
-
-
-
-    var url = encodeURI(`http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${config.apikey}&artist=${lastArtist}&album=${lastAlbum}&format=json`);
-
-    console.log(`Asking LastFM about ${lastArtist} - ${allParts[2]} off *${lastAlbum}*`);
-    console.log(url);
+    let allParts = null;
 
     try {
+        if (config.enabled === false) {
+            return;
+        }
+
+        if (title.includes('[Shouting Fire]')) {
+            SetToUnknown();
+            return;
+        }
+
+
+        // JingleRotation script sends title string like - The Beatles - All Together Now off *The Yellow Submarine*
+        allParts = title.match(/(.+) - (.+) off \*(.+)\*$/);
+        if (!allParts || allParts.length !== 4) {
+            SetToUnknown();
+            return;
+        }
+
+        lastArtist = allParts[1];
+        lastAlbum = allParts[3];
+
+        var url = encodeURI(`http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${config.apikey}&artist=${lastArtist}&album=${lastAlbum}&format=json`);
+
+    //console.log(`Asking LastFM about ${lastArtist} - ${allParts[2]} off *${lastAlbum}*`);
+    //console.log(url);
+
         var req = http.get(url,
             function (res) {
                 //console.log('STATUS: ' + res.statusCode);
@@ -90,7 +112,7 @@ async function UpdateNowPlaying(title) {
                             var body = Buffer.concat(bodyChunks);
 
                             ParseLastFmAlbumInfo(body.toString());
-                            console.log(`Album image is set to ${AlbumImage}`);
+                            //console.log(`Album image is set to ${AlbumImage}`);
 
                             //console.log('BODY: ' + body);
                         });
@@ -206,6 +228,7 @@ function ParseLastFmAlbumInfo(lastFmJson) {
 
         AlbumImage = config.noAlbumImageAvailable;
         if (!albumInfo.image) {
+            SetToUnknown();
             return;
         }
 
@@ -227,7 +250,7 @@ function ParseLastFmAlbumInfo(lastFmJson) {
             }
         }
 
-        console.log(`LastFM found album image for artist ${lastArtist} off ${lastAlbum}`);
+        //console.log(`LastFM found album image for artist ${lastArtist} off ${lastAlbum}`);
         if (onAlbumInfoChange) {
             onAlbumInfoChange(AlbumSummary, AlbumImage);
         }
