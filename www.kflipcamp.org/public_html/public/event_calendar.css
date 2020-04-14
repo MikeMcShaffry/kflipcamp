@@ -7,8 +7,10 @@ html {
 }
 
 .event-calendar-container {
+    width: 100%;
     max-width: 435px;
-    min-width: 435px;
+    min-width: 300px;
+    float: left;
     display: inline-block;
     background-color: #eeeeee;
 }
