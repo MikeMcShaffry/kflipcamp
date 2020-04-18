@@ -1,9 +1,20 @@
 {
+	"lastfm": {
+		"enabled": false,
+		"apikey": "--YOUR LASTFM API KEY--",
+		"apisecret": "--YOUR LASTFM API SECRET--",
+		"applicationName": "",
+		"registeredTo": "--YOUR LASTFM USERNAME--",
+		"noAlbumImageAvailable":  "http://MYDOMAIN/logo.png"
+	},
+	"library": {
+		"databasefile": "./data/MM.DB"
+	},
 	"otto": {
 		"enabled": false,
-		"token": "ADD YOUR DISCORD TOKEN HERE",
+		"token": "--YOUR DISCORD TOKEN--",
 		"prefix" : "!",
-		"mychannelID" : "ADD YOUR CHANNEL ID HERE",		               
+		"mychannelID" : "--YOUR CHANNEL ID--",		               
 		"use_nowplayingfile": false,
 		"nowplayingfile" : "C:/temp/MediaMonkey_NowPlaying.txt"
 	}

@@ -103,8 +103,8 @@ function onSomethingNewPlaying(streamInfo, listenerCount) {
 }
 
 let shoutingFireListeners = 0;
-function onShoutingFireUpdated(_shoutingFireListeners) {
-    shoutingFireListeners = _shoutingFireListeners;
+function onShoutingFireUpdated(shoutingFireListenerCallback) {
+    shoutingFireListeners = shoutingFireListenerCallback;
     io.emit('shoutingfire', { listeners: shoutingFireListeners });
 }
 
@@ -143,27 +143,30 @@ app.use(bodyParser.json());
 //
 // GET /nowplaying/albumimage
 //
-app.get('/nowplaying/albumimage', async function (req, res) {
-    res.set('Content-Type', 'text/html');
-    res.end(lastfm.AlbumImage);
-})
+app.get('/nowplaying/albumimage',
+    async function(req, res) {
+        res.set('Content-Type', 'text/html');
+        res.end(lastfm.AlbumImage);
+    });
 
 //
 // GET /nowplaying/albumsummary
 //
-app.get('/nowplaying/albumsummary', async function (req, res) {
-    res.set('Content-Type', 'text/html');
-    res.end(lastfm.AlbumSummary);
-})
+app.get('/nowplaying/albumsummary',
+    async function(req, res) {
+        res.set('Content-Type', 'text/html');
+        res.end(lastfm.AlbumSummary);
+    });
 
 
 //
 // GET /nowplaying/title
 //
-app.get('/nowplaying/title', async function (req, res) {
-    res.set('Content-Type', 'text/html');
-    res.end(title);
-})
+app.get('/nowplaying/title',
+    async function(req, res) {
+        res.set('Content-Type', 'text/html');
+        res.end(title);
+    });
 
 
 //
