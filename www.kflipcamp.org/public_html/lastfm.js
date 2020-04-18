@@ -5,8 +5,6 @@
 //
 // The source code contained herein is open source under the MIT licence
 
-const sqlite = require('sqlite-async');
-const fs = require('fs');
 const http = require('http');
 
 

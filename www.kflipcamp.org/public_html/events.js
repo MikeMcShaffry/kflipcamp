@@ -39,7 +39,7 @@ async function getEventList() {
 
 
 // Variables that hold calendar information
-let EventList = null;                               // an array of scheduled events
+let eventList = null;                               // an array of scheduled events
 let onScheduleChange = null;                        // a callback function to handle schedule changes
 let lastScheduleSentWasUpdated = null;              // the date of the last schedule change (stored at Google calendar)
 let lastScheduleItemCount = 0;                      // the number of scheduled events
@@ -50,22 +50,22 @@ let lastScheduleItemCount = 0;                      // the number of scheduled e
 async function getEventsAsync() {
 
     try {
-        EventList = await getEventList();
-        const currentUpdated = new Date(EventList.data.updated);
-        const itemCount = EventList.data.items.length;
+        eventList = await getEventList();
+        const currentUpdated = new Date(eventList.data.updated);
+        const itemCount = eventList.data.items.length;
 
         if (!lastScheduleSentWasUpdated ||
             lastScheduleSentWasUpdated < currentUpdated ||
-            lastScheduleItemCount != itemCount) {
+            lastScheduleItemCount !== itemCount) {
             //if (true) {
             console.log('A new schedule for everyone! Sending the latest schedule with ' +
-                EventList.data.items.length +
+                eventList.data.items.length +
                 ' events');
             lastScheduleSentWasUpdated = currentUpdated;
             lastScheduleItemCount = itemCount;
 
             if (onScheduleChange) {
-                onScheduleChange(EventList);
+                onScheduleChange(eventList);
             }
         }
     } catch (err) {
@@ -83,9 +83,9 @@ function getEvents() {
 }
 
 
-function Start(_onScheduleChange) {
+function start(scheduleChangeCallback) {
 
-    onScheduleChange = _onScheduleChange;
+    onScheduleChange = scheduleChangeCallback;
     if (!onScheduleChange) {
         console.log('WARNING - events.js would be more useful if there was a handler for schedule change events');
     }
@@ -98,7 +98,7 @@ function Start(_onScheduleChange) {
 }
 
 if (!module.exports.Start) {
-    module.exports.Start = Start;
-    module.exports.EventList = EventList;
+    module.exports.Start = start;
+    module.exports.EventList = eventList;
 }
 

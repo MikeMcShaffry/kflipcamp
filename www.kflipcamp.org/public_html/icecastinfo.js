@@ -56,7 +56,7 @@ function checkForSomethingNew(newIcecastStatsJson) {
             return;
     }
     catch (err) {
-        if (icecastStatsParseError == false) {
+        if (icecastStatsParseError === false) {
             console.log('Exception in icecast stats - ' + err.message + ' with ' + newIcecastStatsJson);
             icecastStatsParseError = true;
         }

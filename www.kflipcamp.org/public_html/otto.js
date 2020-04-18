@@ -84,7 +84,7 @@ Otto.on("message", async message => {
 		// Any message w/o our command prefix resets the message ID,
 		// so it won't delete the most recent song announcement, because it was talked about.
 		if (message.content.indexOf(config.prefix) !== 0) {
-			if (message.channel == mychannelID) { // ONLY if the message was in the now-talking channel
+			if (message.channel === mychannelID) { // ONLY if the message was in the now-talking channel
 				my_message = 0;		// set this to 0, so it won't delete the most recent song announcement, because it was talked about.
 			}
 			return;
@@ -104,7 +104,7 @@ Otto.on("message", async message => {
 			var ii = 0;
 			OutString = '';
 			for (i = 0; i < song_array.length; i++) {
-				if (song_array[i] != '') {
+				if (song_array[i] !== '') {
 					ii++;
 					OutString = OutString + (song_array[i] + '.\n');
 				}
@@ -145,7 +145,7 @@ Otto.on("message", async message => {
 
 		// Echo the available commands
 		if (command === "help") {
-			message.channel.send('!shaddap to make me shut up \n !talk starts me talking \n !intro sets the DJ "now playing" text \n !np shows the currently playing track \n !last shows the last 10 songs played.');
+			message.channel.send('Commands are \n !shaddap to make me shut up \n !talk starts me talking \n !intro sets the DJ "now playing" text \n !np shows the currently playing track \n !last shows the last 10 songs played.');
 			return;
 		}
 
@@ -184,7 +184,7 @@ Otto.on("message", async message => {
 	}
 
 	catch (err) {
-		console.log('Exceptin in Otto on message - ' + err.message);
+		console.log('Exception in Otto on message - ' + err.message);
     }
 });	// end of on.message handling
 
@@ -195,18 +195,18 @@ function localFileNowPlaying() {
 		newfiledata = fs.readFileSync(config.nowplayingfile, 'utf8');
 
 		// If data changed, AND if we're talking, then announce the new song in channel
-		if (oldfiledata != newfiledata) {
+		if (oldfiledata !== newfiledata) {
 			oldfiledata = newfiledata;
 
 
 			// IF I'm talking, find a way to display the Now Playing
-			if (talk == 1) {
+			if (talk === 1) {
 				// IF I have a currently active message, just edit it.
 				// TODO: handle the error of the message not actually existing anymore
-				if (my_message != 0) {
-					my_message.edit(currentDJ + ' ' + newfiledata)
-					// TODO: handle the error of edit failure due to the message not actually existing anymore
-				}
+				if (my_message !== 0) {
+                    my_message.edit(currentDJ + ' ' + newfiledata);
+                    // TODO: handle the error of edit failure due to the message not actually existing anymore
+                }
 				// If I do NOT have an active message, send a new one and save it.
 				else if (mychannelID) {
 					mychannelID.send(currentDJ + ' ' + newfiledata)
@@ -217,9 +217,9 @@ function localFileNowPlaying() {
 			// Even if NOT talking
 			// update the last_played_message_list - bump them all up one, add this to tail.
 			// since they default to empty, this works fine when we start.
-			for (i = 0; i < song_array.length - 1; i++) {
-				song_array[i] = song_array[i + 1]
-			}
+			for (let i = 0; i < song_array.length - 1; i++) {
+                song_array[i] = song_array[i + 1];
+            }
 			// TODO: Replace that [9] with .length
 			song_array[9] = newfiledata;
 		}
@@ -242,17 +242,17 @@ function UpdateNowPlaying(newsong) {
 
 		newfiledata = newsong;
 
-		if (oldfiledata != newfiledata) {
+		if (oldfiledata !== newfiledata) {
 			oldfiledata = newfiledata;
 
 			// IF I'm talking, find a way to display the Now Playing
-			if (talk == 1) {
+			if (talk === 1) {
 				// IF I have a currently active message, just edit it.
 				// TODO: handle the error of the message not actually existing anymore
-				if (my_message != 0) {
-					my_message.edit(currentDJ + ' ' + newfiledata)
-					// TODO: handle the error of edit failure due to the message not actually existing anymore
-				}
+				if (my_message !== 0) {
+                    my_message.edit(currentDJ + ' ' + newfiledata);
+                    // TODO: handle the error of edit failure due to the message not actually existing anymore
+                }
 				// If I do NOT have an active message, send a new one and save it.
 				else if (mychannelID) {
 					mychannelID.send(currentDJ + ' ' + newfiledata)
@@ -263,9 +263,9 @@ function UpdateNowPlaying(newsong) {
 			// Even if NOT talking
 			// update the last_played_message_list - bump them all up one, add this to tail.
 			// since they default to empty, this works fine when we start.
-			for (i = 0; i < song_array.length - 1; i++) {
-				song_array[i] = song_array[i + 1]
-			}
+			for (let i = 0; i < song_array.length - 1; i++) {
+                song_array[i] = song_array[i + 1];
+            }
 			// TODO: Replace that [9] with .length
 			song_array[9] = newfiledata;
 		}
