@@ -100,8 +100,11 @@ function checkForSomethingNew(newIcecastStatsJson) {
             listeners = firstStreamBroadcasting.listeners;
         }
 
-        // streamAreDifferent returns true if either the stream has changed or the song has changed
+        let streamChanged = false;
+
+        // streamAreDifferent returns true if the stream has changed
         if (streamsAreDifferent(broadcastingStream, firstStreamBroadcasting)) {
+            streamChanged = true;
             sameOldSong = false;
 
             if (!firstStreamBroadcasting) {
@@ -144,7 +147,7 @@ function checkForSomethingNew(newIcecastStatsJson) {
         }
 
         if (onSomethingNewPlaying) {
-            onSomethingNewPlaying(broadcastingStream, listeners);
+            onSomethingNewPlaying(broadcastingStream, listeners, streamChanged);
         }
 
 

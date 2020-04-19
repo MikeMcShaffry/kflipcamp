@@ -86,7 +86,7 @@ function onScheduleChange(eventList) {
 
 
 // onSomethingNewPlaying() - called by icecastinfo.js whenever a stream change happens or something new is playing
-function onSomethingNewPlaying(streamInfo, listenerCount) {
+function onSomethingNewPlaying(streamInfo, listenerCount, streamChanged) {
 
     title = streamInfo.title;
 
@@ -94,7 +94,7 @@ function onSomethingNewPlaying(streamInfo, listenerCount) {
     io.emit('nowplaying', { stream: streamInfo });
 
     if (otto.Enabled) {
-        otto.UpdateNowPlaying(streamInfo.title);
+        otto.UpdateNowPlaying(streamInfo.title, streamChanged);
     }
 
     if (lastfm.Enabled) {

@@ -43,6 +43,7 @@ let defaultIntro = `${currentDJ} is playing`;
 let currentIntro = defaultIntro;
 
 let onCurrentDJChanged = null;
+let onStreamChanged = null;
 
 var song_array = ["","","","","","","","","",""] ; // 10 element array. See https://www.w3schools.com/js/js_arrays.asp
 var my_message = 0;
@@ -262,7 +263,7 @@ function localFileNowPlaying() {
 }
 
 
-function UpdateNowPlaying(newsong) {
+function UpdateNowPlaying(newsong, streamChanged) {
 
 	try {
 		newsong = newsong.replace('[Shouting Fire] ', '');
@@ -300,7 +301,12 @@ function UpdateNowPlaying(newsong) {
             }
 			// TODO: Replace that [9] with .length
 			song_array[9] = newfiledata;
-		}
+        }
+
+        if (streamChanged) {
+            currentDJ = defaultDJ;
+            currentIntro = defaultIntro;
+        }
 	}
 	catch (err) {
 		console.log('Exception in Otto.UpdateNowPlaying', err);
