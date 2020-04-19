@@ -39,8 +39,7 @@ var talk = 0 ;	// starting condition of silent
 var defaultDJ = 'Otto-mation';
 var currentDJ = defaultDJ;
 
-let defaultIntro = `${currentDJ} is playing`;
-let currentIntro = defaultIntro;
+let currentIntro;
 
 let onCurrentDJChanged = null;
 let onStreamChanged = null;
@@ -160,18 +159,16 @@ Otto.on("message", async message => {
 
 		// Set the text displayed before the now playing track info
         if (command === "setdj") {
-            let newDj = null;
+            let currentDJ = defaultDJ;
             if (args.length !== 0) {
-                newDj = args.join(" ");
-                currentDJ = newDj;
-            } else {
-                currentDJ = defaultDJ;
+                currentDJ = args.join(" ");
             }
+            currentIntro = `${currentDJ} is playing`;
 
-            message.channel.send('Set DJ to ' + newDj + '.');
+            message.channel.send('Set DJ to ' + currentDJ + '.');
 
             if (onCurrentDJChanged) {
-                onCurrentDJChanged(newDj);
+                onCurrentDJChanged(currentDJ);
             }
 
 			return;
@@ -181,7 +178,7 @@ Otto.on("message", async message => {
             if (args.length !== 0) {
                 currentIntro = args.join(" ");
             } else {
-                currentIntro = defaultIntro;
+                currentIntro = `${currentDJ} is playing`;
             }
 
             message.channel.send('Intro changed to ' + currentIntro + '.');
@@ -305,7 +302,7 @@ function UpdateNowPlaying(newsong, streamChanged) {
 
         if (streamChanged) {
             currentDJ = defaultDJ;
-            currentIntro = defaultIntro;
+            currentIntro = `${currentDJ} is playing`;
         }
 	}
 	catch (err) {
@@ -318,7 +315,8 @@ function start(onCurrentDJChangedCallback) {
     // TODO: Really should use fs.FSWatcher instead. See: https://stackoverflow.com/questions/35115444/nodejs-fs-fswatcher
 	// set how often to call the nowPlaying function. Start with 2 seconds
 	try {
-		if (config.enabled) {
+        if (config.enabled) {
+
 			Otto.login(config.token);
 
 			if (config.use_nowplayingfile) {
@@ -328,6 +326,9 @@ function start(onCurrentDJChangedCallback) {
             if (onCurrentDJChangedCallback) {
                 onCurrentDJChanged = onCurrentDJChangedCallback;
             }
+
+
+
 		}
 		else {
 			console.log('Otto Discord integration is NOT enabled - check config.json');
@@ -350,7 +351,9 @@ if (config.use_nowplayingfile) {
 
 if (!module.exports.UpdateNowPlaying) {
 	module.exports.Start = start;
-	module.exports.UpdateNowPlaying = UpdateNowPlaying;
+    module.exports.UpdateNowPlaying = UpdateNowPlaying;
+    module.exports.CurrentDJ = currentDJ;
+    module.exports.DefaultDJ = defaultDJ;
 	module.exports.Enabled = config.enabled;
 }
 

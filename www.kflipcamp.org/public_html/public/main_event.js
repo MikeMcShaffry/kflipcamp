@@ -189,7 +189,7 @@ $(function() {
 
 
     function setHeaderText(dj) {
-        if (dj) {
+        if (dj !== 'Otto-mation') {
             $streaming.text(`- ${dj} is ON AIR!`);
             $("head title").text(`KFLIP CAMP - ${dj} is ON AIR!`);
         } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip') {
@@ -220,9 +220,9 @@ $(function() {
             }
 
             whichStreamIsBroadcasting = data.stream;
-            setHeaderText(null);
 
             if (mustUpdateListeners) {
+                setHeaderText('Otto-mation');
                 updateListeners();
             }
 
