@@ -159,7 +159,7 @@ Otto.on("message", async message => {
 
 		// Set the text displayed before the now playing track info
         if (command === "setdj") {
-            let currentDJ = defaultDJ;
+            currentDJ = defaultDJ;
             if (args.length !== 0) {
                 currentDJ = args.join(" ");
             }
