@@ -108,8 +108,9 @@ function onShoutingFireUpdated(shoutingFireListenerCallback) {
     io.emit('shoutingfire', { listeners: shoutingFireListeners });
 }
 
-
-function onCurrentDjChanged(currentDj) {
+let currentDj = '';
+function onCurrentDjChanged(newDj) {
+    currentDj = newDj;
     io.emit('newdj', currentDj);
 }
 
@@ -121,6 +122,7 @@ server.listen(port, async () => {
 
     try {
         otto.Start(onCurrentDjChanged);
+        currentDj = otto.CurrentDJ;
         events.Start(onScheduleChange);
         icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
         icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
@@ -216,7 +218,6 @@ io.on('connection',
                     username: 'KFLIP',
                     message: albumInfo
                 });
-
         }
 
         var currentStream = icecastInfo.GetCurrentStream();
@@ -226,6 +227,9 @@ io.on('connection',
         if (shoutingFireListeners) {
             socket.emit('shoutingfire', { listeners: shoutingFireListeners });
         }
+
+        socket.emit('newdj', currentDj);
+
     });
 
 
