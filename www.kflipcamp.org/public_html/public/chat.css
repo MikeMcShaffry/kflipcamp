@@ -1,5 +1,8 @@
 /* Fix user-agent */
 
+@import url(https://fonts.googleapis.com/css?family=Oswald:400,700);
+
+
 * {
   box-sizing: border-box;
 }
@@ -84,7 +87,7 @@ ul {
 
 
 .listener-group {
-    height: 25px;
+    height: 35px;
     width: 100%;
     padding-left: 15px;
     padding-right: 15px;
@@ -95,27 +98,27 @@ ul {
  
 }
 
-.listener-group .welcome {
-    font-family: 'PT Sans', sans-serif;
-    font-weight:bold;
-    font-size:17px;
-    color: #fff;
-}
+    .listener-group .welcome {
+        font-family: 'Oswald';
+        font-size: 1.3em;
+        font-weight: 400;
+        color: #fff;
+    }
 
-.listener-group .streaming {
-    font-family: 'PT Sans', sans-serif;
-    font-weight: bold;
-    font-size: 17px;
-    color: #fff;
-}
+    .listener-group .streaming {
+        font-family: 'Oswald';
+        font-size: 1.3em;
+        font-weight: 400;
+        color: #fff;
+    }
 
-.listener-group .count {
-    font-family: 'PT Sans', sans-serif;
-    font-weight:bold;
-    font-size:17px;
-    color: #fff;
-    float: right;
-}
+    .listener-group .count {
+        font-family: 'Oswald';
+        font-size: 1.3em;
+        font-weight: 400;
+        color: #fff;
+        float: right;
+    }
 
 
 /* Album Art  */
