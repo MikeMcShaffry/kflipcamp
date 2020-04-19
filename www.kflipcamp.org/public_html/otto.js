@@ -35,7 +35,11 @@ var oldfiledata ='oldfiledata';
 var newfiledata ='newfiledata';
 var mychannelID ; 
 var talk = 0 ;	// starting condition of silent
-var currentDJ = 'Now playing' ;
+
+var defaultDJ = 'Otto-mation is playing';
+var currentDJ = currentDJ;
+let onCurrentDJChanged = null;
+
 var song_array = ["","","","","","","","","",""] ; // 10 element array. See https://www.w3schools.com/js/js_arrays.asp
 var my_message = 0;
 var OutString ='Output string, used to dump the song array';
@@ -145,14 +149,23 @@ Otto.on("message", async message => {
 
 		// Echo the available commands
 		if (command === "help") {
-			message.channel.send('Commands are \n !shaddap to make me shut up \n !talk starts me talking \n !intro sets the DJ "now playing" text \n !np shows the currently playing track \n !last shows the last 10 songs played.');
+			message.channel.send('Commands are \n !shaddap to make me shut up \n !talk starts me talking \n !setdj sets the DJ "now playing" text and in the title \n !np shows the currently playing track \n !last shows the last 10 songs played.');
 			return;
 		}
 
 		// Set the text displayed before the now playing track info
-		if (command === "intro") {
-			currentDJ = args.join(" ");
-			message.channel.send('Current DJ text: ' + currentDJ + '.');
+        if (command === "setdj") {
+            if (args.length === 0) {
+                // set the intro back to the default
+                currentDJ = defaultDJ;
+            } else {
+                currentDJ = args.join(" ");
+            }
+
+            message.channel.send('Current DJ text: ' + currentDJ + '.');
+            if (onCurrentDJChanged) {
+                onCurrentDJChanged(currentDJ);
+            }
 			return;
 		}
 
@@ -276,8 +289,8 @@ function UpdateNowPlaying(newsong) {
 
 }
 
-function Start() {
-	// TODO: Really should use fs.FSWatcher instead. See: https://stackoverflow.com/questions/35115444/nodejs-fs-fswatcher
+function start(onCurrentDJChangedCallback) {
+    // TODO: Really should use fs.FSWatcher instead. See: https://stackoverflow.com/questions/35115444/nodejs-fs-fswatcher
 	// set how often to call the nowPlaying function. Start with 2 seconds
 	try {
 		if (config.enabled) {
@@ -285,14 +298,18 @@ function Start() {
 
 			if (config.use_nowplayingfile) {
 				localFileNowPlayingInterval = setInterval(localFileNowPlaying, 2000);
-			}
+            }
+
+            if (onCurrentDJChangedCallback) {
+                onCurrentDJChanged = onCurrentDJChangedCallback;
+            }
 		}
 		else {
 			console.log('Otto Discord integration is NOT enabled - check config.json');
 		}
 	}
 	catch (err) {
-		console.log('Exception in Otto.Start', err);
+		console.log('Exception in Otto.start', err);
 	}
 
 }
@@ -307,7 +324,7 @@ if (config.use_nowplayingfile) {
 
 
 if (!module.exports.UpdateNowPlaying) {
-	module.exports.Start = Start;
+	module.exports.Start = start;
 	module.exports.UpdateNowPlaying = UpdateNowPlaying;
 	module.exports.Enabled = config.enabled;
 }

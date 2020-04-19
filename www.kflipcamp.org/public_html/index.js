@@ -3,7 +3,7 @@
 //
 // COPYRIGHT (c) 2020 by Michael L. McShaffry - All rights reserved
 //
-// The source code contained herein is open source under the MIT licence, with the EXCEPTION of embedded passwords and authentication keys.
+// The source code contained herein is open source under the MIT license, with the EXCEPTION of embedded passwords and authentication keys.
 
 
 // Setup basic express server
@@ -43,7 +43,7 @@ function updateKflipListenerCount(listeners) {
 
 
 //
-// onAlbumInfoChange - called by the lastfm.js module whenever the album info cahnges - it emits the new album info to all connected browsers
+// onAlbumInfoChange - called by the lastfm.js module whenever the album info changes - it emits the new album info to all connected browsers
 //
 var albumInfo = null;
 function onAlbumInfoChange(albumSummary, albumImage) {
@@ -109,13 +109,18 @@ function onShoutingFireUpdated(shoutingFireListenerCallback) {
 }
 
 
+function onCurrentDjChanged(currentDj) {
+    io.emit('newdj', currentDj);
+}
+
+
 //
 // server.listen - launches the listen port for the website
 //
 server.listen(port, async () => {
 
     try {
-        otto.Start();
+        otto.Start(onCurrentDjChanged);
         events.Start(onScheduleChange);
         icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
         icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
