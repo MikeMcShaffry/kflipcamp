@@ -36,8 +36,12 @@ var newfiledata ='newfiledata';
 var mychannelID ; 
 var talk = 0 ;	// starting condition of silent
 
-var defaultDJ = 'Otto-mation is playing';
-var currentDJ = currentDJ;
+var defaultDJ = 'Otto-mation';
+var currentDJ = defaultDJ;
+
+let defaultIntro = `${currentDJ} is playing`;
+let currentIntro = defaultIntro;
+
 let onCurrentDJChanged = null;
 
 var song_array = ["","","","","","","","","",""] ; // 10 element array. See https://www.w3schools.com/js/js_arrays.asp
@@ -155,19 +159,34 @@ Otto.on("message", async message => {
 
 		// Set the text displayed before the now playing track info
         if (command === "setdj") {
-            if (args.length === 0) {
-                // set the intro back to the default
-                currentDJ = defaultDJ;
+            let newDj = null;
+            if (args.length !== 0) {
+                newDj = args.join(" ");
+                currentDJ = newDj;
             } else {
-                currentDJ = args.join(" ");
+                currentDJ = defaultDJ;
             }
 
-            message.channel.send('Current DJ text: ' + currentDJ + '.');
+            message.channel.send('Set DJ to ' + newDj + '.');
+
             if (onCurrentDJChanged) {
-                onCurrentDJChanged(currentDJ);
+                onCurrentDJChanged(newDj);
             }
+
 			return;
-		}
+        }
+
+        if (command === "intro") {
+            if (args.length !== 0) {
+                currentIntro = args.join(" ");
+            } else {
+                currentIntro = defaultIntro;
+            }
+
+            message.channel.send('Intro changed to ' + currentIntro + '.');
+
+            return;
+        }
 
 		if (command === "shaddap") {
 			// Silence!
@@ -217,12 +236,12 @@ function localFileNowPlaying() {
 				// IF I have a currently active message, just edit it.
 				// TODO: handle the error of the message not actually existing anymore
 				if (my_message !== 0) {
-                    my_message.edit(currentDJ + ' ' + newfiledata);
+                    my_message.edit(currentIntro + ' ' + newfiledata);
                     // TODO: handle the error of edit failure due to the message not actually existing anymore
                 }
 				// If I do NOT have an active message, send a new one and save it.
 				else if (mychannelID) {
-					mychannelID.send(currentDJ + ' ' + newfiledata)
+                    mychannelID.send(currentIntro + ' ' + newfiledata)
 						.then((sentMessage) => { my_message = sentMessage });
 				}
 			}
@@ -263,12 +282,12 @@ function UpdateNowPlaying(newsong) {
 				// IF I have a currently active message, just edit it.
 				// TODO: handle the error of the message not actually existing anymore
 				if (my_message !== 0) {
-                    my_message.edit(currentDJ + ' ' + newfiledata);
+                    my_message.edit(currentIntro + ' ' + newfiledata);
                     // TODO: handle the error of edit failure due to the message not actually existing anymore
                 }
 				// If I do NOT have an active message, send a new one and save it.
 				else if (mychannelID) {
-					mychannelID.send(currentDJ + ' ' + newfiledata)
+                    mychannelID.send(currentIntro + ' ' + newfiledata)
 						.then((sentMessage) => { my_message = sentMessage });
 				}
 			}
