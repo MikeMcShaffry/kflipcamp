@@ -1,0 +1,263 @@
+/* Fix user-agent */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+/**
+html, input {
+  font-family:
+    "HelveticaNeue-Light",
+    "Helvetica Neue Light",
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    "Lucida Grande",
+    sans-serif;
+}
+*/
+
+
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+	margin:0;
+	padding:0;
+	height: 100%;
+	font-family: PT Sans;	
+	background-image: url(/kflip_background.png);
+	
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: cover;
+	background-position: -25%;
+}
+
+
+
+ul {
+  list-style: none;
+  word-wrap: break-word;
+}
+
+/* Two columns, one for chat, one for streaming music */
+
+.content {
+	padding: 1em 2em;
+	height: 100vh;
+}
+.content-columns {
+	/* Setting relative positioning allows for 
+	absolute positioning for sub-classes */
+	position: relative;
+	padding-top: 1em;
+	height: 100%
+}
+
+.content-column-left {
+	/* Value for IE/Win; will be overwritten for other browsers */
+	width: 47%;
+	/*padding-right: 3%;*/
+	float: left;
+	/*padding-bottom: 2em;*/
+	/*background: rgb(230, 230, 230);*/ /* Fallback */
+    /*background: rgba(230, 230, 230, 0.8);*/
+	height: 100%	
+}
+.content-column-right {
+	/* Values for IE/Win; will be overwritten for other browsers */
+	width: 47%;
+	padding-left: 3%;
+	float: left;
+	padding-bottom: 2em;
+    height: 100%;
+    text-align: center;
+}
+
+
+/* Pages */
+
+.pages {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 100%;
+  padding-bottom: 20px;
+}
+
+.page {
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+
+
+.listener-group {
+    height: 25px;
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    background-color: rgb(54, 57, 62);
+    border-radius: 5px;
+    margin-bottom: 10px;
+
+ 
+}
+
+.listener-group .welcome {
+    font-family: 'PT Sans', sans-serif;
+    font-weight:bold;
+    font-size:17px;
+    color: #fff;
+}
+
+.listener-group .streaming {
+    font-family: 'PT Sans', sans-serif;
+    font-weight: bold;
+    font-size: 17px;
+    color: #fff;
+}
+
+.listener-group .count {
+    font-family: 'PT Sans', sans-serif;
+    font-weight:bold;
+    font-size:17px;
+    color: #fff;
+    float: right;
+}
+
+/* Login Page */
+
+/*
+.login.page {
+  background-color: #000;
+}
+
+.login.page .form {
+  text-align: center;
+  top: 50%;
+}
+
+.login.page .form .usernameInput {
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid #fff;
+  outline: none;
+  padding-bottom: 15px;
+  text-align: center;
+}
+
+.login.page .title {
+  font-size: 200%;
+}
+
+.login.page .usernameInput {
+  letter-spacing: 3px;
+}
+
+
+.login.page .title, .login.page .usernameInput {
+  color: #000;
+  font-weight: 100;
+}
+
+
+.usernameInput {
+  border: 2px solid #0F0;
+  height: 60px;
+  left: 0;
+  outline: none;
+  width: 100%;
+  float: bottom;
+  padding-left: 10px;
+  right: 0;
+  margin-bottom:10px;
+}
+
+*/
+
+/* Chat page */
+
+.chat.page {
+}
+
+/* Font */
+
+.messages {
+  /*font-size: 150%;*/
+}
+
+/*
+.inputMessage {
+  font-size: 100%;
+  display: none;
+}
+
+.log {
+  color: black;
+  margin: 5px;
+  text-align: right;
+}
+    */
+
+/* Messages */
+
+/*
+.chatArea {
+  height: 100%;
+}
+
+.chatOverlayArea {
+	height: 100%;
+	margin:0;
+    overflow-y: scroll;
+    background-color: transparent;
+}
+
+.messages {
+  height: 100%;
+  margin: 0;
+  overflow-y: scroll;
+  padding-inline-start: 15px;
+}
+
+.message.typing .messageBody {
+  color: gray;
+}
+
+.username {
+  font-weight: 700;
+  overflow: hidden;
+  padding-right: 15px;
+  text-align: right;
+}
+*/
+
+/* Input */
+
+/*
+.inputMessage {
+  border: 2px solid #000;
+  height: 60px;
+  left: 0;
+  outline: none;
+  width: 100%;
+  float: bottom;
+  padding-left: 10px;
+  right: 0;
+  margin-bottom:10px;
+}
+*/
+
+
