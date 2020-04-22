@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{216dce65-cc4d-445a-bceb-d3048042ec9a}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartupFile>index.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="package.json" />
+    <Content Include="public\event_calendar.css">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Readme.md" />
+    <Content Include="index.js" />
+    <Content Include="index_busted.js" />
+    <Content Include="docs\API.md" />
+    <Content Include="docs\emit.md" />
+    <Content Include="docs\README.md" />
+    <Content Include="lib\client.js" />
+    <Content Include="lib\index.js" />
+    <Content Include="lib\namespace.js" />
+    <Content Include="lib\parent-namespace.js" />
+    <Content Include="lib\socket.js" />
+    <Content Include="public\index.html" />
+    <Content Include="public\audio6_html5_kflip.css" />
+    <Content Include="public\chat.css" />
+    <Content Include="public\style.css" />
+    <Content Include="public\kflip_background.png" />
+    <Content Include="public\logo.png" />
+    <Content Include="public\noimageavailable.jpg" />
+    <Content Include="public\main_event.js" />
+    <Content Include="test\socket.io.js" />
+    <Content Include="public\js\audio6_html5.js" />
+    <Content Include="public\js\jquery.mousewheel.min.js" />
+    <Content Include="public\js\jquery.touchSwipe.min.js" />
+    <Content Include="public\js\lastfm.api.cache.js" />
+    <Content Include="public\js\lastfm.api.js" />
+    <Content Include="public\js\lastfm.api.md5.js" />
+    <Content Include="public\js\swfobject.js" />
+    <Content Include="public\controllers\blackControllers\close-off.png" />
+    <Content Include="public\controllers\blackControllers\close-on.png" />
+    <Content Include="public\controllers\blackControllers\facebook-off.png" />
+    <Content Include="public\controllers\blackControllers\facebook-on.png" />
+    <Content Include="public\controllers\blackControllers\history-off.png" />
+    <Content Include="public\controllers\blackControllers\history-on.png" />
+    <Content Include="public\controllers\blackControllers\open-off.png" />
+    <Content Include="public\controllers\blackControllers\open-on.png" />
+    <Content Include="public\controllers\blackControllers\pause-off.png" />
+    <Content Include="public\controllers\blackControllers\pause-on.png" />
+    <Content Include="public\controllers\blackControllers\play-off.png" />
+    <Content Include="public\controllers\blackControllers\play-on.png" />
+    <Content Include="public\controllers\blackControllers\scrollerFaceOFF.png" />
+    <Content Include="public\controllers\blackControllers\scrollerFaceON.png" />
+    <Content Include="public\controllers\blackControllers\twitter-off.png" />
+    <Content Include="public\controllers\blackControllers\twitter-on.png" />
+    <Content Include="public\controllers\blackControllers\volume-off.png" />
+    <Content Include="public\controllers\blackControllers\volume-on.png" />
+    <Content Include="public\controllers\blackControllers\volumeMute-off.png" />
+    <Content Include="public\controllers\blackControllers\volumeMute-on.png" />
+    <Content Include="public\controllers\whiteControllers\close-off.png" />
+    <Content Include="public\controllers\whiteControllers\close-on.png" />
+    <Content Include="public\controllers\whiteControllers\facebook-off.png" />
+    <Content Include="public\controllers\whiteControllers\facebook-on.png" />
+    <Content Include="public\controllers\whiteControllers\history-off.png" />
+    <Content Include="public\controllers\whiteControllers\history-on.png" />
+    <Content Include="public\controllers\whiteControllers\open-off.png" />
+    <Content Include="public\controllers\whiteControllers\open-on.png" />
+    <Content Include="public\controllers\whiteControllers\pause-off.png" />
+    <Content Include="public\controllers\whiteControllers\pause-on.png" />
+    <Content Include="public\controllers\whiteControllers\play-off.png" />
+    <Content Include="public\controllers\whiteControllers\play-on.png" />
+    <Content Include="public\controllers\whiteControllers\scrollerFaceOFF.png" />
+    <Content Include="public\controllers\whiteControllers\scrollerFaceON.png" />
+    <Content Include="public\controllers\whiteControllers\twitter-off.png" />
+    <Content Include="public\controllers\whiteControllers\twitter-on.png" />
+    <Content Include="public\controllers\whiteControllers\volume-off.png" />
+    <Content Include="public\controllers\whiteControllers\volume-on.png" />
+    <Content Include="public\controllers\whiteControllers\volumeMute-off.png" />
+    <Content Include="public\controllers\whiteControllers\volumeMute-on.png" />
+    <Content Include="test\fixtures\big.jpg" />
+    <Content Include="test\fixtures\big.json" />
+    <Content Include="test\fixtures\server-close.js" />
+    <Content Include="test\support\doge.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="docs" />
+    <Folder Include="kflipcamp" />
+    <Folder Include="lib" />
+    <Folder Include="public" />
+    <Folder Include="public\controllers" />
+    <Folder Include="public\controllers\blackControllers" />
+    <Folder Include="public\controllers\whiteControllers" />
+    <Folder Include="public\js" />
+    <Folder Include="test" />
+    <Folder Include="test\fixtures" />
+    <Folder Include="test\support" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="events.js" />
+    <Compile Include="public\js\event_calendar.js">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

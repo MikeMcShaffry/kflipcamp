@@ -8,6 +8,7 @@
 ' COMMENT: Teaser Automatization
 '
 ' Added a GET call to IceCast to post current song - Popcorn (aka Mike McShaffry, 2019)
+' Enabled the "Enable Jingle Rotation" checkbox - GigaMatt, 2019
 '
 '==========================================================================
 
@@ -23,12 +24,16 @@ Sub OnStartup
     ini.IntValue("JingleRotation","Timer") = 900
   End If
   'SDB.Objects("JRTimer") = Nothing
+ 
+  ' Debug notes - don't bother with ever calling CheckLastPlayed - it isn't necessary 
+  
   'If ini.BoolValue("JingleRotation","EnableTimer") Then
     Set SDB.Objects("JRTimer") = SDB.CreateTimer(ini.IntValue("JingleRotation","Timer")*1000)
     Script.RegisterEvent SDB.Objects("JRTimer"), "OnTimer", "CheckLastPlayed"
   'Else
   '  ini.BoolValue("JingleRotation","EnableTimer") = False
   'End If
+  
   ini.BoolValue("JingleRotation","TimerExecuted") = False
   ind = SDB.UI.AddOptionSheet( "Automatization Options", Script.ScriptPath, "AInitSheet", "ASaveSheet" , -2)
   ind = SDB.UI.AddOptionSheet( "Jingle Rotation", Script.ScriptPath, "InitSheet", "SaveSheet", ind)
@@ -233,7 +238,7 @@ Sub SendSongToIceCast
 	
 	artist = "&artist=unknown"
 	if (Len(SDB.Player.CurrentSong.ArtistName) > 0) Then
-		song =  "&song=" + UrlEncode(SDB.Player.CurrentSong.ArtistName) + "+-+" + UrlEncode(SDB.Player.CurrentSong.Title)
+		song =  "&song=" + UrlEncode(SDB.Player.CurrentSong.ArtistName) + "+-+" + UrlEncode(SDB.Player.CurrentSong.Title) + " off *"  + UrlEncode(SDB.Player.CurrentSong.AlbumName) + "*"
 		artist = UrlEncode(SDB.Player.CurrentSong.ArtistName) 
 	End If
 	
@@ -265,15 +270,21 @@ End Sub
 
 
 Sub OnPlayTrack
-   CheckJingle ini.IntValue("JingleRotation","Counter"),ini.IntValue("JingleRotation","JingleEvery")
+   If ini.BoolValue("JingleRotation","EnableTimer") Then
+      CheckJingle ini.IntValue("JingleRotation","Counter"),ini.IntValue("JingleRotation","JingleEvery")
+   End If
    SendSongToIceCast
 End Sub
 
 Sub CheckJingle (Played, OnEveryTrack)
+  WriteToLog "CheckJingle called with Played=" & Played & " and OnEveryTrack=" & OnEveryTrack
+
+  On Error Resume Next
+
   If (OnEveryTrack > 0) Then
     If Played = 0 Then
       If SDB.Player.CurrentSong.ID = ini.IntValue("JingleRotation","JingleID") Then
-        SDB.Player.PlaylistDelete(SDB.Player.CurrentSongIndex)
+        'SDB.Player.PlaylistDelete(SDB.Player.CurrentSongIndex)
         ini.IntValue("JingleRotation","JingleID") = -1
         Played = -1
       End If
@@ -281,6 +292,7 @@ Sub CheckJingle (Played, OnEveryTrack)
       Played = 0
     End If
     Played = Played+1
+	WriteToLog "Played " & Played & " tracks"
     If (Played = OnEveryTrack) Then
       Dim RndSong
       Randomize
@@ -288,8 +300,16 @@ Sub CheckJingle (Played, OnEveryTrack)
       If SDB.PlaylistByTitle(ini.StringValue("JingleRotation","JingleGenre")).Tracks.Count = RndSong Then
         RndSong = RndSong-1
       End If
+	  WriteToLog "CheckJingle Adding a Jingle now"
       Call SDB.Player.PlaylistAddTrack(SDB.PlaylistByTitle(ini.StringValue("JingleRotation","JingleGenre")).Tracks.Item(RndSong))
-      Call SDB.Player.PlaylistMoveTrack(SDB.Player.PlaylistCount-1, SDB.Player.CurrentSongIndex+1)
+	  If (Err.Number = 0) Then
+		WriteToLog "CheckJingle Added a Jingle successfully"	  
+	  Else 
+		  WriteToLog "Error: " & Err.Description
+		  Err.Clear()
+	  End If
+	  ' Do not move the Jingle to the next song. Add it to the end and leave it there.
+      'Call SDB.Player.PlaylistMoveTrack(SDB.Player.PlaylistCount-1, SDB.Player.CurrentSongIndex+1)
       ini.IntValue("JingleRotation","JingleID") = SDB.Player.CurrentPlaylist.Item(SDB.Player.CurrentSongIndex+1).ID
       Played = 0
       ini.StringValue("JingleRotation","PlayedAt") = FormatDateTime(Now,0)
@@ -298,9 +318,10 @@ Sub CheckJingle (Played, OnEveryTrack)
       End If
     End If
     ini.IntValue("JingleRotation","Counter") = Played
-  Else
+  Else  
     If SDB.Player.CurrentSong.ID = ini.IntValue("JingleRotation","JingleID") Then
-      SDB.Player.PlaylistDelete(SDB.Player.CurrentSongIndex)
+	  WriteToLog "Played " & Played & " tracks"
+      'SDB.Player.PlaylistDelete(SDB.Player.CurrentSongIndex)
       ini.IntValue("JingleRotation","JingleID") = -1
       ini.IntValue("JingleRotation","Counter") = 0
       ini.StringValue("JingleRotation","PlayedAt") = FormatDateTime(Now,0)
@@ -309,28 +330,63 @@ Sub CheckJingle (Played, OnEveryTrack)
   End If
 End Sub 
 
+
 Sub CheckLastPlayed(Timer)
-  Dim Res
-  If (((SDB.Player.isPlaying) And (not SDB.Player.isPaused)) and (not ini.BoolValue("JingleRotation","TimerExecuted"))) And (ini.IntValue("JingleRotation","JingleID") < 0) Then
-    'res = SDB.MessageBox( SDB.Localize(ini.StringValue("JingleRotation","PlayedAt")&";"), mtError, Array(mbOk))
-    If ((DateDiff("s",CDate(ini.StringValue("JingleRotation","PlayedAt")),Now) => ini.IntValue("JingleRotation","Timer")) And (ini.IntValue("JingleRotation","Counter") > 0)) Or (ini.IntValue("JingleRotation","JingleEvery") = 0)Then
-      If ((SDB.Player.CurrentSong.SongLength > ini.IntValue("JingleRotation","Timer") Or (ini.IntValue("JingleRotation","Counter") > 0)) Or (SDB.Player.PlaybackTime => ini.IntValue("JingleRotation","Timer"))) Or (ini.IntValue("JingleRotation","JingleEvery") = 0) Then
-        Dim RndSong
-        Randomize
-        RndSong = Int((SDB.PlaylistByTitle(ini.StringValue("JingleRotation","JingleGenre")).Tracks.Count+1) * Rnd)
-        If SDB.PlaylistByTitle(ini.StringValue("JingleRotation","JingleGenre")).Tracks.Count = RndSong Then
-          RndSong = RndSong-1
-        End If
-        Call SDB.Player.PlaylistAddTrack(SDB.PlaylistByTitle(ini.StringValue("JingleRotation","JingleGenre")).Tracks.Item(RndSong))
-        Call SDB.Player.PlaylistMoveTrack(SDB.Player.PlaylistCount-1, SDB.Player.CurrentSongIndex+1)
-        ini.IntValue("JingleRotation","JingleID") = SDB.Player.CurrentPlaylist.Item(SDB.Player.CurrentSongIndex+1).ID
-        Played = 0
-        ini.StringValue("JingleRotation","PlayedAt") = FormatDateTime(Now,0)
-        ini.IntValue("JingleRotation","Counter") = Played
-        ini.BoolValue("JingleRotation","TimerExecuted") = True
-      End If
-    End If
-  Else
-    ini.StringValue("JingleRotation","PlayedAt") = FormatDateTime(Now,0)
-  End If
+  On Error Resume Next
+  WriteToLog "CheckLastPlayed called with Timer=" & Timer
+
+   If ini.BoolValue("JingleRotation","EnableTimer") Then
+	  Dim Res
+	  If (((SDB.Player.isPlaying) And (not SDB.Player.isPaused)) and (not ini.BoolValue("JingleRotation","TimerExecuted"))) And (ini.IntValue("JingleRotation","JingleID") < 0) Then
+		'res = SDB.MessageBox( SDB.Localize(ini.StringValue("JingleRotation","PlayedAt")&";"), mtError, Array(mbOk))
+		If ((DateDiff("s",CDate(ini.StringValue("JingleRotation","PlayedAt")),Now) => ini.IntValue("JingleRotation","Timer")) And (ini.IntValue("JingleRotation","Counter") > 0)) Or (ini.IntValue("JingleRotation","JingleEvery") = 0)Then
+		  If ((SDB.Player.CurrentSong.SongLength > ini.IntValue("JingleRotation","Timer") Or (ini.IntValue("JingleRotation","Counter") > 0)) Or (SDB.Player.PlaybackTime => ini.IntValue("JingleRotation","Timer"))) Or (ini.IntValue("JingleRotation","JingleEvery") = 0) Then
+			Dim RndSong
+			Randomize
+			RndSong = Int((SDB.PlaylistByTitle(ini.StringValue("JingleRotation","JingleGenre")).Tracks.Count+1) * Rnd)
+			If SDB.PlaylistByTitle(ini.StringValue("JingleRotation","JingleGenre")).Tracks.Count = RndSong Then
+			  RndSong = RndSong-1
+			End If
+			 WriteToLog "CheckLastPlayed Adding a Jingle now"
+			Call SDB.Player.PlaylistAddTrack(SDB.PlaylistByTitle(ini.StringValue("JingleRotation","JingleGenre")).Tracks.Item(RndSong))
+			''Call SDB.Player.PlaylistMoveTrack(SDB.Player.PlaylistCount-1, SDB.Player.CurrentSongIndex+1)
+			  If (Err.Number = 0) Then
+				WriteToLog "CheckLastPlayed Added a Jingle successfully"	  
+			  Else 
+				  WriteToLog "Error: " & Err.Description
+				  Err.Clear()
+			  End If
+			ini.IntValue("JingleRotation","JingleID") = SDB.Player.CurrentPlaylist.Item(SDB.Player.CurrentSongIndex+1).ID
+			Played = 0
+			ini.StringValue("JingleRotation","PlayedAt") = FormatDateTime(Now,0)
+			ini.IntValue("JingleRotation","Counter") = Played
+			ini.BoolValue("JingleRotation","TimerExecuted") = True
+		  End If
+		End If
+	  Else
+		ini.StringValue("JingleRotation","PlayedAt") = FormatDateTime(Now,0)
+	  End If
+   End If
+End Sub 
+
+
+Sub WriteToLog(logLine)
+    logLine = Now & "   " & logLine
+    On Error Resume Next 	
+	
+	Set objFileToWrite = CreateObject("Scripting.FileSystemObject").OpenTextFile("C:\Logs\JingleRotationLog.txt",8, true)
+	If (Err.Number <> 0) Then
+		MsgBox "Error: " & Err.Description
+		Err.Clear()	
+	End If
+	objFileToWrite.WriteLine(logLine)
+	If (Err.Number <> 0) Then
+		MsgBox "Error: " & Err.Description
+		Err.Clear()	
+	End If	
+	objFileToWrite.Close
+	Set objFileToWrite = Nothing
+	
+	
+
 End Sub
