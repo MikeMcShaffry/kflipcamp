@@ -1,61 +1,38 @@
+//
+// index.js - Entry point for the kflipcamp.org web site
+//
+// COPYRIGHT (c) 2020 by Michael L. McShaffry - All rights reserved
+//
+// The source code contained herein is open source under the MIT license, with the EXCEPTION of embedded passwords and authentication keys.
+
+
 // Setup basic express server
-var express = require('express');
-var app = express();
-var path = require('path');
-var server = require('http').createServer(app);
-var io = require('.')(server);
+const express = require('express');
+const bodyParser = require("body-parser");
+const app = express();
+
+const path = require('path');
+const server = require('http').createServer(app);
+
+// Socket.io listens on port 3000 (or configured environment variable) for events like the song or DJ calendar changing
+const io = require('.')(server);
 var port = process.env.PORT || 3000;
-var events = require('./events.js');
 
-let kflipShows = null;
-let kflipShowString = null;
-let lastScheduleSentWasUpdated = null;
-let lastScheduleItemCount = 0;
-let lastReportedShoutingFireListeners = 0;
+
+const events = require('./events.js');
+const icecastInfo = require('./icecastinfo.js');
+const otto = require('./otto.js');
+const library = require('./library.js');
+const lastfm = require('./lastfm.js');
+
+
+// Stores the last title information from icecast stats - it is in the form of artist - song - album
+let title = '';
+
+//
+// updateKflipListenerCount(listeners) - emits the number of current listeners to any connected browser
+//
 let lastReportedKflipListeners = 0;
-let broadcastingStream = null;
-
-
-async function getKflipShowsAsync() {
-
-    try {
-        kflipShows = await events.get();
-        const currentUpdated = new Date(kflipShows.data.updated);
-        const itemCount = kflipShows.data.items.length;
-
-        if (!lastScheduleSentWasUpdated ||
-            lastScheduleSentWasUpdated < currentUpdated ||
-            lastScheduleItemCount != itemCount) {
-            //if (true) {
-            console.log('A new schedule for everyone! Sending the latest schedule with ' +
-                kflipShows.data.items.length +
-                ' events');
-            lastScheduleSentWasUpdated = currentUpdated;
-            lastScheduleItemCount = itemCount;
-            kflipShowString = JSON.stringify(kflipShows);
-
-            let keys = Object.keys(io.sockets.sockets);
-
-            keys.forEach(function(key) {
-                const connectedSocket = io.sockets.sockets[key];
-                connectedSocket.emit('schedule',
-                    {
-                        username: 'KFLIP',
-                        message: kflipShowString
-                    });
-            });
-        }
-    } catch (err) {
-        console.log('There was an exception -' + err);
-    }
-}
-
-function getKflipShows() {
-    (async () => {
-        await getKflipShowsAsync();
-    })();
-}
-
 function updateKflipListenerCount(listeners) {
     lastReportedKflipListeners = listeners;
     io.emit('listeners',
@@ -64,279 +41,168 @@ function updateKflipListenerCount(listeners) {
         });
 }
 
-const http = require('http');
-var kflipstatus = {
-    host: 'www.kflipcamp.org',
-    path: '/status-json.xsl',
-    port: 8000
-};
 
+//
+// onAlbumInfoChange - called by the lastfm.js module whenever the album info changes - it emits the new album info to all connected browsers
+//
+var albumInfo = null;
+function onAlbumInfoChange(albumSummary, albumImage) {
 
-function streamsAreDifferent(stream1, stream2) {
-    if (stream1 && !stream2)
-        return true;
+    albumInfo = { summary: albumSummary, image: albumImage };
 
-    if (!stream1 && stream2)
-        return true;
+    let keys = Object.keys(io.sockets.sockets);
 
-    return (stream1.listenurl !== stream2.listenurl);
+    keys.forEach(function (key) {
+        const connectedSocket = io.sockets.sockets[key];
+        connectedSocket.emit('albuminfo',
+            {
+                username: 'KFLIP',
+                message: albumInfo
+            });
+    });
 }
 
 
-let icecastStatsParseError = false;
-function checkForSomethingNew(newIcecastStatsJson) {
 
-    try {
-        if (newIcecastStatsJson.includes(': - ,')) {
-            newIcecastStatsJson = newIcecastStatsJson.replace(': - ,', ': "-" ,');
-        }
+//
+// onScheduleChange - called by the events.js module whenever the schedule cahnges - it emits the new schedule to all connected browsers
+//
+var kflipShowString = null;
+function onScheduleChange(eventList) {
 
+    kflipShowString = JSON.stringify(eventList);
 
-        var newIcecastStats = JSON.parse(newIcecastStatsJson);
+    let keys = Object.keys(io.sockets.sockets);
 
-        if (icecastStatsParseError) {
-            console.log('Icecast stats parse error is gone.');
-            icecastStatsParseError = false;
-        }
-
-        if (!newIcecastStats.icestats || !newIcecastStats.icestats.source)
-            return;
-
-        let sameOldSong = true;
-        let newTitle = '';
-        let listeners = 0;
-        let streamIndex = 0;
-        let firstStreamBroadcasting = null;
-
-        // This index setting will work with the below while loop if newIcecastStats.icestats.source
-        // is an array or a single object
-        const sources = (newIcecastStats.icestats.source.length === undefined)
-            ? 1
-            : newIcecastStats.icestats.source.length;
-
-        let newSource = (newIcecastStats.icestats.source.length === undefined) ? newIcecastStats.icestats.source : newIcecastStats.icestats.source[0];
-
-        while (streamIndex < sources) {
-
-            if (newSource.audio_info) {
-                firstStreamBroadcasting = newSource;
-                break;
-            }
-
-            // If the icestats.source is an array, this will look at the next element
-
-            ++streamIndex;
-            if (streamIndex < sources) {
-                newSource = newIcecastStats.icestats.source[streamIndex];
-            }
-        }
-
-        if (firstStreamBroadcasting) {
-            newTitle = firstStreamBroadcasting.title;
-            listeners = firstStreamBroadcasting.listeners;
-        }
-
-        if (streamsAreDifferent(broadcastingStream, firstStreamBroadcasting)) {
-            sameOldSong = false;
-
-            if (!firstStreamBroadcasting) {
-                // Oops - it looks like no stream is broadcasting at all! How?
-                newTitle = 'Dead air';
-                sameOldSong = false;
-                listeners = 0;
-                console.log('Stream has changed - We are off the air!');
-            } else {
-                sameOldSong = false;
-
-                if (firstStreamBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip') {
-                    console.log('Stream has changed - A live DJ is broadcasting');
-                } else if (firstStreamBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip_auto') {
-                    console.log('Stream has changed - Otto has the KFLIP stream');
-                } else if (firstStreamBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire') {
-                    console.log('Stream has changed - KFLIP is broadcasting ShoutingFire');
-                }
-            }
-
-            broadcastingStream = firstStreamBroadcasting;
-
-        } else if (!broadcastingStream || (broadcastingStream.title !== newTitle)) {
-            broadcastingStream.title  = newSource.title;
-            sameOldSong = false;
-        }
-
-        if (listeners !== lastReportedKflipListeners) {
-            updateKflipListenerCount(listeners);
-        }
-
-        if (sameOldSong) {
-            return;
-        }
-
-        console.log('Now playing: ' + newTitle + ' (' + listeners + ') listeners');
-        io.emit('nowplaying', { stream: broadcastingStream });
-
-    } catch (err) {
-        if (icecastStatsParseError == false) {
-            console.log('Exception in icecast stats: ' + newIcecastStatsJson);
-            icecastStatsParseError = true;
-        }
-    }
+    keys.forEach(function (key) {
+        const connectedSocket = io.sockets.sockets[key];
+        connectedSocket.emit('schedule',
+            {
+                username: 'KFLIP',
+                message: kflipShowString
+            });
+    });
 }
 
 
-async function getNowPlayingAsync() {
+// onSomethingNewPlaying() - called by icecastinfo.js whenever a stream change happens or something new is playing
+function onSomethingNewPlaying(streamInfo, listenerCount, streamChanged) {
 
-    try {
-        var req = http.get(kflipstatus,
-            function(res) {
-                //console.log('STATUS: ' + res.statusCode);
-                //console.log('HEADERS: ' + JSON.stringify(res.headers));
+    title = streamInfo.title;
 
-                // Buffer the body entirely for processing as a whole.
-                var bodyChunks = [];
-                res.on('data',
-                    function(chunk) {
-                        // You can process streamed parts here...
-                        bodyChunks.push(chunk);
-                    }).on('end',
-                    function() {
-                        var body = Buffer.concat(bodyChunks);
-                        checkForSomethingNew(body.toString());
+    console.log('Now playing: ' + streamInfo.title + ' (' + listenerCount + ') listeners');
+    io.emit('nowplaying', { stream: streamInfo });
 
-                        //console.log('BODY: ' + body);
-                    });
-            });
-
-        req.on('error',
-            function(e) {
-                console.log('ERROR: ' + e.message);
-            });
-    } catch (err) {
-        console.log('Exception in getNowPlayingAsync - ' + err);
+    if (otto.Enabled) {
+        otto.UpdateNowPlaying(streamInfo.title, streamChanged);
     }
 
-}
-
-function updateNowPlaying() {
-    (async () => {
-        await getNowPlayingAsync();
-    })();
-}
-
-
-function onShoutingFire() {
-    return (broadcastingStream &&
-        broadcastingStream.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire');
+    if (lastfm.Enabled) {
+        lastfm.UpdateNowPlaying(streamInfo.title);
+    }
 }
 
 let shoutingFireListeners = 0;
-const https = require('https');
-const cheerio = require('cheerio');
-var shoutingFireStatus = {
-
-    host: 'shoutingfire-ice.streamguys1.com',
-    path: '/status.xsl'
-};
-
-function checkShoutingFire() {
-
-    try {
-
-        if (onShoutingFire() === false) {
-            return;
-        }
-
-
-        var req = https.get(shoutingFireStatus,
-            function (res) {
-                //console.log('STATUS: ' + res.statusCode);
-                //console.log('HEADERS: ' + JSON.stringify(res.headers));
-
-                // Buffer the body entirely for processing as a whole.
-                var bodyChunks = [];
-                res.on('data',
-                    function (chunk) {
-                        // You can process streamed parts here...
-                        bodyChunks.push(chunk);
-                    }).on('end',
-                    function () {
-                        var body = Buffer.concat(bodyChunks);
-
-                        try {
-                       
-                            const $ = cheerio.load(body);
-                            let h3 = null;
-
-                            $('h3').each(function(i, e) {
-                                if ($(this).text().includes('/live')) {
-                                    h3 = $(this);
-                                    return false;
-                                }
-                                return true;
-                            });
-
-                            if (h3) {
-                                const parents = h3.parentsUntil('.newscontent');
-                                if (parents.length) {
-                                    const divStreamHeader = parents[parents.length - 1];
-                                    const infoTable = divStreamHeader.nextSibling;
-
-                                    $('td', infoTable).each(function(i, e) {
-                                        if ($(this).text().includes('Current Listeners')) {
-                                            shoutingFireListeners = $(this.nextSibling).text();
-                                            return false;
-                                        }
-                                        return true;
-                                    });
-                                }
-                            }
-
-                            shoutingFireListeners = parseInt(shoutingFireListeners);
-
-                            if (lastReportedShoutingFireListeners !== shoutingFireListeners) {
-                                lastReportedShoutingFireListeners = shoutingFireListeners;
-                                io.emit('shoutingfire', { listeners: shoutingFireListeners });
-                            }
-
-                            //console.log('ShoutingFire has ' + shoutingFireListeners + ' listeners');
-
-                        } catch (err) {
-                            console.log('There was a problem finding ShoutingFire listener count');
-                        }
-                    });
-            });
-
-        req.on('error',
-            function (e) {
-                console.log('ERROR: ' + e.message);
-            });
-    } catch (err) {
-        console.log('Exception in checkShoutingFire - ' + err);
-    }
+function onShoutingFireUpdated(shoutingFireListenerCallback) {
+    shoutingFireListeners = shoutingFireListenerCallback;
+    io.emit('shoutingfire', { listeners: shoutingFireListeners });
 }
 
-server.listen(port, () => {
-    getKflipShows();
-    setInterval(getKflipShows, 15000);
-    setInterval(updateNowPlaying, 5000);
+let currentDj = '';
+function onCurrentDjChanged(newDj) {
+    currentDj = newDj;
+    io.emit('newdj', currentDj);
+}
 
-    checkShoutingFire();
-    setInterval(checkShoutingFire, 60000);
 
-    console.log('Server listening at port %d', port);
+//
+// server.listen - launches the listen port for the website
+//
+server.listen(port, async () => {
+
+    try {
+        otto.Start(onCurrentDjChanged);
+        currentDj = otto.CurrentDJ;
+        events.Start(onScheduleChange);
+        icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
+        icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
+        library.Start();
+        lastfm.Start(onAlbumInfoChange);
+
+        console.log('Server listening at port %d', port);
+    }
+    catch (err) {
+        console.log('CRITICAL ERROR - Exception in server.listen', err);
+        process.exit();
+    }
 });
 
-// Routing
+// Routing API calls for the web site - first the static routes that serve files and directories of files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/js', express.static(path.join(__dirname, 'public/js')));
 app.use('/controllers', express.static(path.join(__dirname, 'public/controllers')));
 
-var numUsers = 0;
+// Add a parser to manage POST data
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 
+//
+// GET /nowplaying/albumimage
+//
+app.get('/nowplaying/albumimage',
+    async function(req, res) {
+        res.set('Content-Type', 'text/html');
+        res.end(lastfm.AlbumImage);
+    });
+
+//
+// GET /nowplaying/albumsummary
+//
+app.get('/nowplaying/albumsummary',
+    async function(req, res) {
+        res.set('Content-Type', 'text/html');
+        res.end(lastfm.AlbumSummary);
+    });
+
+
+//
+// GET /nowplaying/title
+//
+app.get('/nowplaying/title',
+    async function(req, res) {
+        res.set('Content-Type', 'text/html');
+        res.end(title);
+    });
+
+
+//
+// GET /search
+//
+app.get('/search', async function (req, res) {
+    let results = [];
+    try {
+        if (req.body.by === 'artist') {
+            var artist = req.body.artist; 
+            results = await library.SearchByArtist(artist);
+        }
+    }
+    catch (err) {
+        console.log('Error detected in POST /search: ' + err.message);
+    }
+
+    res.end(JSON.stringify(results));
+});
+
+
+
+//
+// io.on('connection') - A browser will initiate a connection to the web site to listen for events like the song or calendar changing
+//
 io.on('connection',
     (socket) => {
 
+        // The moment they connect we will send them the kflip DJ schedule, and nowPlaying and listener information
         if (kflipShowString) {
 
             socket.emit('schedule',
@@ -346,13 +212,39 @@ io.on('connection',
                 });
         }
 
-        if (broadcastingStream) {
-
-            socket.emit('nowplaying', { stream: broadcastingStream });
-
-            if (onShoutingFire()) {
-                socket.emit('shoutingfire', { listeners: shoutingFireListeners });
-            }
-
+        if (albumInfo) {
+            socket.emit('albuminfo',
+                {
+                    username: 'KFLIP',
+                    message: albumInfo
+                });
         }
+
+        var currentStream = icecastInfo.GetCurrentStream();
+        if (currentStream) {
+            socket.emit('nowplaying', { stream: currentStream });
+        }
+        if (shoutingFireListeners) {
+            socket.emit('shoutingfire', { listeners: shoutingFireListeners });
+        }
+
+        socket.emit('newdj', currentDj);
+
     });
+
+
+//
+// Avoids the process shutting down due to an unhandled promise rejection or unhandled exceptions
+//
+process.on('unhandledRejection', error => {
+    console.log('unhandledRejection', error);
+});
+
+
+process.on('uncaughtException', error => {
+    console.log('unchaughtException ', error);
+});
+
+
+
+

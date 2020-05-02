@@ -7,16 +7,18 @@ html {
 }
 
 .event-calendar-container {
+    width: 100%;
     max-width: 435px;
-    min-width: 435px;
+    min-width: 300px;
+    float: left;
     display: inline-block;
-    background-color: #eeeeee;
 }
 
 .event-calendar-scroll {
     height: 250px;
     overflow-y: scroll;
 }
+
 
 .event-calendar {
     font-size: 14px;
@@ -81,6 +83,7 @@ ss {
     padding-top: 5px;
     padding-bottom: 5px;
     text-align: left;
+    border-radius: 5px;
 }
 
 .event-container:hover {
