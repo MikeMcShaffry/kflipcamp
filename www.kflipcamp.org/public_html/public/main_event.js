@@ -7,6 +7,16 @@ $(function() {
     ];
 
 
+    //
+    // Event box toggle
+    //
+    $('.event-list').find('.event').click(function () {
+       var clickOnMe = $(this).next().hasClass('open');
+       if (!clickOnMe) {
+           $('.event-list').find('.openEv').removeClass('open');
+       }
+       $(this).next().toggleClass('open');
+   });
 
 
     // Initialize variables
