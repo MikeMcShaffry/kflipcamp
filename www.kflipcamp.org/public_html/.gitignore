@@ -2,3 +2,5 @@
 node_modules/
 obj/
 bin/
+data/
+config.json

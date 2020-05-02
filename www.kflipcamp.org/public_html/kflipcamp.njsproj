@@ -13,17 +13,25 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
+    <StartWebBrowser>True</StartWebBrowser>
+    <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Content Include="icecastinfo.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="lastfm.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="otto.js" />
     <Content Include="package.json" />
     <Content Include="public\event_calendar.css">
       <SubType>Code</SubType>
     </Content>
     <Content Include="Readme.md" />
     <Content Include="index.js" />
-    <Content Include="index_busted.js" />
     <Content Include="docs\API.md" />
     <Content Include="docs\emit.md" />
     <Content Include="docs\README.md" />
