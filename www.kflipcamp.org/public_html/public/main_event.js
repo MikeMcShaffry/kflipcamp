@@ -199,20 +199,22 @@ $(function() {
 
 
     function setHeaderText(dj) {
+        $("head title").text('KFLIP CAMP');
         if (dj !== 'Otto-mation') {
             $streaming.text(`- ${dj} is ON AIR!`);
             $("head title").text(`KFLIP CAMP - ${dj} is ON AIR!`);
-        } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip') {
-            $streaming.text(" - A Human DJ is LIVE!");
-            $("head title").text(`KFLIP CAMP`);
-        } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip_auto') {
-            $streaming.text(" - on Otto-mation");
-            $("head title").text(`KFLIP CAMP`);
-        } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire') {
-            $streaming.text(" - on SHOUTINGFIRE!");
-            $("head title").text(`KFLIP CAMP`);
+        } else if (whichStreamIsBroadcasting && whichStreamIsBroadcasting.listenurl) {
+
+            if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip') {
+                $streaming.text(' - A Human DJ is LIVE!');
+            } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip_auto') {
+                $streaming.text(' - on Otto-mation');
+            } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire') {
+                $streaming.text(' - on SHOUTINGFIRE!');
+            }
         }
     }
+
 
     socket.on('nowplaying', (data) => {
         if (!data.stream) {
