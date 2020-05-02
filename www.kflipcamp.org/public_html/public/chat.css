@@ -40,6 +40,14 @@ ul {
   word-wrap: break-word;
 }
 
+h2 {
+    font-family: 'Oswald';
+    font-size: 1.5em;
+    font-weight: 400;
+    color: #fff;
+    margin: 5px 0px;
+}
+
 /* Two columns, one for chat, one for streaming music */
 
 .content {
@@ -57,6 +65,7 @@ ul {
 	float: left;
 	height: 100%	
 }
+
 .content-column-right {
 	/* Values for IE/Win; will be overwritten for other browsers */
 	width: 53%;
@@ -138,5 +147,131 @@ ul {
    object-fit:scale-down;
 }
 
+
+/* Help Box*/
+.minihelpbox {
+    width: 100%;
+    max-width: 435px;
+    min-width: 300px;
+    float: left;
+    padding-top: 5px;
+    background-color: rgb(0, 0, 0);
+    border-radius: 5px;
+    height: 35px;
+}
+
+
+
+.minihelpbox p {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #fff;
+    /*padding-bottom: 15px;*/
+    margin: 0px;
+}
+
+.minihelpbox p:hover {
+    color: #7095D2;
+}
+
+
+.helptext {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #fff;
+    padding-bottom: 15px;
+}
+
+.helptext a {
+    color: #1ABC9C;
+}
+.helptext a:visited {
+    color: #7095D2;
+}
+
+.helpsubject {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #1ABC9C;
+}
+
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 100; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+
+    border-radius: 5px;
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-header {
+    padding: 2px 16px;
+    background-color: #7095D2;
+    color: white;
+}
+
+.modal-body {
+    padding: 2px 16px;
+    background-color: #000;
+}
+
+.modal-footer {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
 
 
