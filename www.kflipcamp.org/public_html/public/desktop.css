@@ -1,0 +1,244 @@
+/* Page Layout Elements */
+
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 10px;
+    height: 100%;
+    font-family: PT Sans;
+    background-image: url(/kflip_background.png);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: -25%;
+}
+
+div.column-content {
+    width: 100%;
+    height: auto;
+}
+
+div.column-content .albumimage {
+    width: 100%;
+    height: auto;
+    background-color: rgb(0, 0, 0);
+    border-radius: 5px;
+}
+
+
+
+.column {
+    padding: 0 6px;
+    float: left;
+    width: 49.99999%;
+    max-width: 500px;
+}
+
+@media only screen and (max-width: 500px) {
+    .column {
+        width: 100%;
+    }
+}
+
+.chat-window {
+    height: 90vh;
+}
+
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+
+/* Listener Group - the top menu bar thiny */
+
+
+.listener-group {
+    height: 35px;
+    max-width: 980px;
+    padding-left: 15px;
+    padding-right: 15px;
+    background-color: rgb(54, 57, 62);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.listener-group .welcome {
+    font-family: 'Oswald';
+    font-size: 1.3em;
+    font-weight: 400;
+    color: #fff;
+}
+
+.listener-group .streaming {
+    font-family: 'Oswald';
+    font-size: 1.3em;
+    font-weight: 400;
+    color: #fff;
+}
+
+.listener-group .count {
+    font-family: 'Oswald';
+    font-size: 1.3em;
+    font-weight: 400;
+    float: right;
+    color: #fff;
+}
+
+
+
+
+
+
+/* Helpbox and Modal Dialog */
+
+
+
+/* Help Box*/
+.minihelpbox {
+    width: 100%;
+    padding-top: 5px;
+    background-color: rgb(0, 0, 0);
+    border-radius: 5px;
+    height: 35px;
+    margin: 0 0 5px;
+}
+
+
+
+.minihelpbox p {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #fff;
+    /*padding-bottom: 15px;*/
+    margin: 0px;
+    text-align: center;
+}
+
+.minihelpbox p:hover {
+    color: #7095D2;
+}
+
+
+.helptext {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #fff;
+    padding-bottom: 15px;
+}
+
+.helptext a {
+    color: #1ABC9C;
+}
+
+.helptext a:visited {
+    color: #7095D2;
+}
+
+.helpsubject {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #1ABC9C;
+}
+
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 100; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    border-radius: 5px;
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+@keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+/* The Close Button */
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+.modal-header {
+    padding: 2px 16px;
+    background-color: #7095D2;
+    color: white;
+}
+
+.modal-body {
+    padding: 2px 16px;
+    background-color: #000;
+}
+
+.modal-footer {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
+
+
