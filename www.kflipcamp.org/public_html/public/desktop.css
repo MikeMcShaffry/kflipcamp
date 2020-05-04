@@ -5,16 +5,16 @@
     box-sizing: border-box;
 }
 
-body {
-    margin: 0;
-    padding: 10px;
-    height: 100%;
-    font-family: PT Sans;
+
+html {
     background-image: url(/kflip_background.png);
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
-    background-position: -25%;
+}
+
+body {
+    margin: 10px;
 }
 
 div.column-content {
@@ -22,11 +22,23 @@ div.column-content {
     height: auto;
 }
 
-div.column-content .albumimage {
+div.column-content .albumarea {
+    align-content: center;
+    background-color: rgb(0, 0, 0);
+    max-height: 400px;
+}
+
+div.column-content .albumarea .albumimage {
     width: 100%;
     height: auto;
-    background-color: rgb(0, 0, 0);
+
     border-radius: 5px;
+    max-width:300px;
+    max-height:300px;
+
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 
@@ -59,16 +71,13 @@ div.column-content .albumimage {
 
 
 .listener-group {
+    margin: 10px;
     height: 35px;
     max-width: 980px;
     padding-left: 15px;
     padding-right: 15px;
     background-color: rgb(54, 57, 62);
     border-radius: 5px;
-    margin-bottom: 10px;
-    margin-top: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
 }
 
 .listener-group .welcome {
