@@ -1,12 +1,15 @@
-﻿<!doctype html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html>
 <head>
     <meta charset="UTF-8">
     <title>KFLiP Camp</title>
-    <meta name="description" content="Listen to KFLiP's ecletic music library anytime, or listen to real humans Friday 9pm US Central or Monday 7pm US Central time.">
+    <meta name="description" content="Listen to KFLiP's eclectic music library anytime, or listen to real humans Friday 9pm US Central or Monday 7pm US Central time.">
     <meta name="robots" content="index, nofollow">
     <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700,700i" rel="stylesheet">
-    <link rel="stylesheet" href="chat.css">
+
+    <link rel="stylesheet" href="desktop.css" type="text/css">
+
+
     <link rel="stylesheet" href="event_calendar.css" type="text/css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -23,163 +26,151 @@
 </head>
 <body>
 
-<div class="content">
-	<div class="content-columns">
-
-		<div class="content-column-left">
-            
-		    <div class="listener-group"><span class="welcome">KFLiP</span><span class="streaming"></span><span class="count"></span></div>
-			
-			<!-- New hotness TitanEmbed chat -->
-			
-			<iframe src="https://titanembeds.com/embed/182283804726001664?theme=DiscordDark&scrollbartheme=3d-dark" height="95%" width="100%" frameborder="0"></iframe>
-
-		</div>
-        <div class="content-column-right">
-
-            <div class="albumimagearea">
-                <img class="albumimage" src="logo.png">
-            </div>
+    <div class="listener-group"><span class="welcome">KFLiP</span><span class="streaming"></span><span class="count"></span></div>
 
 
-            <div id="myradiodivcontainer" style='height:65px;
-    width: 100%;
-    max-width: 435px;
-    min-width: 300px;
--webkit-border-top-left-radius: 5px;
-  -webkit-border-top-right-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;
-  -webkit-border-bottom-left-radius: 5px;
-  -moz-border-radius-topleft: 5px;
-  -moz-border-radius-topright: 5px;
-  -moz-border-radius-bottomright: 5px;
-  -moz-border-radius-bottomleft: 5px;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
-  border: 0px none rgb(255, 255, 255);'>
-                <div style="overflow:hidden; height:0px; width:0px;"></div>
-            </div>
+    <div class="column">
+        <div class="chat-window">
+            <iframe src="https://titanembeds.com/embed/182283804726001664?theme=DiscordDark&scrollbartheme=3d-dark" height="95%" width="100%" frameborder="0"></iframe>
 
-            <div class="minihelpbox"><p id="myBtn">I can't hear the music! <i>Click here for help...</i></p></div>
-
-            <div class="xl-trans-spacer"></div>
-
-            <div class="event-calendar-container">
-                <div class="event-calendar-scroll">
-                    <div class="event-calendar">
-                        <!--
-                <div class="head">
-                    <p class="top-line">This is where all the kflip shows are going to go</p>
-                </div>
-                -->
-                    </div>
-                </div>
-            </div>
-
-            <br style="clear:both;">
         </div>
-	</div>
-</div>
-
-
-<!-- The Modal -->
-<div id="myModal" class="modal" style="display: none;">
-
-    <!-- Modal content -->
-    <div class="modal-content">
-        <div class="modal-header">
-            <span class="close">&times;</span>
-            <h2>Need a little help?</h2>
-        </div>
-        <div class="modal-body">
-            <div class="helpsubject">
-                Do you see PLEASE GET THE TOKEN?
-            </div>
-            <div class="helptext">
-                Browse to <a href="http://www.kflipcamp.org">http://www.kflipcamp.org</a> to get rid of that token thing. Yeah. It's dumb. We know.
-            </div>
-
-            <div class="helpsubject">
-                You click on the PLAY button but nothing happens.
-            </div>
-            <div class="helptext">
-                Just wait. For some browsers, the audio takes A VERY LONG TIME to start up. 90-120 seconds is not unheard of. Why
-                does this happen? God only knows. We are trying to make it better.
-            </div>
-        </div>
-        <!--<div class="modal-footer">
-           <h3>Modal Footer</h3>
-        </div>-->
     </div>
 
-</div>
+
+    <div class="column">
+        <div class="column-content">
+            <div class="albumarea">
+                <img class="albumimage" src="logo.png">
+            </div>
+        </div>
+
+        <div class="column-content">
+            <div id="myradiodivcontainer" style='height:65px; -webkit-border-top-left-radius: 5px; -webkit-border-top-right-radius: 5px;
+                -webkit-border-bottom-right-radius: 5px;  -webkit-border-bottom-left-radius: 5px;
+                -moz-border-radius-topleft: 5px;  -moz-border-radius-topright: 5px;
+                -moz-border-radius-bottomright: 5px;  -moz-border-radius-bottomleft: 5px;
+                border-top-left-radius: 5px;  border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;  border-bottom-left-radius: 5px;
+                border: 0px none rgb(255, 255, 255);'>
+            </div>
+        </div>
+
+        <div class="column-content">
+            <div class="minihelpbox"><p id="helpButton">I can't hear the music! <i>Click here for help...</i></p></div>
+        </div>
+
+        <div class="column-content" style="padding-top: 5px;">
+            <div class="event-calendar-scroll">
+                <div class="event-calendar"></div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="clearfix"></div>
+
+
+    <!-- FOOTER AREA FOR GOD KNOWS WHAT -->
+
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal" style="display: none;">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>Need a little help?</h2>
+            </div>
+            <div class="modal-body">
+                <div class="helpsubject">
+                    Do you see PLEASE GET THE TOKEN?
+                </div>
+                <div class="helptext">
+                    Browse to <a href="http://www.kflipcamp.org">http://www.kflipcamp.org</a> to get rid of that token thing. Yeah. It's dumb. We know.
+                </div>
+
+                <div class="helpsubject">
+                    You click on the PLAY button but nothing happens.
+                </div>
+                <div class="helptext">
+                    Just wait. For some browsers, the audio takes A VERY LONG TIME to start up. 90-120 seconds is not unheard of. Why
+                    does this happen? God only knows. We are trying to make it better.
+                </div>
+            </div>
+            <!--<div class="modal-footer">
+               <h3>Modal Footer</h3>
+            </div>-->
+        </div>
+
+    </div>
 
 
 </body>
 
+
 <script>
-	$("#myradiodivcontainer").flashradio({
-		token: "eHh4L2xnbWpxZGJucS9wc2gB",
-		userinterface: "small",
-		bigcoverstyle: "circle",
-		backgroundcolor: "",
-		themecolor: "#add4ff",
-		themefontcolor: "#ffffff",
-		startvolume: "100",
-		radioname: "KFLiP",
-		scroll: "auto",
-		autoplay: "false",
-		useanalyzer: "fake",
-		analyzertype: "6",
-		usecover: "false",
-		usestreamcorsproxy: "false",
-		getcoveroverradioco: "false",
-		affiliatetoken: "1000lIPN",
-		debug: "false",
-		ownsongtitleurl: "http://www.kflipcamp.org/nowplaying/title",
-		radiocover: "",
-		songgooglefontname: "Oswald:wght@300",
-		songfontname: "Oswald",
-		titlegooglefontname: "Oswald:400",
-		titlefontname: "Oswald",
-		corsproxy: "none",
-		streamprefix: "",
-		mountpoint: "/kflip",
-		radiouid: "",
-		apikey: "",
-		radiojar: "",
-		radioco: "",
-		streamid: "1",
-		streampath: "/live",
-		streamtype: "icecast2",
-		streamurl: "http://www.kflipcamp.org:8000",
-		songinformationinterval: "5000"
+    $("#myradiodivcontainer").flashradio({
+        token: "eHh4L2xnbWpxZGJucS9wc2gB",
+        userinterface: "small",
+        bigcoverstyle: "circle",
+        backgroundcolor: "",
+        themecolor: "#add4ff",
+        themefontcolor: "#ffffff",
+        startvolume: "100",
+        radioname: "KFLiP",
+        scroll: "auto",
+        autoplay: "false",
+        useanalyzer: "fake",
+        analyzertype: "6",
+        usecover: "false",
+        usestreamcorsproxy: "false",
+        getcoveroverradioco: "false",
+        affiliatetoken: "1000lIPN",
+        debug: "false",
+        ownsongtitleurl: "http://www.kflipcamp.org/nowplaying/title",
+        radiocover: "",
+        songgooglefontname: "Oswald:wght@300",
+        songfontname: "Oswald",
+        titlegooglefontname: "Oswald:400",
+        titlefontname: "Oswald",
+        corsproxy: "none",
+        streamprefix: "",
+        mountpoint: "/kflip",
+        radiouid: "",
+        apikey: "",
+        radiojar: "",
+        radioco: "",
+        streamid: "1",
+        streampath: "/live",
+        streamtype: "icecast2",
+        streamurl: "http://www.kflipcamp.org:8000",
+        songinformationinterval: "5000"
     });
 
 
-// Get the modal
+    // Get the modal
     var modal = document.getElementById("myModal");
 
-// Get the button that opens the modal
-    var btn = document.getElementById("myBtn");
+    // Get the button that opens the modal
+    var btn = document.getElementById("helpButton");
 
-// Get the <span> element that closes the modal
+    // Get the <span> element that closes the modal
     var span = document.getElementsByClassName("close")[0];
 
-// When the user clicks the button, open the modal 
-    btn.onclick = function() {
+    // When the user clicks the button, open the modal
+    btn.onclick = function () {
         modal.style.display = "block";
     }
 
-// When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
         modal.style.display = "none";
     }
 
-// When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
         if (event.target == modal) {
             modal.style.display = "none";
         }

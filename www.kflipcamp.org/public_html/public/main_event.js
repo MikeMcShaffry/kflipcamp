@@ -20,13 +20,10 @@ $(function() {
 
 
     // Initialize variables
-    var $window = $(window);
     var $eventList = $(".event-calendar");   // Google calender event-list
     var $listeners = $(".listener-group .count");
     var $streaming = $(".listener-group .streaming");
     var $albumimage = $(".albumimage");
-
-    var $heroPlayer = $(".audio6_html5"); 
 
     // Prompt for setting a username
 
@@ -87,7 +84,7 @@ $(function() {
       var localStart = moment(startDate).local();
       var localEnd = moment(endDate).local();
       var $description = $('<span class="description"/>')
-          .text('Broadcasting from ' + localStart.format('hh:mm a') + ' - ' + localEnd.format('hh:mm a'));
+          .text('ON AIR ' + localStart.format('hh:mm a') + ' - ' + localEnd.format('hh:mm a'));
       $detailContainer.append($description);
 
       var $spacer = $('<div class="spacer"/>');
@@ -238,9 +235,6 @@ $(function() {
                 updateListeners();
             }
 
-            if ($heroPlayer.length > 0) {
-                $heroPlayer.jqHandleNowPlaying(whichStreamIsBroadcasting);
-            }
         }
     });
 

@@ -6,20 +6,8 @@ html {
     background-color: rgb(14, 151, 167);
 }
 
-.event-calendar-container {
-    width: 100%;
-    max-width: 435px;
-    min-width: 300px;
-    float: left;
-    display: inline-block;
-}
-
-.new-event-calendar-container {
-
-}
-
 .event-calendar-scroll {
-    height: 250px;
+    max-height: 340px;
     overflow-y: scroll;
 }
 
