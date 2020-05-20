@@ -19,6 +19,7 @@ html {
     white-space: nowrap;
 }
 
+
 .head {
     margin-bottom: 0px;
 }
@@ -67,6 +68,22 @@ ss {
     /*rojo*/
 }
 
+.event:nth-child(3n+1) .flipside-event-container {
+    border-left-color: #15cb43;
+    /* verde */
+}
+
+.event:nth-child(3n) .flipside-event-container {
+    border-left-color: #FDD835;
+    /*amarillo*/
+}
+
+.event:nth-child(3n-1) .flipside-event-container {
+    border-left-color: #F44336;
+    /*rojo*/
+}
+
+
 .event-container {
     color: #131313;
     transition: all 0.2s ease;
@@ -83,7 +100,25 @@ ss {
     background: #ECEFF1;
 }
 
-.date-container {
+
+.flipside-event-container {
+    color: #131313;
+    transition: all 0.2s ease;
+    background: #FAFAFA;
+    border-left: 3px solid;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: left;
+    border-radius: 5px;
+}
+
+.flipside-event-container:hover {
+    border-left-width: 10px;
+    background: #ECEFF1;
+}
+
+
+.event-container .date-container {
     display: inline-block;
     width: 5em;
     padding-top: 5px;
@@ -96,25 +131,58 @@ ss {
     color: #343434;
 }
 
-.click-for-details {
+.flipside-event-container .date-container {
+    display: inline-block;
+    width: 5em;
+    padding-top: 3px;
+    padding-left: 13px;
+    padding-right: 0;
+    padding-bottom: 2px;
+    font-family: Oswald;
+    font-weight: 500;
+    color: #343434;
+    max-width: 35px;
+}
+
+
+.event-container .click-for-details {
     font-size: .7em;
     float: right;
 }
 
-.date {
+.flipside-event-container .click-for-details {
+    font-size: .7em;
+    float: right;
+    margin-top: -1.5em;
+}
+
+
+.event-container .date {
     font-size: 1.5em;
     display: block;
 }
 
-.dia {
-    display: block;
+.flipside-event-container .date {
+    font-size: 1em;
+    display: none;
+}
+
+.event-container .dia {
+    display: none;
     font-size: .4em;
     font-weight: 100;
     margin-top: -.8em;
     text-transform: uppercase;
 }
 
-.month {
+.flipside-event-container .dia {
+    display: block;
+    font-size: 1em;
+    font-weight: 100;
+    text-transform: uppercase;
+}
+
+.event-container .month {
     display: block;
     font-size: .7em;
     font-weight: 400;
@@ -122,7 +190,16 @@ ss {
     text-transform: uppercase;
 }
 
-.detail-container {
+.flipside-event-container .month {
+    display: block;
+    font-size: .7em;
+    font-weight: 400;
+    margin-top: -.4em;
+    text-transform: uppercase;
+    display: none;
+}
+
+.event-container .detail-container {
     display: inline-block;
     vertical-align: top;
     padding-top: 3px;
@@ -130,15 +207,38 @@ ss {
     width: 70%;
 }
 
-.title {
+.flipside-event-container .detail-container {
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 3px;
+    padding-left: 15px;
+    width: 70%;
+    margin-top: 0;
+}
+
+.event-container .title {
     text-transform: uppercase;
     font-family: Oswald;
     font-weight: 400;
-    font-size: 1.3em;
+    font-size: 1em;
     color: #8D6E63;
 }
 
-.description {
+.flipside-event-container .title {
+    text-transform: uppercase;
+    font-family: Oswald;
+    font-weight: 400;
+    font-size: 1.1em;
+    color: #8D6E63;
+}
+
+.event-container .description {
+    display: block;
+    font-size: 0.9em;
+    color: #e85d79;
+}
+
+.flipside-event-container .description {
     display: block;
     font-size: 0.9em;
     color: #e85d79;

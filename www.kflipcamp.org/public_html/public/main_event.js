@@ -7,6 +7,12 @@ $(function() {
     ];
 
 
+    const dowNames = [
+        "SUN", "GTFO", "TUE",
+        "WED", "THU", "FRI",
+        "SAT"
+    ];
+
     //
     // Event box toggle
     //
@@ -46,10 +52,12 @@ $(function() {
               <div class="event-container">
                   <span class="date-container">
                       <span class="date">06<span class="month">Diciembre</span></span>
+                      <span class="dia">TUE</span>
                   </span>
                   <span class="detail-container">
                       <span class="title">Los días de diciembre</span>
                       <span class="description">Pequeña descripción del evento</span>
+
                   </span>
                   </span>
               </div>
@@ -64,7 +72,7 @@ $(function() {
       var endDate = new Date(event.end.dateTime);
 
       var $a = $('<a href="#" class="event"/>');
-      var $eventContainer = $('<div class="event-container"/>');
+      var $eventContainer = $('<div class="flipside-event-container"/>');
       $a.append($eventContainer);
 
       var $dateContainer = $('<span class="date-container"/>');
@@ -74,8 +82,13 @@ $(function() {
           .text(startDate.getDate());
       var $month = $('<span class="month"/>')
           .text(monthNames[startDate.getMonth()]);
+      var $dia = $('<span class="dia"/>')
+          .text(dowNames[startDate.getDay()]);
+
       $date.append($month);
       $dateContainer.append($date);
+      $dateContainer.append($dia);
+
 
       var $detailContainer = $('<span class="detail-container"/>');
       $eventContainer.append($detailContainer);
@@ -87,7 +100,7 @@ $(function() {
       var localStart = moment(startDate).local();
       var localEnd = moment(endDate).local();
       var $description = $('<span class="description"/>')
-          .text('ON AIR ' + localStart.format('hh:mm a') + ' - ' + localEnd.format('hh:mm a'));
+          .text(localStart.format('hh:mm a') + ' - ' + localEnd.format('hh:mm a'));
       $detailContainer.append($description);
 
       var $spacer = $('<div class="spacer"/>');
