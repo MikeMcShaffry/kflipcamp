@@ -30,13 +30,11 @@
     <Content Include="otto.js" />
     <Content Include="package-lock.json" />
     <Content Include="package.json" />
-    <Content Include="public\chat.css" />
     <Content Include="public\desktop.css" />
     <Content Include="public\event_calendar.css">
       <SubType>Code</SubType>
     </Content>
     <Content Include="public\favicon.ico" />
-    <Content Include="public\index_old.html" />
     <Content Include="Readme.md" />
     <Content Include="index.js" />
     <Content Include="docs\API.md" />
@@ -50,7 +48,6 @@
     <Content Include="public\index.html" />
     <Content Include="public\kflip_background.png" />
     <Content Include="public\logo.png" />
-    <Content Include="public\noimageavailable.jpg" />
     <Content Include="public\main_event.js" />
     <Content Include="test\socket.io.js" />
     <Content Include="test\fixtures\big.jpg" />

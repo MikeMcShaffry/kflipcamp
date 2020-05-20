@@ -1,21 +1,28 @@
 {
-	"lastfm": {
-		"enabled": false,
-		"apikey": "--YOUR LASTFM API KEY--",
-		"apisecret": "--YOUR LASTFM API SECRET--",
-		"applicationName": "",
-		"registeredTo": "--YOUR LASTFM USERNAME--",
-		"noAlbumImageAvailable":  "http://MYDOMAIN/logo.png"
-	},
-	"library": {
-		"databasefile": "./data/MM.DB"
-	},
-	"otto": {
-		"enabled": false,
-		"token": "--YOUR DISCORD TOKEN--",
-		"prefix" : "!",
-		"mychannelID" : "--YOUR CHANNEL ID--",		               
-		"use_nowplayingfile": false,
-		"nowplayingfile" : "C:/temp/MediaMonkey_NowPlaying.txt"
-	}
+  "lastfm": {
+    "enabled": false,
+    "apikey": "--YOUR LASTFM API KEY--",
+    "apisecret": "--YOUR LASTFM API SECRET--",
+    "applicationName": "",
+    "registeredTo": "--YOUR LASTFM USERNAME--",
+    "noAlbumImageAvailable": "http://MYDOMAIN/logo.png"
+  },
+  "library": {
+    "databasefile": "./data/MM.DB"
+  },
+  "otto": {
+    "enabled": false,
+    "token": "--YOUR DISCORD TOKEN--",
+    "prefix": "!",
+    "mychannelID": "--YOUR CHANNEL ID--",
+    "use_nowplayingfile": false,
+    "nowplayingfile": "C:/temp/MediaMonkey_NowPlaying.txt"
+  },
+  "googlecalendar": {
+    "auth": "--YOUR GOOGLE CALENDAR AUTH TOKEN--",
+    "calendarId": "--YOUR CALENDAR ID--@group.calendar.google.com"
+  },
+  "studioinfo": {
+    "phone": "+1-999-867-5309"
+  }
 }

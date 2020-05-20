@@ -43,6 +43,8 @@ let currentIntro;
 
 let onCurrentDJChanged = null;
 let onStreamChanged = null;
+let onPhoneDisplayChanged = null;
+let phoneDisplayed = false;
 
 var song_array = ["","","","","","","","","",""] ; // 10 element array. See https://www.w3schools.com/js/js_arrays.asp
 var my_message = 0;
@@ -122,21 +124,49 @@ Otto.on("message", async message => {
 		}
 
 
+        // echo what's now playing.
+        if (command === "np") {
+            message.channel.send(newfiledata);
+            return;
+        }
 
-		//////////////////////////////////////////////////////////////////////////////////////////////////
+        const kflipdj = message.member.roles.cache.some(r => ["DJs"].includes(r.name));
+
+        let helpmsg =
+            `Commands are\n\
+  !help shows commands\n\
+  !np shows the currently playing track\n\
+  !last shows the last 10 songs played.`;
+
+        if (kflipdj) {
+            helpmsg +=
+                `\n---\n\
+DJ Commands are\n\
+  !shaddap to make me shut up\n\
+  !talk starts me talking\n\
+  !setdj {who} {link} sets the DJ and an optional link\n\
+  !intro {blah} gets me to change my song intro text\n\
+    (no parameters on the last two clears them to the default)\n\
+  !phone displays or hides the number to KFLIP Central`;
+        }
+
+        // Echo the available commands
+        if (command === "help") {
+            return message.channel.send(helpmsg);
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////// From here on down, ONLY DJs //////////////////////////////////////////////////////////
 
-		// Smart-ass reply to non-moderators trying to issue !commands. 
-		// TODO: Handle people saying "!!!!", or similar.
-		if (!message.member.roles.cache.some(r => ["DJs"].includes(r.name))) {
-			return message.reply("You're not my real mom!!");
-		};
+        // Smart-ass reply to non-moderators trying to issue !commands. 
+        // TODO: Handle people saying "!!!!", or similar.
+        if (!kflipdj) {
+            return message.reply("You're not my real mom!!");
+        };
 
-		// echo what's now playing.
-		if (command === "np") {
-			message.channel.send(newfiledata);
-			return;
-		}
+
+
 
 		// Wake the bot up by setting the channel ID.
 		if (command === "ping") {
@@ -148,14 +178,9 @@ Otto.on("message", async message => {
 				clearInterval(localFileNowPlayingInterval);
 				localFileNowPlayingInterval = setInterval(localFileNowPlaying, 2000);				// TODO CONFIGURATION - we can put that scan interval in the config file
 			}
-			return;
+			return true;
 		}
 
-		// Echo the available commands
-		if (command === "help") {
-			message.channel.send('Commands are \n !shaddap to make me shut up \n !talk starts me talking \n !setdj sets the DJ "now playing" text and in the title \n !np shows the currently playing track \n !last shows the last 10 songs played.');
-			return;
-		}
 
 		// Set the text displayed before the now playing track info
         if (command === "setdj") {
@@ -171,7 +196,7 @@ Otto.on("message", async message => {
                 onCurrentDJChanged(currentDJ);
             }
 
-			return;
+			return true;
         }
 
         if (command === "intro") {
@@ -183,22 +208,35 @@ Otto.on("message", async message => {
 
             message.channel.send('Intro changed to ' + currentIntro + '.');
 
-            return;
+            return true;
+        }
+
+        if (command === "phone") {
+            phoneDisplayed = !phoneDisplayed;
+            let msg = '';
+
+            if (phoneDisplayed)
+                msg = "Phone number is visible";
+            else
+                msg = 'Phone number is hidden'; 
+
+            if (onPhoneDisplayChanged) {
+                onPhoneDisplayChanged(phoneDisplayed);
+            }
+            return message.channel.send(msg);
         }
 
 		if (command === "shaddap") {
 			// Silence!
 			talk = 0;
-			message.channel.send('Shutting up. !talk to start me up again.');
-			return;
-		}
+			return message.channel.send('Shutting up. !talk to start me up again.');
+        }
 
 		if (command === "talk") {
 			// Speak!
 			talk = 1;
-			message.channel.send('Yapping again.');
-			return;
-		}
+			return message.channel.send('Yapping again.');
+        }
 
 		//  MrMike says: taking this out, since this will exit the kflip website process!
 		//
@@ -206,7 +244,7 @@ Otto.on("message", async message => {
 			if (config.use_nowplayingfile) {
 				message.channel.send('Shutting down.');
 				process.exit();
-				return;
+				return true;
 			}
 			console.log('Otto Exit command not supported on this configuration');
 		}
@@ -311,7 +349,7 @@ function UpdateNowPlaying(newsong, streamChanged) {
 
 }
 
-function start(onCurrentDJChangedCallback) {
+function start(onCurrentDJChangedCallback, onPhoneDisplayedCallback) {
     // TODO: Really should use fs.FSWatcher instead. See: https://stackoverflow.com/questions/35115444/nodejs-fs-fswatcher
 	// set how often to call the nowPlaying function. Start with 2 seconds
 	try {
@@ -327,9 +365,10 @@ function start(onCurrentDJChangedCallback) {
                 onCurrentDJChanged = onCurrentDJChangedCallback;
             }
 
-
-
-		}
+            if (onPhoneDisplayedCallback) {
+                onPhoneDisplayChanged = onPhoneDisplayedCallback;
+            }
+        }
 		else {
 			console.log('Otto Discord integration is NOT enabled - check config.json');
 		}

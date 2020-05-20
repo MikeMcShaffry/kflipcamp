@@ -19,6 +19,8 @@ const io = require('.')(server);
 var port = process.env.PORT || 3000;
 
 
+const config = require("./config.json").studio;
+
 const events = require('./events.js');
 const icecastInfo = require('./icecastinfo.js');
 const otto = require('./otto.js');
@@ -115,13 +117,20 @@ function onCurrentDjChanged(newDj) {
 }
 
 
+let phoneDisplayed = false;
+function onPhoneDisplayChanged(phoneOn) {
+    phoneDisplayed = phoneOn;
+
+    io.emit('phone', { displayed: phoneDisplayed, number: config.phone });
+};
+
 //
 // server.listen - launches the listen port for the website
 //
 server.listen(port, async () => {
 
     try {
-        otto.Start(onCurrentDjChanged);
+        otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
         currentDj = otto.CurrentDJ;
         events.Start(onScheduleChange);
         icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
@@ -140,7 +149,6 @@ server.listen(port, async () => {
 // Routing API calls for the web site - first the static routes that serve files and directories of files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/js', express.static(path.join(__dirname, 'public/js')));
-app.use('/controllers', express.static(path.join(__dirname, 'public/controllers')));
 
 // Add a parser to manage POST data
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -229,6 +237,7 @@ io.on('connection',
         }
 
         socket.emit('newdj', currentDj);
+        socket.emit('phone', { displayed: phoneDisplayed, number: config.phone });
 
     });
 

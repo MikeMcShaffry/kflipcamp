@@ -21,9 +21,12 @@ $(function() {
 
     // Initialize variables
     var $eventList = $(".event-calendar");   // Google calender event-list
-    var $listeners = $(".listener-group .count");
-    var $streaming = $(".listener-group .streaming");
+    var $listeners = $(".title-bar .count");
+    var $currentDj = $(".title-bar .dj");
+    var $phone = $(".title-bar .phone");
     var $albumimage = $(".albumimage");
+    var $livelinkarea = $(".livelinkarea");
+    var $livelink = $(".livelinkarea a");
 
     // Prompt for setting a username
 
@@ -195,27 +198,64 @@ $(function() {
     });
 
 
-    function setHeaderText(dj) {
+    function setHeaderText(newdj) {
+
+        let dj = newdj;
+        let link = '';
+
+        let linkStart = newdj.indexOf('http');
+        if (linkStart !== -1) {
+            link = newdj.substr(linkStart);
+            dj = newdj.substr(0, linkStart - 1);
+        }
+
+        if (link) {
+            $livelink.attr("href", link);
+            $livelinkarea.css({display: "block"});
+            $albumimage.css({ display: "none" });
+        } else {
+            $livelinkarea.css({ display: "none" });
+            $albumimage.css({ display: "block" });
+        }
+
         $("head title").text('KFLIP CAMP');
+
         if (dj !== 'Otto-mation') {
-            $streaming.text(`- ${dj} is ON AIR!`);
-            $("head title").text(`KFLIP CAMP - ${dj} is ON AIR!`);
+            $currentDj.text(`- LIVE - ${dj}`);
+            $("head title").text(`KFLIP CAMP - LIVE - ${dj}`);
+
         } else if (whichStreamIsBroadcasting && whichStreamIsBroadcasting.listenurl) {
 
             if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip') {
-                $streaming.text(' - A Human DJ is LIVE!');
+                $currentDj.text('- A Human DJ is LIVE!');
             } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip_auto') {
-                $streaming.text(' - on Otto-mation');
+                $currentDj.text('- on Otto-mation');
             } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire') {
-                $streaming.text(' - on SHOUTINGFIRE!');
+                $currentDj.text('- on SHOUTINGFIRE!');
             }
+        }
+    }
+
+
+    socket.on('phone',
+        (data) => {
+            if (data) {
+                setPhoneText(data);
+            }
+        });
+
+    function setPhoneText(data) {
+        if (data.displayed === false) {
+            $phone.text('');
+        } else {
+            $phone.text(data.number);
         }
     }
 
 
     socket.on('nowplaying', (data) => {
         if (!data.stream) {
-            $streaming.text(" - OFF AIR");
+            $currentDj.text(" - OFF AIR");
             whichStreamIsBroadcasting = null;
             updateListeners();
         } else {
@@ -239,14 +279,15 @@ $(function() {
     });
 
 
-    socket.on('albuminfo', (data) => {
+  socket.on('albuminfo',
+    (data) => {
 
         console.log(`New album information received - image ${data.message.image}`);
         if ($albumimage.length > 0) {
             $albumimage.attr("src", data.message.image);
         }
 
-    })
+  });
 
   socket.on('disconnect', () => {
 

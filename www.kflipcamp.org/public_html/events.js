@@ -5,17 +5,15 @@
 //
 // The source code contained herein is open source under the MIT licence, with the EXCEPTION of embedded passwords and authentication keys.
 
+// Here we load the config.json file that contains our token and our prefix values. 
 
+const config = require("./config.json").googlecalendar;			// <<<<<<< I added a google calendar section to the config file
 
 const { google } = require('googleapis');
 const cal = google.calendar({
     version: 'v3',
-    auth: 'AIzaSyD8q-Cjvq1lid62vUbdp2VEiv5yL1gObio'                              // TODO CONFIGURATION - this auth key should be in a configuration file somewhere
+    auth: config.auth
 });
-
-// Set the calendar to query -                 
-const calendar = 'q6gr9cqtbf3lb5q1nqaj4c0ca8@group.calendar.google.com';        // TODO CONFIGURATION - this calendar endpoint should be in a configuration file somewhere
-
 
 async function getEventList() {
 
@@ -25,7 +23,7 @@ async function getEventList() {
     let list = await cal.events.list({
         // Set times to ISO strings as such
         timeMin: new Date(startDate).toISOString(),
-        calendarId: calendar
+        calendarId: config.calendarId
     });
 
     list.data.items.forEach(function(event) {
