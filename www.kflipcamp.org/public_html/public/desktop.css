@@ -158,6 +158,17 @@ div.column-content .livelinkarea a:visited {
     text-align: center;
 }
 
+.minihelpbox a {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #fff;
+    /*padding-bottom: 15px;*/
+    margin: 0px;
+    text-align: left;
+}
+
+
 .minihelpbox p:hover {
     color: #7095D2;
 }
