@@ -29,7 +29,7 @@ const lastfm = require('./lastfm.js');
 
 
 // Stores the last title information from icecast stats - it is in the form of artist - song - album
-let title = '';
+let streamInfo = null;
 
 //
 // updateKflipListenerCount(listeners) - emits the number of current listeners to any connected browser
@@ -88,9 +88,9 @@ function onScheduleChange(eventList) {
 
 
 // onSomethingNewPlaying() - called by icecastinfo.js whenever a stream change happens or something new is playing
-function onSomethingNewPlaying(streamInfo, listenerCount, streamChanged) {
+function onSomethingNewPlaying(newStreamInfo, listenerCount, streamChanged) {
 
-    title = streamInfo.title;
+    streamInfo = newStreamInfo;
 
     console.log('Now playing: ' + streamInfo.title + ' (' + listenerCount + ') listeners');
     io.emit('nowplaying', { stream: streamInfo });
@@ -180,7 +180,7 @@ app.get('/nowplaying/albumsummary',
 app.get('/nowplaying/title',
     async function(req, res) {
         res.set('Content-Type', 'text/html');
-        res.end(title);
+        res.end(streamInfo.title);
     });
 
 
@@ -228,9 +228,9 @@ io.on('connection',
                 });
         }
 
-        var currentStream = icecastInfo.GetCurrentStream();
-        if (currentStream) {
-            socket.emit('nowplaying', { stream: currentStream });
+
+        if (streamInfo) {
+            socket.emit('nowplaying', { stream: streamInfo });
         }
         if (shoutingFireListeners) {
             socket.emit('shoutingfire', { listeners: shoutingFireListeners });
