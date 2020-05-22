@@ -159,9 +159,9 @@ $(function() {
 
         let onShoutingFire = (whichStreamIsBroadcasting &&
             whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire');
-//        if (onShoutingFire) {
-//            listeners = shoutingFireListeners;
-//        }
+        if (onShoutingFire) {
+            listeners += shoutingFireListeners;
+        }
 
         if (listeners === 1) {
             t = "1 Listener";
