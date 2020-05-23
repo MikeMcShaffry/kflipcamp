@@ -287,3 +287,14 @@ div.column-content .livelinkarea a:visited {
 }
 
 
+
+/* Patron Box*/
+
+
+.patreon-area {
+    width: 100%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+
