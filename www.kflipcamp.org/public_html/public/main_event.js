@@ -72,7 +72,8 @@ $(function() {
       var endDate = new Date(event.end.dateTime);
 
       var $a = $('<a href="#" class="event"/>');
-      var $eventContainer = $('<div class="flipside-event-container"/>');
+      // var $eventContainer = $('<div class="flipside-event-container"/>');
+      var $eventContainer = $('<div class="event-container"/>');
       $a.append($eventContainer);
 
       var $dateContainer = $('<span class="date-container"/>');
