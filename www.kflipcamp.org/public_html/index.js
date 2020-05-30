@@ -121,7 +121,15 @@ function onStartEvent(event) {
         return;
     }
 
-    let script = spawn('/bin/ffmpeg', ['-nostdin', '-hide_banner', '-nostats', '-loglevel', 'panic', '-y', '-i', 'http://www.kflipcamp.org:8000/kflip', filename ]);
+    let script = spawn('/bin/ffmpeg', ['-nostdin', '-hide_banner', '-nostats', '-loglevel', 'panic', '-y', '-i', 'http://www.kflipcamp.org:8000/kflip', filename]);
+    script.stdout.on('data', (data) => {
+
+        // data is a Buffer
+        // log a conversion to a string that is one less byte
+        // this is drop the line feed.
+        console.log(data.slice(0, data.length - 1).toString('utf8'));
+    });
+
     eventProcesses[event.id] = script;
 }
 
