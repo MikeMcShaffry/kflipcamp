@@ -169,7 +169,7 @@ function onEndEvent(event) {
         return;
     }
 
-    let rename = spawn('/bin/mv', [`/tmp/${event.id}.mp3.tmp`, `/tmp/${datestamp}-${event.summary}-${seconds}.mp3`]);
+    let rename = spawn('/bin/mv', [`/tmp/${event.id}.mp3`, `/tmp/${datestamp}-${event.summary}-${seconds}.mp3`]);
     rename.stdout.on('data', (data) => {
 
         // data is a Buffer
