@@ -112,7 +112,7 @@ function onStartEvent(event) {
 
     console.log(`Starting event ${event.id}:${event.summary}`);
 
-    let filename = `/tmp/${event.id}.mp3.tmp`;
+    let filename = `/tmp/${event.id}.mp3`;
 
 
     if (os.platform() === 'win32') {
@@ -127,8 +127,16 @@ function onStartEvent(event) {
         // data is a Buffer
         // log a conversion to a string that is one less byte
         // this is drop the line feed.
-        console.log(data.slice(0, data.length - 1).toString('utf8'));
+        console.log('ffmpeg stdout ' + data);
     });
+    script.stderr.on('data', (data) => {
+
+        // data is a Buffer
+        // log a conversion to a string that is one less byte
+        // this is drop the line feed.
+        console.log('ffmpeg sterr: ' + data);
+    });
+    
 
     eventProcesses[event.id] = script;
 }
