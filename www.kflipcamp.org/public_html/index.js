@@ -257,7 +257,12 @@ app.get('/nowplaying/albumsummary',
 app.get('/nowplaying/title',
     async function(req, res) {
         res.set('Content-Type', 'text/html');
-        res.end(streamInfo.title);
+        if (streamInfo && streamInfo.title) {
+            res.end(streamInfo.title);
+        }
+        else {
+            res.end();
+        }
     });
 
 
