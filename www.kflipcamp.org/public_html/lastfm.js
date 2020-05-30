@@ -75,14 +75,14 @@ async function UpdateNowPlaying(title) {
 
         title = title.replace('[Shouting Fire]', '');
 
-        // JingleRotation script sends title string like - The Beatles - All Together Now off *The Yellow Submarine*
-        allParts = title.match(/(.+) by (.+) off \*(.+)\*$/);
+        // OutputNowPlaying script sends title string like - The Beatles - All Together Now off *The Yellow Submarine*
+        allParts = title.match(/(.+) - (.+) off *(.+)*$/);
         if (!allParts || allParts.length !== 4) {
             SetToUnknown();
             return;
         }
 
-        lastArtist = allParts[2];
+        lastArtist = allParts[1];
         lastAlbum = allParts[3];
 
         var url = encodeURI(`http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${config.apikey}&artist=${lastArtist}&album=${lastAlbum}&format=json`);
