@@ -42,6 +42,11 @@ let onScheduleChange = null;                        // a callback function to ha
 let lastScheduleSentWasUpdated = null;              // the date of the last schedule change (stored at Google calendar)
 let lastScheduleItemCount = 0;                      // the number of scheduled events
 
+let currentEvents = {};                             // events where the start and end times are withing the buffer time
+let bufferTimeInSec = 120;                           // lead time to announce call onStartingEvent or trailing time to call onEventEnded
+
+
+
 //
 // getEventsAsync() -  Grab the KFLIP calendar and if there are any changes, emit them to any connected browsers
 //
@@ -61,6 +66,60 @@ async function getEventsAsync() {
                 ' events');
             lastScheduleSentWasUpdated = currentUpdated;
             lastScheduleItemCount = itemCount;
+
+            var now = new Date().getTime();
+            for (var n = 0; n < itemCount; ++n) {
+
+                var event = eventList.data.items[n];
+                if (!event.start || !event.start.dateTime) {
+                    console.log('No start time - ' + event.summary);
+                    continue;
+                }
+                if (!event.end|| !event.end.dateTime) {
+                    console.log('No end time - ' + event.summary);
+                    continue;
+                }
+                var start = new Date(event.start.dateTime).getTime();
+                start -= (bufferTimeInSec * 1000);
+                var end = new Date(event.end.dateTime).getTime();
+                end += (bufferTimeInSec * 1000);
+
+                var eventIsHappening = false;
+                if (now >= start && now <= end) {
+                    eventIsHappening = true;
+                }
+
+                if (!currentEvents[event.id] && eventIsHappening) {
+                    // The event isn't listed as current, so lets check to see if it is happening now!
+                    console.log('Starting event ' + event.summary);
+                    currentEvents[event.id] = event;
+                }
+                else if (currentEvents[event.id] && !eventIsHappening) {
+                    // The event is listed as current, so let's check to see if it moved or is over
+                    console.log('Ending event ' + event.summary);
+                    delete currentEvents[event.id];
+                }
+            }
+
+            // There's one more way an event can end, if it was just deleted from the calendar. 
+            for (var eventId in currentEvents) {
+
+                var found = false;
+                for (var n = 0; n < itemCount; ++n) {
+                    var event = eventList.data.items[n];
+                    if (event.id === eventId) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found === false) {
+                    console.log('A current event was deleted. Ending event ' + currentEvents[eventId].summary);
+                    delete currentEvents[eventId];
+                }
+            }
+
+
 
             if (onScheduleChange) {
                 onScheduleChange(eventList);
