@@ -112,7 +112,7 @@ function onStartEvent(event) {
 
     console.log(`Starting event ${event.id}:${event.summary}`);
 
-    let filename = `${event.id}.mp3.tmp`;
+    let filename = `/tmp/${event.id}.mp3.tmp`;
 
 
     if (os.platform() === 'win32') {
@@ -149,11 +149,11 @@ function onEndEvent(event) {
 
 
     if (os.platform() === 'win32') {
-        console.log(`(skipped) /bin/mv ${event.id}.mp3.tmp ${datestamp}-${event.summary}-${seconds}.mp3`);
+        console.log(`(skipped) /bin/mv /tmp/${event.id}.mp3.tmp /tmp/${datestamp}-${event.summary}-${seconds}.mp3`);
         return;
     }
 
-    let rename = spawn('/bin/mv', [`${event.id}.mp3.tmp`, `${datestamp}-${event.summary}-${seconds}.mp3`]);
+    let rename = spawn('/bin/mv', [`/tmp/${event.id}.mp3.tmp`, `/tmp/${datestamp}-${event.summary}-${seconds}.mp3`]);
     rename.stdout.on('data', (data) => {
 
         // data is a Buffer
