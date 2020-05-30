@@ -231,7 +231,9 @@ io.on('connection',
 
         if (streamInfo) {
             socket.emit('nowplaying', { stream: streamInfo });
+            socket.emit('listeners', { count: streamInfo.listeners });
         }
+
         if (shoutingFireListeners) {
             socket.emit('shoutingfire', { listeners: shoutingFireListeners });
         }
