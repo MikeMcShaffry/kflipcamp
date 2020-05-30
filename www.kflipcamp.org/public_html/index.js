@@ -165,7 +165,7 @@ function onEndEvent(event) {
 
 
     if (os.platform() === 'win32') {
-        console.log(`(skipped) /bin/mv /tmp/${event.id}.mp3.tmp /tmp/${datestamp}-${event.summary}-${seconds}.mp3`);
+        console.log(`(skipped) /bin/mv /tmp/${event.id}.mp3 /tmp/${datestamp}-${event.summary}-${seconds}.mp3`);
         return;
     }
 
