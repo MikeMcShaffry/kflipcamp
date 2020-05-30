@@ -14,6 +14,12 @@ const app = express();
 const path = require('path');
 const server = require('http').createServer(app);
 
+const spawn = require('child_process').spawn;
+const os = require('os');
+
+let eventProcesses = {};
+
+
 // Socket.io listens on port 3000 (or configured environment variable) for events like the song or DJ calendar changing
 const io = require('.')(server);
 var port = process.env.PORT || 3000;
@@ -86,6 +92,77 @@ function onScheduleChange(eventList) {
     });
 }
 
+const monthNames = [
+    "Jan", "Feb", "Mar",
+    "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep",
+    "Oct", "Nov", "Dec"
+];
+
+
+function onStartEvent(event) {
+
+    if (eventProcesses[event.id]) {
+        console.log(`Event ${event.id} already exists - killing the old one`);
+
+        if (os.platform() !== 'win32') {
+            eventProcesses[event.id].kill();
+        }
+    }
+
+    console.log(`Starting event ${event.id}:${event.summary}`);
+
+    let filename = `${event.id}.mp3.tmp`;
+
+
+    if (os.platform() === 'win32') {
+        console.log(`(skipped) /bin/ffmpeg -nostdin -hide_banner -nostats -loglevel panic -y -i http://www.kflipcamp.org:8000/kflip ${filename}`);
+        eventProcesses[event.id] = event;
+        return;
+    }
+
+    let script = spawn('/bin/ffmpeg', ['-nostdin', '-hide_banner', '-nostats', '-loglevel', 'panic', '-y', '-i', 'http://www.kflipcamp.org:8000/kflip', filename ]);
+    eventProcesses[event.id] = script;
+}
+
+function onEndEvent(event) {
+
+    let now = new Date();
+    const month = monthNames[now.getMonth()];
+    const day = now.getDay();
+    let datestamp = `${day}-${month}`;
+
+    const seconds = now.getHours() * 3600 + now.getMinutes();
+
+    console.log(`Ending event ${event.id}:${event.summary} at ${seconds}s`);
+
+    if (!eventProcesses[event.id]) {
+        console.log(`Event ${event.id} ended but recording process doesn't exist anymore.`);
+        return;
+    }
+
+    if (os.platform() !== 'win32') {
+        eventProcesses[event.id].kill();
+    }
+    delete eventProcesses[event.id];
+
+
+
+    if (os.platform() === 'win32') {
+        console.log(`(skipped) /bin/mv ${event.id}.mp3.tmp ${datestamp}-${event.summary}-${seconds}.mp3`);
+        return;
+    }
+
+    let rename = spawn('/bin/mv', [`${event.id}.mp3.tmp`, `${datestamp}-${event.summary}-${seconds}.mp3`]);
+    rename.stdout.on('data', (data) => {
+
+        // data is a Buffer
+        // log a conversion to a string that is one less byte
+        // this is drop the line feed.
+        console.log(data.slice(0, data.length - 1).toString('utf8'));
+    });
+}
+
 
 // onSomethingNewPlaying() - called by icecastinfo.js whenever a stream change happens or something new is playing
 function onSomethingNewPlaying(newStreamInfo, listenerCount, streamChanged) {
@@ -132,7 +209,7 @@ server.listen(port, async () => {
     try {
         otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
         currentDj = otto.CurrentDJ;
-        events.Start(onScheduleChange);
+        events.Start(onScheduleChange, onStartEvent, onEndEvent);
         icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
         icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
         library.Start();

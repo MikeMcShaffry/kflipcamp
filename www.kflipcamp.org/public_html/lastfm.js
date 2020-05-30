@@ -84,8 +84,13 @@ async function UpdateNowPlaying(title) {
 
         lastArtist = allParts[1];
         lastAlbum = allParts[3];
+        lastAlbum = lastAlbum.replace('*', '');         // WHY DO I HAVE TO DO THIS????
+        lastAlbum = lastAlbum.replace('*', '');         // WHY DO I HAVE TO DO THIS????
 
-        var url = encodeURI(`http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${config.apikey}&artist=${lastArtist}&album=${lastAlbum}&format=json`);
+        let query = `http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${config.apikey}&artist=${lastArtist}&album=${lastAlbum}&format=json`;
+        //console.log('Sending query ' + query);
+
+        var url = encodeURI(query);
 
     //console.log(`Asking LastFM about ${lastArtist} - ${allParts[2]} off *${lastAlbum}*`);
     //console.log(url);

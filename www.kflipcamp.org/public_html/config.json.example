@@ -20,7 +20,10 @@
   },
   "googlecalendar": {
     "auth": "--YOUR GOOGLE CALENDAR AUTH TOKEN--",
-    "calendarId": "--YOUR CALENDAR ID--@group.calendar.google.com"
+    "calendarId": "--YOUR CALENDAR ID--@group.calendar.google.com",
+    "checkdelay": 15,
+    "extraStartTime": 300,
+    "extraEndTime": 300
   },
   "studioinfo": {
     "phone": "+1-999-867-5309"

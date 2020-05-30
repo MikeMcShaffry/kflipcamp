@@ -9,6 +9,7 @@
 
 const config = require("./config.json").googlecalendar;			// <<<<<<< I added a google calendar section to the config file
 
+
 const { google } = require('googleapis');
 const cal = google.calendar({
     version: 'v3',
@@ -43,9 +44,9 @@ let lastScheduleSentWasUpdated = null;              // the date of the last sche
 let lastScheduleItemCount = 0;                      // the number of scheduled events
 
 let currentEvents = {};                             // events where the start and end times are withing the buffer time
-let bufferTimeInSec = 120;                           // lead time to announce call onStartingEvent or trailing time to call onEventEnded
 
-
+let onEventStart = null;                            // callback for event start
+let onEventEnd = null;                              // callback for event end
 
 //
 // getEventsAsync() -  Grab the KFLIP calendar and if there are any changes, emit them to any connected browsers
@@ -80,9 +81,9 @@ async function getEventsAsync() {
                     continue;
                 }
                 var start = new Date(event.start.dateTime).getTime();
-                start -= (bufferTimeInSec * 1000);
+                start -= (config.extraStartTime * 1000);
                 var end = new Date(event.end.dateTime).getTime();
-                end += (bufferTimeInSec * 1000);
+                end += (config.extraEndTime * 1000);
 
                 var eventIsHappening = false;
                 if (now >= start && now <= end) {
@@ -91,12 +92,17 @@ async function getEventsAsync() {
 
                 if (!currentEvents[event.id] && eventIsHappening) {
                     // The event isn't listed as current, so lets check to see if it is happening now!
-                    console.log('Starting event ' + event.summary);
+
                     currentEvents[event.id] = event;
+                    if (onEventStart) {
+                        onEventStart(event);
+                    }
                 }
                 else if (currentEvents[event.id] && !eventIsHappening) {
                     // The event is listed as current, so let's check to see if it moved or is over
-                    console.log('Ending event ' + event.summary);
+                    if (onEventEnd) {
+                        onEventEnd(event);
+                    }
                     delete currentEvents[event.id];
                 }
             }
@@ -114,12 +120,12 @@ async function getEventsAsync() {
                 }
 
                 if (found === false) {
-                    console.log('A current event was deleted. Ending event ' + currentEvents[eventId].summary);
+                    if (onEventEnd) {
+                        onEventEnd(currentEvents[eventId]);
+                    }
                     delete currentEvents[eventId];
                 }
             }
-
-
 
             if (onScheduleChange) {
                 onScheduleChange(eventList);
@@ -140,18 +146,25 @@ function getEvents() {
 }
 
 
-function start(scheduleChangeCallback) {
+function start(scheduleChangeCallback, onStartCallback, onEndCallback) {
 
     onScheduleChange = scheduleChangeCallback;
     if (!onScheduleChange) {
         console.log('WARNING - events.js would be more useful if there was a handler for schedule change events');
     }
 
+    onEventStart = onStartCallback;
+    onEventEnd = onEndCallback;
+
     // Call it once to get the latest schedule upon startup
     getEvents();
 
     // Set an interval to check the schedule every 15 seconds
-    setInterval(getEvents, 15000);                   // TODO CONFIGURATION - add the TTL of the scehdule to the configuration file
+    let checkDelay = 15000;
+    if (config.checkDelay && config.checkDelay > 5) {
+        checkDelay = config.checkDelay * 1000;
+    }
+    setInterval(getEvents, checkDelay);
 }
 
 if (!module.exports.Start) {
