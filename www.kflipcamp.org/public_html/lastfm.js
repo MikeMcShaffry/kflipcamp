@@ -76,7 +76,7 @@ async function UpdateNowPlaying(title) {
         title = title.replace('[Shouting Fire]', '');
 
         // JingleRotation script sends title string like - The Beatles - All Together Now off *The Yellow Submarine*
-        allParts = title.match(/(.+) by (.+) off \*(.+)\*\.$/);
+        allParts = title.match(/(.+) by (.+) off \*(.+)\*$/);
         if (!allParts || allParts.length !== 4) {
             SetToUnknown();
             return;
