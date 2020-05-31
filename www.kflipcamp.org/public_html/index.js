@@ -105,7 +105,13 @@ let eventHappeningNow = false;
 
 function onStartEvent(event) {
 
-    eventDetails = "";
+    console.log(`Starting event ${event.id}:${event.summary}`);
+
+    if (!config.recordEvents) {
+        return;
+    }
+
+    eventDetails = "\n---------------------------------------\n   Playlist:\n";
     eventHappeningNow = true;
 
     if (eventProcesses[event.id]) {
@@ -116,21 +122,21 @@ function onStartEvent(event) {
         }
     }
 
-    console.log(`Starting event ${event.id}:${event.summary}`);
 
-    let filename = `/tmp/${event.id}.mp3`;
+
+    let filename = `${config.recordDir}${event.id}.mp3`;
     if (fs.existsSync(filename)) {
         // Looks like the server restarted while I recording was happening! Lets save what we have.
         finalizeRecording(event);
     }
 
     if (os.platform() === 'win32') {
-        console.log(`(skipped) /bin/ffmpeg -nostdin -hide_banner -nostats -loglevel panic -y -i http://www.kflipcamp.org:8000/kflip ${filename}`);
+        console.log(`(skipped) /bin/ffmpeg -nostdin -hide_banner -nostats -loglevel panic -y -i ${config.recordMount} ${filename}`);
         eventProcesses[event.id] = event;
         return;
     }
 
-    let script = spawn('/bin/ffmpeg', ['-nostdin', '-hide_banner', '-nostats', '-loglevel', 'panic', '-y', '-i', 'http://www.kflipcamp.org:8000/kflip', filename]);
+    let script = spawn('/bin/ffmpeg', ['-nostdin', '-hide_banner', '-nostats', '-loglevel', 'panic', '-y', '-i', config.recordMount, filename]);
     script.stdout.on('data', (data) => {
 
         // data is a Buffer
@@ -157,14 +163,19 @@ function onStartEvent(event) {
 function finalizeRecording(event) {
     let now = new Date();
     const month = monthNames[now.getMonth()];
-    const day = now.getDay();
+    const day = now.getDate();
     let datestamp = `${day}-${month}`;
 
     const seconds = now.getHours() * 3600 + now.getMinutes();
 
-    fs.renameSync(`/tmp/${event.id}.mp3`, `/tmp/${datestamp}-${event.summary}-${seconds}.mp3`);
+    if (os.platform() === 'win32') {
+        console.log(`(skipped) /bin/mv ${config.recordDir}${event.id}.mp3 ${config.recordDir}${datestamp}-${event.summary}-${seconds}.mp3`);
+    }
+    else {
+        fs.renameSync(`${config.recordDir}${event.id}.mp3`, `${config.recordDir}${datestamp}-${event.summary}-${seconds}.mp3`);
+    }
 
-    eventDetails += `\nEvent recording stored in ${datestamp}-${event.summary}-${seconds}.mp3\n`
+    eventDetails += `\n   Event recording stored in ${datestamp}-${event.summary}-${seconds}.mp3\n`
 
     console.log(eventDetails);
 }
@@ -176,6 +187,10 @@ function onEndEvent(event) {
 
     console.log(`Ending event ${event.id}:${event.summary}`);
 
+    if (!config.recordEvents) {
+        return;
+    }
+
     if (!eventProcesses[event.id]) {
         console.log(`Event ${event.id} ended but recording process doesn't exist anymore.`);
         return;
@@ -186,11 +201,6 @@ function onEndEvent(event) {
     }
     delete eventProcesses[event.id];
 
-    if (os.platform() === 'win32') {
-        console.log(`(skipped) /bin/mv /tmp/${event.id}.mp3 /tmp/${datestamp}-${event.summary}-${seconds}.mp3`);
-        return;
-    }
-
     finalizeRecording(event);
 }
 
@@ -200,8 +210,8 @@ function onSomethingNewPlaying(newStreamInfo, listenerCount, streamChanged) {
 
     streamInfo = newStreamInfo;
 
-    if (eventHappeningNow) {
-        eventDetails += streamInfo.title + '\n';
+    if (eventHappeningNow && config.recordEvents) {
+        eventDetails += `   ${streamInfo.title}\n`;
     }
 
     console.log('Now playing: ' + streamInfo.title + ' (' + listenerCount + ') listeners');

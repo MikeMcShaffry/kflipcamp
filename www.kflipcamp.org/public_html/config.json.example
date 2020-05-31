@@ -26,6 +26,9 @@
     "extraEndTime": 300
   },
   "studioinfo": {
-    "phone": "+1-999-867-5309"
+    "phone": "+1-999-867-5309",
+    "recordEvents": true,
+    "recordMount": "http://MYDOMAIN:PORT/MOUNT",
+    "recordDir": "/tmp/"
   }
 }
