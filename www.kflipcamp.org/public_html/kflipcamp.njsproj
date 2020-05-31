@@ -19,6 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Content Include="archive.js" />
     <Content Include="config.json" />
     <Content Include="config.json.example" />
     <Content Include="icecastinfo.js">
@@ -49,6 +50,7 @@
     <Content Include="public\kflip_background.png" />
     <Content Include="public\logo.png" />
     <Content Include="public\main_event.js" />
+    <Content Include="scripts\archive.sh.erb" />
     <Content Include="test\socket.io.js" />
     <Content Include="test\fixtures\big.jpg" />
     <Content Include="test\fixtures\big.json" />
@@ -61,6 +63,7 @@
     <Folder Include="lib" />
     <Folder Include="public" />
     <Folder Include="public\js" />
+    <Folder Include="scripts\" />
     <Folder Include="test" />
     <Folder Include="test\fixtures" />
     <Folder Include="test\support" />

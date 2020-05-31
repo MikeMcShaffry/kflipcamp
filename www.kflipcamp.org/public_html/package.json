@@ -32,6 +32,7 @@
     "engine.io": "~3.3.1",
     "express": "^4.17.1",
     "googleapis": "^48.0.0",
+    "handlebars": "^4.7.6",
     "has-binary2": "~1.0.2",
     "socket.io-adapter": "~1.1.0",
     "socket.io-client": "2.2.0",

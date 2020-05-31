@@ -26,9 +26,13 @@
     "extraEndTime": 300
   },
   "studioinfo": {
-    "phone": "+1-999-867-5309",
-    "recordEvents": true,
+    "phone": "+1-999-867-5309"
+  },
+  "archive": {
+    "enabled": true,
     "recordMount": "http://MYDOMAIN:PORT/MOUNT",
-    "recordDir": "/tmp/"
+    "tmpDir": "/tmp/",
+    "s3bucket": "S3BUCKET",
+    "url": "https://S3BUCKET.s3-REGION.amazonaws.com/"
   }
 }
