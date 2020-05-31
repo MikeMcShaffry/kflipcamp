@@ -14,25 +14,18 @@ const app = express();
 const path = require('path');
 const server = require('http').createServer(app);
 
-const spawn = require('child_process').spawn;
-const os = require('os');
-const fs = require('fs');
-
-let eventProcesses = {};
-
-
 // Socket.io listens on port 3000 (or configured environment variable) for events like the song or DJ calendar changing
 const io = require('.')(server);
 var port = process.env.PORT || 3000;
 
-
-const config = require("./config.json").studio;
+const config = require('./config.json').studio;
 
 const events = require('./events.js');
 const icecastInfo = require('./icecastinfo.js');
 const otto = require('./otto.js');
 const library = require('./library.js');
 const lastfm = require('./lastfm.js');
+const archive = require('./archive.js');
 
 
 // Stores the last title information from icecast stats - it is in the form of artist - song - album
@@ -93,126 +86,13 @@ function onScheduleChange(eventList) {
     });
 }
 
-const monthNames = [
-    "Jan", "Feb", "Mar",
-    "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep",
-    "Oct", "Nov", "Dec"
-];
-
-let eventDetails = "";
-let eventHappeningNow = false;
-
-function onStartEvent(event) {
-
-    console.log(`Starting event ${event.id}:${event.summary}`);
-
-    if (!config.recordEvents) {
-        return;
-    }
-
-    eventDetails = "\n---------------------------------------\n   Playlist:\n";
-    eventHappeningNow = true;
-
-    if (eventProcesses[event.id]) {
-        console.log(`Event ${event.id} already exists - killing the old one`);
-
-        if (os.platform() !== 'win32') {
-            eventProcesses[event.id].kill();
-        }
-    }
-
-
-
-    let filename = `${config.recordDir}${event.id}.mp3`;
-    if (fs.existsSync(filename)) {
-        // Looks like the server restarted while I recording was happening! Lets save what we have.
-        finalizeRecording(event);
-    }
-
-    if (os.platform() === 'win32') {
-        console.log(`(skipped) /bin/ffmpeg -nostdin -hide_banner -nostats -loglevel panic -y -i ${config.recordMount} ${filename}`);
-        eventProcesses[event.id] = event;
-        return;
-    }
-
-    let script = spawn('/bin/ffmpeg', ['-nostdin', '-hide_banner', '-nostats', '-loglevel', 'panic', '-y', '-i', config.recordMount, filename]);
-    script.stdout.on('data', (data) => {
-
-        // data is a Buffer
-        // log a conversion to a string that is one less byte
-        // this is drop the line feed.
-        console.log('ffmpeg stdout ' + data);
-    });
-    script.stderr.on('data', (data) => {
-
-        // data is a Buffer
-        // log a conversion to a string that is one less byte
-        // this is drop the line feed.
-        console.log('ffmpeg sterr: ' + data);
-    });
-    
-    eventProcesses[event.id] = script;
-}
-
-//
-// This renames the event recording to the summary text of the event, plus a tag the seconds from midnight
-//   to keep multiple recording of the same event (perhaps the service was restarted or an event was moved)
-//   from overwriting each other
-//
-function finalizeRecording(event) {
-    let now = new Date();
-    const month = monthNames[now.getMonth()];
-    const day = now.getDate();
-    let datestamp = `${day}-${month}`;
-
-    const seconds = now.getHours() * 3600 + now.getMinutes();
-
-    if (os.platform() === 'win32') {
-        console.log(`(skipped) /bin/mv ${config.recordDir}${event.id}.mp3 ${config.recordDir}${datestamp}-${event.summary}-${seconds}.mp3`);
-    }
-    else {
-        fs.renameSync(`${config.recordDir}${event.id}.mp3`, `${config.recordDir}${datestamp}-${event.summary}-${seconds}.mp3`);
-    }
-
-    eventDetails += `\n   Event recording stored in ${datestamp}-${event.summary}-${seconds}.mp3\n`
-
-    console.log(eventDetails);
-}
-
-//
-// An event ended, was deleted, or moved and we should save the recording
-//
-function onEndEvent(event) {
-
-    console.log(`Ending event ${event.id}:${event.summary}`);
-
-    if (!config.recordEvents) {
-        return;
-    }
-
-    if (!eventProcesses[event.id]) {
-        console.log(`Event ${event.id} ended but recording process doesn't exist anymore.`);
-        return;
-    }
-
-    if (os.platform() !== 'win32') {
-        eventProcesses[event.id].kill();
-    }
-    delete eventProcesses[event.id];
-
-    finalizeRecording(event);
-}
-
 
 // onSomethingNewPlaying() - called by icecastinfo.js whenever a stream change happens or something new is playing
 function onSomethingNewPlaying(newStreamInfo, listenerCount, streamChanged) {
 
     streamInfo = newStreamInfo;
 
-    if (eventHappeningNow && config.recordEvents) {
-        eventDetails += `   ${streamInfo.title}\n`;
-    }
+    archive.AddToLog(streamInfo.title);
 
     console.log('Now playing: ' + streamInfo.title + ' (' + listenerCount + ') listeners');
     io.emit('nowplaying', { stream: streamInfo });
@@ -252,13 +132,15 @@ function onPhoneDisplayChanged(phoneOn) {
 server.listen(port, async () => {
 
     try {
+
+        await archive.Start();
         otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
         currentDj = otto.CurrentDJ;
-        events.Start(onScheduleChange, onStartEvent, onEndEvent);
+        events.Start(onScheduleChange, archive.OnStartEvent, archive.OnEndEvent);
         icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
         icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
-        library.Start();
-        lastfm.Start(onAlbumInfoChange);
+        await library.Start();
+        await lastfm.Start(onAlbumInfoChange);
 
         console.log('Server listening at port %d', port);
     }

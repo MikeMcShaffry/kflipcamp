@@ -1,0 +1,13 @@
+#!/bin/bash
+
+function archive() {
+   year=`/bin/date +"%Y"`
+   /bin/logger -s "Copying archive file to s3://{{s3bucket}}/${year}/$0"
+   /usr/local/bin/aws s3 cp $0 s3://{{s3bucket}}/${year}/$0
+   rm -f $0
+   /bin/logger -s "Removed archive file $0"
+}
+
+export -f archive
+
+find {{tmpDir}}*.mp3 -mmin +30 -exec /bin/bash -c 'archive "$0"' {} \;
