@@ -36,6 +36,14 @@ async function getEventList() {
     return list;
 }
 
+async function getEvent(id) {
+    return await cal.events.getEvent(id);
+}
+
+async function updateEvent(event) {
+    await cal.events.update(event);
+}
+
 
 // Variables that hold calendar information
 let eventList = null;                               // an array of scheduled events
@@ -172,5 +180,7 @@ function start(scheduleChangeCallback, onStartCallback, onEndCallback) {
 if (!module.exports.Start) {
     module.exports.Start = start;
     module.exports.EventList = eventList;
+    module.exports.GetEventDescription = getEvent;
+    module.exports.UpdateEvent = updateEvent;
 }
 
