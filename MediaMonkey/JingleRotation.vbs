@@ -43,12 +43,26 @@ Sub OnStartup
     ini.StringValue("JingleRotation","JingleGenre") = "Jingles"
   End If
 
+
+  If ini.BoolValue("JingleRotation","EnableIcecastPost") = "" Then
+	ini.BoolValue("JingleRotation","EnableIcecastPost") = False
+  End If
+
+
   If ini.StringValue("JingleRotation","IceCastServer") = "" Then
     ini.StringValue("JingleRotation","IceCastServer") = "www.kflipcamp.org:8000"
   End If
   
   If ini.StringValue("JingleRotation","IceCastMountPoint") = "" Then
     ini.StringValue("JingleRotation","IceCastMountPoint") = "kflip_auto"
+  End If
+
+  If ini.StringValue("JingleRotation","IceCastUsername") = "" Then
+    ini.StringValue("JingleRotation","IceCastUsername") = "source"
+  End If
+
+  If ini.StringValue("JingleRotation","IceCastPassword") = "" Then
+    ini.StringValue("JingleRotation","IceCastPassword") = "RaspberryCider"
   End If
   
   Dim SetDef
@@ -105,13 +119,6 @@ Sub InitSheet(Sheet)
     End If
   End If
 
-  Set edt = UI.NewCheckBox(Sheet)
-  edt.Common.SetRect 5, 83, 150, 20
-  edt.Caption = "Enable Jingle Rotation"
-  edt.Common.ControlName = "JREnable"
-  edt.Common.Enabled = True
-  edt.Checked = ini.BoolValue("JingleRotation","EnableTimer")
-
   Set Edt = UI.NewLabel(Sheet)
   Edt.Common.SetRect 5, 60, 75, 20
   Edt.Caption = "Max Time NotPlayed:"
@@ -126,14 +133,31 @@ Sub InitSheet(Sheet)
   edt.Value =  ini.IntValue("JingleRotation","Timer")
   edt.Common.Enabled = True
 
+  Set edt = UI.NewCheckBox(Sheet)
+  edt.Common.SetRect 5, 83, 150, 20
+  edt.Caption = "Enable Jingle Rotation"
+  edt.Common.ControlName = "JREnable"
+  edt.Common.Enabled = True
+  edt.Checked = ini.BoolValue("JingleRotation","EnableTimer")
+
+
+  Set edt = UI.NewCheckBox(Sheet)
+  edt.Common.SetRect 5, 120, 240, 20
+  edt.Caption = "Enable Metadata Post to IceCast Server"
+  edt.Common.ControlName = "JRIcecastPostEnable"
+  edt.Common.Enabled = False
+  edt.Checked = ini.BoolValue("JingleRotation","EnableIcecastPost")
+  edt.Common.Enabled = True
+
+
   Set Edt = UI.NewLabel(Sheet)
-  Edt.Common.SetRect 5, 110, 75, 20
+  Edt.Common.SetRect 5, 150, 75, 20
   Edt.Caption = "IceCast Server:"
   Edt.Autosize = False
   Edt.Alignment = 1
   
   Set Edt = UI.NewEdit(Sheet)
-  Edt.Common.SetRect 85, 107, 150, 20
+  Edt.Common.SetRect 125, 147, 150, 21
   Edt.Common.ControlName = "JRIceCastServer"
    Edt.Text = ini.StringValue("JingleRotation","IceCastServer")
    If Edt.Text = "" Then
@@ -141,20 +165,62 @@ Sub InitSheet(Sheet)
    End If 
   Edt.Common.Enabled = True
   
+  
   Set Edt = UI.NewLabel(Sheet)
-  Edt.Common.SetRect 5, 135, 75, 20
+  Edt.Common.SetRect 5, 175, 75, 20
   Edt.Caption = "IceCast MountPoint:"
   Edt.Autosize = False
   Edt.Alignment = 1
 
   Set Edt = UI.NewEdit(Sheet)
-  Edt.Common.SetRect 105, 133, 150, 20
+  Edt.Common.SetRect 125, 173, 150, 21
   Edt.Common.ControlName = "JRIceCastMountPoint"
   Edt.Text = ini.StringValue("JingleRotation","IceCastMountPoint")
   If Edt.Text = "" Then
       Edt.Text = "kflip"
   End If 
   Edt.Common.Enabled = True
+  
+  Set Edt = UI.NewLabel(Sheet)
+  Edt.Common.SetRect 5, 205, 75, 20
+  Edt.Caption = "IceCast Username:"
+  Edt.Autosize = False
+  Edt.Alignment = 1
+
+  Set Edt = UI.NewEdit(Sheet)
+  Edt.Common.SetRect 125, 203, 150, 21
+  Edt.Common.ControlName = "JRIceCastUsername"
+  Edt.Text = ini.StringValue("JingleRotation","IceCastUsername")
+  If Edt.Text = "" Then
+      Edt.Text = "source"
+  End If 
+  Edt.Common.Enabled = True
+  
+  Set Edt = UI.NewLabel(Sheet)
+  Edt.Common.SetRect 5, 235, 75, 20
+  Edt.Caption = "IceCast Username:"
+  Edt.Autosize = False
+  Edt.Alignment = 1
+
+  Set Edt = UI.NewEdit(Sheet)
+  Edt.Common.SetRect 125, 233, 150, 21
+  Edt.Common.ControlName = "JRIceCastPassword"
+  Edt.Text = ini.StringValue("JingleRotation","IceCastPassword")
+  If Edt.Text = "" Then
+      Edt.Text = "RaspberryCider"
+  End If 
+  Edt.Common.Enabled = True
+   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   Set ini = Nothing
 End Sub
 
@@ -175,9 +241,12 @@ Sub SaveSheet(Sheet)
   Else
     ini.BoolValue("JingleRotation","EnableTimer") = False
   End If
+  ini.BoolValue("JingleRotation","EnableIcecastPost") = Sheet.Common.ChildControl("JRIcecastPostEnable").Checked
   Ini.StringValue("JingleRotation","IceCastServer") = Sheet.Common.ChildControl( "JRIceCastServer").Text
   Ini.StringValue("JingleRotation","IceCastMountPoint") = Sheet.Common.ChildControl( "JRIceCastMountPoint").Text
-  
+  Ini.StringValue("JingleRotation","IceCastUsername") = Sheet.Common.ChildControl( "JRIceCastUsername").Text
+  Ini.StringValue("JingleRotation","IceCastPassword") = Sheet.Common.ChildControl( "JRIceCastPassword").Text
+   
   Set ini = Nothing
 End Sub
 
@@ -258,6 +327,11 @@ Sub SendSongToIceCast
 	  userName = "admin"
 	  password = "RaspberryCider"
 
+      'ShoutingFire live
+	  'userName = "source"
+	  'password = "lyopomata"
+
+
       Error.Clear
 	  restReq.open "GET", url, false, userName, password
 	  Error.Clear
@@ -269,11 +343,18 @@ Sub SendSongToIceCast
 End Sub
 
 
+
+
+
 Sub OnPlayTrack
-   If ini.BoolValue("JingleRotation","EnableTimer") Then
-      CheckJingle ini.IntValue("JingleRotation","Counter"),ini.IntValue("JingleRotation","JingleEvery")
-   End If
-   SendSongToIceCast
+	If ini.BoolValue("JingleRotation","EnableTimer") Then
+		CheckJingle ini.IntValue("JingleRotation","Counter"),ini.IntValue("JingleRotation","JingleEvery")
+	End If
+   
+	If ini.BoolValue("JingleRotation","EnableIcecastPost") Then
+	  SendSongToIceCast
+	End If
+   
 End Sub
 
 Sub CheckJingle (Played, OnEveryTrack)
