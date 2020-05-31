@@ -16,6 +16,7 @@ const server = require('http').createServer(app);
 
 const spawn = require('child_process').spawn;
 const os = require('os');
+const fs = require('fs');
 
 let eventProcesses = {};
 
@@ -99,8 +100,13 @@ const monthNames = [
     "Oct", "Nov", "Dec"
 ];
 
+let eventDetails = "";
+let eventHappeningNow = false;
 
 function onStartEvent(event) {
+
+    eventDetails = "";
+    eventHappeningNow = true;
 
     if (eventProcesses[event.id]) {
         console.log(`Event ${event.id} already exists - killing the old one`);
@@ -113,7 +119,10 @@ function onStartEvent(event) {
     console.log(`Starting event ${event.id}:${event.summary}`);
 
     let filename = `/tmp/${event.id}.mp3`;
-
+    if (fs.existsSync(filename)) {
+        // Looks like the server restarted while I recording was happening! Lets save what we have.
+        finalizeRecording(event);
+    }
 
     if (os.platform() === 'win32') {
         console.log(`(skipped) /bin/ffmpeg -nostdin -hide_banner -nostats -loglevel panic -y -i http://www.kflipcamp.org:8000/kflip ${filename}`);
@@ -137,12 +146,15 @@ function onStartEvent(event) {
         console.log('ffmpeg sterr: ' + data);
     });
     
-
     eventProcesses[event.id] = script;
 }
 
-function onEndEvent(event) {
-
+//
+// This renames the event recording to the summary text of the event, plus a tag the seconds from midnight
+//   to keep multiple recording of the same event (perhaps the service was restarted or an event was moved)
+//   from overwriting each other
+//
+function finalizeRecording(event) {
     let now = new Date();
     const month = monthNames[now.getMonth()];
     const day = now.getDay();
@@ -150,7 +162,19 @@ function onEndEvent(event) {
 
     const seconds = now.getHours() * 3600 + now.getMinutes();
 
-    console.log(`Ending event ${event.id}:${event.summary} at ${seconds}s`);
+    fs.renameSync(`/tmp/${event.id}.mp3`, `/tmp/${datestamp}-${event.summary}-${seconds}.mp3`);
+
+    eventDetails += `\nEvent recording stored in ${datestamp}-${event.summary}-${seconds}.mp3\n`
+
+    console.log(eventDetails);
+}
+
+//
+// An event ended, was deleted, or moved and we should save the recording
+//
+function onEndEvent(event) {
+
+    console.log(`Ending event ${event.id}:${event.summary}`);
 
     if (!eventProcesses[event.id]) {
         console.log(`Event ${event.id} ended but recording process doesn't exist anymore.`);
@@ -162,21 +186,12 @@ function onEndEvent(event) {
     }
     delete eventProcesses[event.id];
 
-
-
     if (os.platform() === 'win32') {
         console.log(`(skipped) /bin/mv /tmp/${event.id}.mp3 /tmp/${datestamp}-${event.summary}-${seconds}.mp3`);
         return;
     }
 
-    let rename = spawn('/bin/mv', [`/tmp/${event.id}.mp3`, `/tmp/${datestamp}-${event.summary}-${seconds}.mp3`]);
-    rename.stdout.on('data', (data) => {
-
-        // data is a Buffer
-        // log a conversion to a string that is one less byte
-        // this is drop the line feed.
-        console.log(data.slice(0, data.length - 1).toString('utf8'));
-    });
+    finalizeRecording(event);
 }
 
 
@@ -184,6 +199,10 @@ function onEndEvent(event) {
 function onSomethingNewPlaying(newStreamInfo, listenerCount, streamChanged) {
 
     streamInfo = newStreamInfo;
+
+    if (eventHappeningNow) {
+        eventDetails += streamInfo.title + '\n';
+    }
 
     console.log('Now playing: ' + streamInfo.title + ' (' + listenerCount + ') listeners');
     io.emit('nowplaying', { stream: streamInfo });

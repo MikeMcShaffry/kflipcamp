@@ -68,69 +68,71 @@ async function getEventsAsync() {
             lastScheduleSentWasUpdated = currentUpdated;
             lastScheduleItemCount = itemCount;
 
-            var now = new Date().getTime();
-            for (var n = 0; n < itemCount; ++n) {
-
-                var event = eventList.data.items[n];
-                if (!event.start || !event.start.dateTime) {
-                    console.log('No start time - ' + event.summary);
-                    continue;
-                }
-                if (!event.end|| !event.end.dateTime) {
-                    console.log('No end time - ' + event.summary);
-                    continue;
-                }
-                var start = new Date(event.start.dateTime).getTime();
-                start -= (config.extraStartTime * 1000);
-                var end = new Date(event.end.dateTime).getTime();
-                end += (config.extraEndTime * 1000);
-
-                var eventIsHappening = false;
-                if (now >= start && now <= end) {
-                    eventIsHappening = true;
-                }
-
-                if (!currentEvents[event.id] && eventIsHappening) {
-                    // The event isn't listed as current, so lets check to see if it is happening now!
-
-                    currentEvents[event.id] = event;
-                    if (onEventStart) {
-                        onEventStart(event);
-                    }
-                }
-                else if (currentEvents[event.id] && !eventIsHappening) {
-                    // The event is listed as current, so let's check to see if it moved or is over
-                    if (onEventEnd) {
-                        onEventEnd(event);
-                    }
-                    delete currentEvents[event.id];
-                }
-            }
-
-            // There's one more way an event can end, if it was just deleted from the calendar. 
-            for (var eventId in currentEvents) {
-
-                var found = false;
-                for (var n = 0; n < itemCount; ++n) {
-                    var event = eventList.data.items[n];
-                    if (event.id === eventId) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (found === false) {
-                    if (onEventEnd) {
-                        onEventEnd(currentEvents[eventId]);
-                    }
-                    delete currentEvents[eventId];
-                }
-            }
-
             if (onScheduleChange) {
                 onScheduleChange(eventList);
             }
         }
+
+        var now = new Date().getTime();
+        for (var n = 0; n < itemCount; ++n) {
+
+            var event = eventList.data.items[n];
+            if (!event.start || !event.start.dateTime) {
+                console.log('No start time - ' + event.summary);
+                continue;
+            }
+            if (!event.end || !event.end.dateTime) {
+                console.log('No end time - ' + event.summary);
+                continue;
+            }
+            var start = new Date(event.start.dateTime).getTime();
+            start -= (config.extraStartTime * 1000);
+            var end = new Date(event.end.dateTime).getTime();
+            end += (config.extraEndTime * 1000);
+
+            var eventIsHappening = false;
+            if (now >= start && now <= end) {
+                eventIsHappening = true;
+            }
+
+            if (!currentEvents[event.id] && eventIsHappening) {
+                // The event isn't listed as current, so lets check to see if it is happening now!
+
+                currentEvents[event.id] = event;
+                if (onEventStart) {
+                    onEventStart(event);
+                }
+            }
+            else if (currentEvents[event.id] && !eventIsHappening) {
+                // The event is listed as current, so let's check to see if it moved or is over
+                if (onEventEnd) {
+                    onEventEnd(event);
+                }
+                delete currentEvents[event.id];
+            }
+        }
+
+        // There's one more way an event can end, if it was just deleted from the calendar. 
+        for (var eventId in currentEvents) {
+
+            var found = false;
+            for (var n = 0; n < itemCount; ++n) {
+                var event = eventList.data.items[n];
+                if (event.id === eventId) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found === false) {
+                if (onEventEnd) {
+                    onEventEnd(currentEvents[eventId]);
+                }
+                delete currentEvents[eventId];
+            }
+        }
+
+
     } catch (err) {
         console.log('Exception in getEventsAsync -' + err.message);
     }
