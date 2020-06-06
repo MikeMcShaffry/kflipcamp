@@ -21,6 +21,8 @@ const writeFile = util.promisify(fs.writeFile);
 const handlebars = require('handlebars');
 
 let eventProcesses = {};
+let eventDetails = {};
+let addDetails = null;
 
 const archiveConfig = require('./config.json').archive;
 
@@ -32,10 +34,7 @@ const monthNames = [
     "Oct", "Nov", "Dec"
 ];
 
-let eventDetails = "";
-let eventHappeningNow = false;
-
-function onStartEvent(event) {
+async function onStartEvent(event) {
 
     console.log(`Starting event ${event.id}:${event.summary}`);
 
@@ -43,8 +42,11 @@ function onStartEvent(event) {
         return;
     }
 
-    eventDetails = "\n---------------------------------------\n   Playlist:\n";
-    eventHappeningNow = true;
+    let existing = '';
+    if (eventDetails[event.id]) {
+        existing = eventDetails[event.id];
+    }
+    eventDetails[event.id] = `${existing}\n---------------------------------------\n   Playlist:\n`;
 
     if (eventProcesses[event.id]) {
         console.log(`Event ${event.id} already exists - killing the old one`);
@@ -53,8 +55,6 @@ function onStartEvent(event) {
             eventProcesses[event.id].kill();
         }
     }
-
-
 
     let filename = `${archiveConfig.tmpDir}${event.id}.mp3`;
     if (fs.existsSync(filename)) {
@@ -88,16 +88,16 @@ function onStartEvent(event) {
 }
 
 //
-// This renames the event recording to the summary text of the event, plus a tag the seconds from midnight
+// finalizeRecording renames the event recording to the summary text of the event, plus a tag the seconds from midnight
 //   to keep multiple recording of the same event (perhaps the service was restarted or an event was moved)
 //   from overwriting each other
 //
-function finalizeRecording(event) {
-    let now = new Date();
+async function finalizeRecording(event) {
+    const now = new Date();
     const month = monthNames[now.getMonth()];
     const day = now.getDate();
     const year = now.getFullYear();
-    let datestamp = `${month}-${day}`;
+    const datestamp = `${month}-${day}`;
     const archiveUrl = `${archiveConfig.url}/${year}`;
 
     const seconds = now.getHours() * 3600 + now.getMinutes();
@@ -109,9 +109,12 @@ function finalizeRecording(event) {
         fs.renameSync(`${archiveConfig.tmpDir}${event.id}.mp3`, `${archiveConfig.tmpDir}${datestamp}-${event.summary}-${seconds}.mp3`);
     }
 
-    const link = encodeURI(`${archiveUrl}/${datestamp}-${event.summary}-${seconds}.mp3`);
+    const link = encodeURI(`${archiveUrl}${datestamp}-${event.summary}-${seconds}.mp3`);
 
-    eventDetails += `\n   Event recording stored in ${link}\n`
+    eventDetails[event.id] += `\n   Event recording stored in ${link}\n`;
+    if (addDetails) {
+        await addDetails(event.id, eventDetails);
+    }
 
     console.log(eventDetails);
 }
@@ -119,7 +122,7 @@ function finalizeRecording(event) {
 //
 // An event ended, was deleted, or moved and we should save the recording
 //
-function onEndEvent(event) {
+async function onEndEvent(event) {
 
     console.log(`Ending event ${event.id}:${event.summary}`);
 
@@ -135,20 +138,28 @@ function onEndEvent(event) {
     if (os.platform() !== 'win32') {
         eventProcesses[event.id].kill();
     }
-    delete eventProcesses[event.id];
 
-    finalizeRecording(event);
+    await finalizeRecording(event);
+
+    delete eventProcesses[event.id];
+    delete eventDetails[event.id];
 }
 
 function addToLog(detail) {
-    if (eventHappeningNow && archiveConfig.enabled) {
-        eventDetails += `   ${detail}\n`;
+    if (archiveConfig.enabled) {
+
+        let eventIds = Object.keys(eventDetails);
+        for (let n = 0; n < eventIds.length; n++) {
+            let eventId = eventIds[n];
+            eventDetails[eventId] += `   ${detail}\n`;
+        }
+
     }
 }
 
 
-async function start() {
-    // nothing to do here
+async function start(addDetailsCallback) {
+    addDetails = addDetailsCallback;
 }
 
 async function postInstall() {

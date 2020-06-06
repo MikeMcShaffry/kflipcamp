@@ -133,7 +133,7 @@ server.listen(port, async () => {
 
     try {
 
-        await archive.Start();
+        await archive.Start(events.AddDetails);
         otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
         currentDj = otto.CurrentDJ;
         events.Start(onScheduleChange, archive.OnStartEvent, archive.OnEndEvent);
