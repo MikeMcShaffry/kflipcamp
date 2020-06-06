@@ -12,10 +12,16 @@ const archive = require('./archive.js');
 // Calls all post install scripts
 //
 function postInstall() {
-    (async () => {
-
-        await archive.PostInstall();
-    })();
+    try {
+        (async () => {
+            await archive.PostInstall();
+            console.log('PostInstall successful');
+        })();
+    }
+    catch (err) {
+        console.log('Exception in postInstall', JSON.stringify(err));
+        process.exit(1);
+    }
 }
 
 postInstall();
