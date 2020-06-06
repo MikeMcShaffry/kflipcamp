@@ -22,7 +22,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "nyc mocha --reporter spec --slow 200 --bail --timeout 10000 test/socket.io.js"
+    "test": "nyc mocha --reporter spec --slow 200 --bail --timeout 10000 test/socket.io.js",
+    "postinstall":  "scripts/postinstall.sh" 
   },
   "dependencies": {
     "body-parser": "^1.19.0",

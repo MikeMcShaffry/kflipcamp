@@ -148,12 +148,17 @@ function addToLog(detail) {
 
 
 async function start() {
+    // nothing to do here
+}
+
+async function postInstall() {
     if (archiveConfig.enabled) {
         var source = await readFile('scripts/archive.sh.erb', 'utf8');
         var template = handlebars.compile(source);
         var archiveScript = template(archiveConfig);
         await writeFile('scripts/archive.sh', archiveScript);
         fs.chmodSync('scripts/archive.sh', '0770');
+        console.log('Archive script has been created');
     }
 }
 
@@ -161,6 +166,7 @@ async function start() {
 
 if (!module.exports.Start) {
     module.exports.Start = start;
+    module.exports.PostInstall = postInstall;
     module.exports.OnStartEvent = onStartEvent;
     module.exports.OnEndEvent = onEndEvent;
     module.exports.AddToLog = addToLog;
