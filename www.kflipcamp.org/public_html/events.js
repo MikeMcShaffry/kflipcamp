@@ -11,15 +11,23 @@ const config = require("./config.json").googlecalendar;			// <<<<<<< I added a g
 
 
 const { google } = require('googleapis');
+
+const auth = new google.auth.GoogleAuth({
+    keyFile: config.auth_keyfile,
+    scopes: ['https://www.googleapis.com/auth/calendar']
+});
+
+
+
 const cal = google.calendar({
     version: 'v3',
-    auth: config.auth
+    auth: auth
 });
 
 async function getEventList() {
 
     // Set beginning of query to yesterday
-    let startDate = new Date();
+    let startDate = new Date().getTime() - (config.extraEndTime * 1000);
 
     let list = await cal.events.list({
         // Set times to ISO strings as such
@@ -37,11 +45,25 @@ async function getEventList() {
 }
 
 async function getEvent(id) {
-    return await cal.events.getEvent(id);
+    return await cal.events.get({
+        calendarId: config.calendarId,
+        eventId: id,
+        auth: auth
+    });
 }
 
-async function updateEvent(event) {
-    await cal.events.update(event);
+async function updateEventDescription(event) {
+    try {
+        const results = await cal.events.patch({
+            calendarId: config.calendarId,
+            eventId: event.data.id,
+            requestBody: { description: event.data.description },
+            auth: auth
+        });
+        console.log('Event updated - ' + event.id.summary);
+    } catch (err) {
+        console.log('Exception in updateEventDescription -' + err.message);
+    }
 }
 
 
@@ -82,9 +104,9 @@ async function getEventsAsync() {
         }
 
         var now = new Date().getTime();
-        for (var n = 0; n < itemCount; ++n) {
+        for (let n = 0; n < itemCount; ++n) {
 
-            var event = eventList.data.items[n];
+            let event = eventList.data.items[n];
             if (!event.start || !event.start.dateTime) {
                 console.log('No start time - ' + event.summary);
                 continue;
@@ -108,23 +130,25 @@ async function getEventsAsync() {
 
                 currentEvents[event.id] = event;
                 if (onEventStart) {
-                    onEventStart(event);
+                    await onEventStart(event);
                 }
             }
             else if (currentEvents[event.id] && !eventIsHappening) {
                 // The event is listed as current, so let's check to see if it moved or is over
                 if (onEventEnd) {
-                    onEventEnd(event);
+                    await onEventEnd(event);
                 }
                 delete currentEvents[event.id];
             }
         }
 
+        let eventIds = Object.keys(currentEvents);
         // There's one more way an event can end, if it was just deleted from the calendar. 
-        for (var eventId in currentEvents) {
+        for (let m=0; m < eventIds.length; ++m) {
 
-            var found = false;
-            for (var n = 0; n < itemCount; ++n) {
+            let eventId = eventIds[m];
+            let found = false;
+            for (let n = 0; n < itemCount; ++n) {
                 var event = eventList.data.items[n];
                 if (event.id === eventId) {
                     found = true;
@@ -147,7 +171,7 @@ async function getEventsAsync() {
 }
 
 // 
-// getEvents() - calls the asynchronouse getEventsAsync from a normal function
+// getEvents() - calls the asynchronous getEventsAsync from a normal function
 //
 function getEvents() {
     (async () => {
@@ -155,6 +179,18 @@ function getEvents() {
     })();
 }
 
+
+async function addDetails(id, details) {
+    let event = await getEvent(id);
+
+    if (!event.data.description) {
+        event.data.description = details;
+    } else {
+        event.data.description += details;
+    }
+
+    await updateEventDescription(event);
+}
 
 function start(scheduleChangeCallback, onStartCallback, onEndCallback) {
 
@@ -181,6 +217,7 @@ if (!module.exports.Start) {
     module.exports.Start = start;
     module.exports.EventList = eventList;
     module.exports.GetEventDescription = getEvent;
-    module.exports.UpdateEvent = updateEvent;
+    module.exports.UpdateEventDescription = updateEventDescription;
+    module.exports.AddDetails = addDetails;
 }
 
