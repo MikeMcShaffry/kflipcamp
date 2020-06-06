@@ -60,7 +60,7 @@ async function updateEventDescription(event) {
             requestBody: { description: event.data.description },
             auth: auth
         });
-        console.log('Event updated - ' + event.id.summary);
+        console.log('Event updated - ' + event.data.summary);
     } catch (err) {
         console.log('Exception in updateEventDescription -' + err.message);
     }

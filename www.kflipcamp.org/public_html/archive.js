@@ -98,7 +98,7 @@ async function finalizeRecording(event) {
     const day = now.getDate();
     const year = now.getFullYear();
     const datestamp = `${month}-${day}`;
-    const archiveUrl = `${archiveConfig.url}/${year}`;
+    const archiveUrl = `${archiveConfig.url}${year}`;
 
     const seconds = now.getHours() * 3600 + now.getMinutes();
 
@@ -109,14 +109,14 @@ async function finalizeRecording(event) {
         fs.renameSync(`${archiveConfig.tmpDir}${event.id}.mp3`, `${archiveConfig.tmpDir}${datestamp}-${event.summary}-${seconds}.mp3`);
     }
 
-    const link = encodeURI(`${archiveUrl}${datestamp}-${event.summary}-${seconds}.mp3`);
+    const link = encodeURI(`${archiveUrl}/${datestamp}-${event.summary}-${seconds}.mp3`);
 
     eventDetails[event.id] += `\n   Event recording stored in ${link}\n`;
     if (addDetails) {
-        await addDetails(event.id, eventDetails);
+        await addDetails(event.id, eventDetails[event.id]);
     }
 
-    console.log(eventDetails);
+    console.log(eventDetails[event.id]);
 }
 
 //
