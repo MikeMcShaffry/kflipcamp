@@ -34,6 +34,8 @@ const monthNames = [
     "Oct", "Nov", "Dec"
 ];
 
+const divider = '\n---------------------------------------\n';
+
 async function onStartEvent(event) {
 
     console.log(`Starting event ${event.id}:${event.summary}`);
@@ -111,7 +113,7 @@ async function finalizeRecording(event) {
 
     const link = encodeURI(`${archiveUrl}/${datestamp}-${event.summary}-${seconds}.mp3`);
 
-    eventDetails[event.id] += `\n   Event recording stored in ${link}\n`;
+    eventDetails[event.id] = `${divider}Click here to listen to this show: ${link}\n${eventDetails[event.id]}`;
     if (addDetails) {
         await addDetails(event.id, eventDetails[event.id]);
     }
@@ -151,7 +153,7 @@ function addToLog(detail) {
         let eventIds = Object.keys(eventDetails);
         for (let n = 0; n < eventIds.length; n++) {
             let eventId = eventIds[n];
-            eventDetails[eventId] += `   ${detail}\n`;
+            eventDetails[eventId] += `   - ${detail}\n`;
         }
 
     }
