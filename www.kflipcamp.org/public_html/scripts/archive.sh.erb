@@ -11,4 +11,4 @@ function archive() {
 
 export -f archive
 
-find {{tmpDir}}*.mp3 -mmin +30 -exec /bin/bash -c 'archive "$0"' {} \;
+find {{tmpDir}}*.mp3 -mmin +5 -exec /bin/bash -c 'archive "$0"' {} \;
