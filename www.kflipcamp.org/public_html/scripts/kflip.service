@@ -4,6 +4,7 @@ Documentation=
 After=network.target
 
 [Service]
+WorkingDirectory=/home/kflip/public_html
 Environment=NODE_PORT=3000
 Type=simple
 User=kflip
