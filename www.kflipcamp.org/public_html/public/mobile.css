@@ -39,13 +39,13 @@ div.column-content .albumarea {
 
 .albumimage {
     position: absolute;
-    left: 320px;
+    left: 345px;
     width: auto;
     height: auto;
 
     border-radius: 5px;
     max-width:300px;
-    max-height:300px;
+    max-height:275px;
 
     display: block;
     margin-left: auto;
@@ -84,7 +84,7 @@ button {
     font-size: 4em;
     font-weight: 400;
     width: 300px;
-    height: 300px;
+    height: 275px;
     border: none;
     cursor: pointer;
     color: #7095D2;
@@ -164,7 +164,7 @@ button {
     width: 100%;
     max-width: 610px;
     position: fixed;
-    top: 375px;
+    top: 350px;
     padding-left: 15px;
     padding-right: 15px;
     background-color: rgb(54, 57, 62);
