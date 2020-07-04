@@ -130,14 +130,14 @@ button {
 .title-bar {
     margin-top: 10px;
     margin-bottom: 10px;
-    height: 55px;
+    height: 40px;
     max-width: 610px;
     padding-left: 15px;
     padding-right: 15px;
     background-color: rgb(54, 57, 62);
     border-radius: 5px;
     font-family: 'Oswald';
-    font-size: 2em;
+    font-size: 1.5em;
     font-weight: 400;
     color: #fff;
 }
@@ -164,7 +164,7 @@ button {
     width: 100%;
     max-width: 610px;
     position: fixed;
-    top: 350px;
+    top: 335px;
     padding-left: 15px;
     padding-right: 15px;
     background-color: rgb(54, 57, 62);
