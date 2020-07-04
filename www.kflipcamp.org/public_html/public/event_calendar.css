@@ -2,9 +2,7 @@
 @import url(https://fonts.googleapis.com/css?family=Montserrat);
 @import url(https://fonts.googleapis.com/css?family=Oswald:400,700);
 
-html {
-    background-color: rgb(14, 151, 167);
-}
+
 
 .event-calendar-scroll {
     max-height: 340px;
