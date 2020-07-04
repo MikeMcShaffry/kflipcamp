@@ -32,10 +32,12 @@
     <Content Include="package-lock.json" />
     <Content Include="package.json" />
     <Content Include="public\desktop.css" />
+    <Content Include="public\mobile.css" />
     <Content Include="public\event_calendar.css">
       <SubType>Code</SubType>
     </Content>
     <Content Include="public\favicon.ico" />
+    <Content Include="public\mobile.html" />
     <Content Include="Readme.md" />
     <Content Include="postinstall.js" />
     <Content Include="docs\API.md" />
