@@ -1,0 +1,402 @@
+/* Page Layout Elements */
+
+
+* {
+    box-sizing: border-box;
+}
+
+
+html {
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #7095D2
+}
+
+h2 {
+    font-family: 'Oswald';
+    font-size: 1.5em;
+    font-weight: 400;
+    color: #fff;
+    margin: 5px 0px;
+}
+
+body {
+    margin: 10px;
+}
+
+
+#container {
+    display: block;
+}
+
+@media only screen and (orientation:portrait) {
+
+    #container {
+        height: 100vw;
+        -webkit-transform: rotate(90deg);
+        -moz-transform: rotate(90deg);
+        -o-transform: rotate(90deg);
+        -ms-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+}
+
+@media only screen and (orientation:landscape) {
+
+    #container {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+}
+
+
+
+
+
+div.column-content {
+    width: 100%;
+    height: auto;
+}
+
+div.column-content .albumarea {
+    align-content: center;
+    background-color: rgb(0, 0, 0);
+    border-radius: 5px;
+    max-height: 400px;
+}
+
+.albumimage {
+    position: absolute;
+    left: 345px;
+    width: auto;
+    height: auto;
+
+    border-radius: 5px;
+    max-width:300px;
+    max-height:275px;
+
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div.column-content .livelinkarea {
+    align-content: center;
+    background-color: rgb(0, 0, 0);
+    border-radius: 5px;
+    height: 200px;
+
+    font-family: 'Oswald';
+    font-size: 1.3em;
+    font-weight: 400;
+    color: #fff;
+    text-align: center;
+    padding: 50px 0;
+}
+
+
+div.column-content .livelinkarea a {
+    color: #1ABC9C;
+}
+
+div.column-content .livelinkarea a:visited {
+    color: #7095D2;
+}
+
+
+/* Mobile play / pause button */
+
+button {
+    position: absolute;
+    font-family: 'Oswald';
+    font-size: 4em;
+    font-weight: 400;
+    width: 300px;
+    height: 275px;
+    border: none;
+    cursor: pointer;
+    color: #7095D2;
+    border-radius: 5px;
+}
+
+.play {
+    background-image: url(/mobile_play.png);
+}
+
+.pause {
+    background-image: url(/mobile_pause.png);
+}
+
+
+.column {
+    padding: 0 6px;
+    float: left;
+    width: 49.99999%;
+    max-width: 500px;
+}
+
+@media only screen and (max-width: 500px) {
+    .column {
+        width: 100%;
+    }
+}
+
+.chat-window {
+    height: 90vh;
+}
+
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+
+/* Listener Group - the top menu bar thiny */
+
+
+.title-bar {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 40px;
+    max-width: 610px;
+    padding-left: 15px;
+    padding-right: 15px;
+    background-color: rgb(54, 57, 62);
+    border-radius: 5px;
+    font-family: 'Oswald';
+    font-size: 1.5em;
+    font-weight: 400;
+    color: #fff;
+}
+
+
+
+.title-bar .count {
+    padding-left: 30px;
+    float: right;
+}
+
+.title-bar .phone {
+    padding-left: 30px;
+    float: right;
+}
+
+
+
+/* Mobile now playing info */
+
+.nowplaying-bar {
+    margin-top: 10px;
+    height: 65px;
+    width: 100%;
+    max-width: 610px;
+    position: fixed;
+    top: 335px;
+    padding-left: 15px;
+    padding-right: 15px;
+    background-color: rgb(54, 57, 62);
+    border-radius: 5px;
+    font-family: 'Oswald';
+    font-size: 1.25em;
+    font-weight: 400;
+    color: #fff;
+    /*overflow: hidden;*/
+}
+
+
+.nowplaying-bar div {
+    display: block;
+    width: 100%;
+    position: absolute;
+    overflow: hidden;
+    /*animation: marquee 10s linear infinite;*/
+}
+
+.nowplaying-bar span {
+    float: left;
+    width: 100%;
+}
+
+@keyframes marquee {
+    0% {
+        left: 0%;
+    }
+
+    100% {
+        left: -100%;
+    }
+}
+
+
+
+/* Helpbox and Modal Dialog */
+
+
+
+/* Help Box*/
+.minihelpbox {
+    width: 100%;
+    padding-top: 5px;
+    background-color: rgb(0, 0, 0);
+    border-radius: 5px;
+    height: 35px;
+    margin: 0 0 5px;
+}
+
+
+
+.minihelpbox p {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #fff;
+    /*padding-bottom: 15px;*/
+    margin: 0px;
+    text-align: center;
+}
+
+.minihelpbox a {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #fff;
+    /*padding-bottom: 15px;*/
+    margin: 0px;
+    text-align: left;
+}
+
+
+.minihelpbox p:hover {
+    color: #7095D2;
+}
+
+
+.helptext {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #fff;
+    padding-bottom: 15px;
+}
+
+.helptext a {
+    color: #1ABC9C;
+}
+
+.helptext a:visited {
+    color: #7095D2;
+}
+
+.helpsubject {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #1ABC9C;
+}
+
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 100; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    border-radius: 5px;
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+@keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+/* The Close Button */
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+.modal-header {
+    padding: 2px 16px;
+    background-color: #7095D2;
+    color: white;
+}
+
+.modal-body {
+    padding: 2px 16px;
+    background-color: #000;
+}
+
+.modal-footer {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
+
+
+
+/* Patron Box*/
+
+
+.patreon-area {
+    width: 100%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+

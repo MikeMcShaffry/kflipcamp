@@ -1,4 +1,0 @@
-Application name	www.kflipcamp.org
-API key	5f49868a97ed59cce286b0ecd0fa3112
-Shared secret	bf18d878fda13d99923996fcf1db6414
-Registered to	tanukisac

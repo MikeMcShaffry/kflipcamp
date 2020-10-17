@@ -1,0 +1,15 @@
+[Unit]
+Description=KFLIP nodejs service
+Documentation=
+After=network.target
+
+[Service]
+WorkingDirectory=/home/kflip/public_html
+Environment=NODE_PORT=3000
+Type=simple
+User=kflip
+ExecStart=/usr/bin/node /home/kflip/public_html/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

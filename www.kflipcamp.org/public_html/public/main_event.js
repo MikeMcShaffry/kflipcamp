@@ -7,6 +7,12 @@ $(function() {
     ];
 
 
+    const dowNames = [
+        "SUN", "GTFO", "TUE",
+        "WED", "THU", "FRI",
+        "SAT"
+    ];
+
     //
     // Event box toggle
     //
@@ -20,15 +26,50 @@ $(function() {
 
 
     // Initialize variables
-    var $window = $(window);
     var $eventList = $(".event-calendar");   // Google calender event-list
-    var $listeners = $(".listener-group .count");
-    var $streaming = $(".listener-group .streaming");
+    var $listeners = $(".title-bar .count");
+    var $currentDj = $(".title-bar .dj");
+    var $phone = $(".title-bar .phone");
     var $albumimage = $(".albumimage");
+    var $livelinkarea = $(".livelinkarea");
+    var $livelink = $(".livelinkarea a");
+    var $nowPlayingBar = $(".nowplaying-bar .nowplaying-text");
 
-    var $heroPlayer = $(".audio6_html5"); 
+    var $player = $("#mobile_player")[0]; // id for audio element
+    var $btnPlayPause = $("#btnPlayPause");
 
-    // Prompt for setting a username
+    $btnPlayPause.click(function () {
+        if ($player.paused || $player.ended) {
+            // Change the button to a pause button
+            changeButtonType(btnPlayPause, 'pause');
+            $player.play();
+        }
+        else {
+            // Change the button to a play button
+            changeButtonType(btnPlayPause, 'play');
+            $player.pause();
+        }
+    });
+
+    if ($player) {
+        // Add a listener for the play and pause events so the buttons state can be updated
+        $player.addEventListener('play', function () {
+            // Change the button to be a pause button
+            changeButtonType(btnPlayPause, 'Pause');
+        }, false);
+
+        $player.addEventListener('pause', function () {
+            // Change the button to be a play button
+            changeButtonType(btnPlayPause, 'Play');
+        }, false);
+    }
+
+    // Updates a button's title, innerHTML and CSS class
+    function changeButtonType(btn, value) {
+        btn.title = value.toLowerCase();
+        btn.innerHTML = value;
+        btn.className = value.toLowerCase();
+    }
 
     let kflipListeners = 0;
     let shoutingFireListeners = 0;
@@ -46,10 +87,12 @@ $(function() {
               <div class="event-container">
                   <span class="date-container">
                       <span class="date">06<span class="month">Diciembre</span></span>
+                      <span class="dia">TUE</span>
                   </span>
                   <span class="detail-container">
                       <span class="title">Los días de diciembre</span>
                       <span class="description">Pequeña descripción del evento</span>
+
                   </span>
                   </span>
               </div>
@@ -64,6 +107,7 @@ $(function() {
       var endDate = new Date(event.end.dateTime);
 
       var $a = $('<a href="#" class="event"/>');
+      // var $eventContainer = $('<div class="flipside-event-container"/>');
       var $eventContainer = $('<div class="event-container"/>');
       $a.append($eventContainer);
 
@@ -74,8 +118,13 @@ $(function() {
           .text(startDate.getDate());
       var $month = $('<span class="month"/>')
           .text(monthNames[startDate.getMonth()]);
+      var $dia = $('<span class="dia"/>')
+          .text(dowNames[startDate.getDay()]);
+
       $date.append($month);
       $dateContainer.append($date);
+      $dateContainer.append($dia);
+
 
       var $detailContainer = $('<span class="detail-container"/>');
       $eventContainer.append($detailContainer);
@@ -87,7 +136,7 @@ $(function() {
       var localStart = moment(startDate).local();
       var localEnd = moment(endDate).local();
       var $description = $('<span class="description"/>')
-          .text('Broadcasting from ' + localStart.format('hh:mm a') + ' - ' + localEnd.format('hh:mm a'));
+          .text(localStart.format('hh:mm a') + ' - ' + localEnd.format('hh:mm a'));
       $detailContainer.append($description);
 
       var $spacer = $('<div class="spacer"/>');
@@ -146,7 +195,6 @@ $(function() {
 
         let onShoutingFire = (whichStreamIsBroadcasting &&
             whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire');
-
         if (onShoutingFire) {
             listeners += shoutingFireListeners;
         }
@@ -198,29 +246,72 @@ $(function() {
     });
 
 
-    function setHeaderText(dj) {
+    function setHeaderText(newdj) {
+
+        let dj = newdj;
+        let link = '';
+
+        let linkStart = newdj.indexOf('http');
+        if (linkStart !== -1) {
+            link = newdj.substr(linkStart);
+            dj = newdj.substr(0, linkStart - 1);
+        }
+
+        if (link) {
+            $livelink.attr("href", link);
+            $livelinkarea.css({display: "block"});
+            $albumimage.css({ display: "none" });
+        } else {
+            $livelinkarea.css({ display: "none" });
+            $albumimage.css({ display: "block" });
+        }
+
         $("head title").text('KFLIP CAMP');
+
         if (dj !== 'Otto-mation') {
-            $streaming.text(`- ${dj} is ON AIR!`);
-            $("head title").text(`KFLIP CAMP - ${dj} is ON AIR!`);
+            $currentDj.text(`- LIVE - ${dj}`);
+            $("head title").text(`KFLIP CAMP - LIVE - ${dj}`);
+
         } else if (whichStreamIsBroadcasting && whichStreamIsBroadcasting.listenurl) {
 
             if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip') {
-                $streaming.text(' - A Human DJ is LIVE!');
+                $currentDj.text('- A Human DJ is LIVE!');
             } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip_auto') {
-                $streaming.text(' - on Otto-mation');
+                $currentDj.text('- on Otto-mation');
             } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire') {
-                $streaming.text(' - on SHOUTINGFIRE!');
+                $currentDj.text('- on SHOUTINGFIRE!');
             }
         }
     }
 
 
+    socket.on('phone',
+        (data) => {
+            if (data) {
+                setPhoneText(data);
+            }
+        });
+
+    function setPhoneText(data) {
+        if (data.displayed === false) {
+            $phone.text('');
+        } else {
+            $phone.text(data.number);
+        }
+    }
+
+
+    function updateNowPlaying(title) {
+        console.log(`Now playing - ${title}`);
+        $nowPlayingBar.text(title);
+    }
+
     socket.on('nowplaying', (data) => {
         if (!data.stream) {
-            $streaming.text(" - OFF AIR");
+            $currentDj.text(" - OFF AIR");
             whichStreamIsBroadcasting = null;
             updateListeners();
+            updateNowPlaying("Now Playing - silence...");
         } else {
 
             let mustUpdateListeners = false;
@@ -237,22 +328,21 @@ $(function() {
                 setHeaderText('Otto-mation');
                 updateListeners();
             }
-
-            if ($heroPlayer.length > 0) {
-                $heroPlayer.jqHandleNowPlaying(whichStreamIsBroadcasting);
-            }
+            updateNowPlaying(data.stream.title);
         }
+
     });
 
 
-    socket.on('albuminfo', (data) => {
+  socket.on('albuminfo',
+    (data) => {
 
         console.log(`New album information received - image ${data.message.image}`);
         if ($albumimage.length > 0) {
             $albumimage.attr("src", data.message.image);
         }
 
-    })
+  });
 
   socket.on('disconnect', () => {
 

@@ -33,31 +33,40 @@ sub OutputNowPlaying
 	strArtist = "[unknown artist]"
 	End If
 
-   'Open the file (overwrite=True, unicode=True)
-  Set objFSO = CreateObject("Scripting.FileSystemObject")
-  Set objTextFile = objFSO.CreateTextFile(strTextFilePath, True, True)
+  Dim objStream
+  Set objStream = CreateObject("ADODB.Stream")
+  objStream.CharSet = "utf-8"
+  objStream.Open
+
+   'Open the file & write
+  'Set objFSO = CreateObject("Scripting.FileSystemObject")
+  'Set objTextFile = objFSO.CreateTextFile(strTextFilePath,2)
   
   On Error Resume Next
   
-	' Write the file
 	'If the album name is NOT known, don't show it
-  If strAlbum = "" Then  
-    objTextFile.Write ": """ & strTrack & """ by " & strArtist & "."
-  ElseIf strAlbum = " " Then  
-    objTextFile.Write ": """ & strTrack & """ by " & strArtist & "."
-  Else 
-    objTextFile.Write ": """ & strTrack & """ by " & strArtist & " off *" & strAlbum & "*."
-  End If
+  'If strAlbum = "" Then  
+  '  objTextFile.Write " """ & strTrack & """ by " & strArtist 
+  'ElseIf strAlbum = " " Then  
+  '  objTextFile.Write " """ & strTrack & """ by " & strArtist
+  'Else 
+  '  objTextFile.Write " """ & strTrack & """ by " & strArtist & " off *" & strAlbum & "*"
+  'End If
 
+  If strAlbum = "" Then  
+    objStream.WriteText strArtist & " - " & strTrack
+  ElseIf strAlbum = " " Then  
+    objStream.WriteText strArtist & " - " & strTrack
+  Else 
+    objStream.WriteText strArtist & " - " & strTrack  & " off *" & strAlbum & "*"
+  End If
   
+  objStream.SaveToFile strTextFilePath, 2
   
   If Err.Number <> 0 Then
-'  objTextFile.WriteLine ": Something in unicode! I hate unicode! Eck, pthew!"
+  objTextFile.WriteLine ": Something in unicode! I hate unicode! Eck, pthew!"
   Err.Clear
   End If
-	
-   'close the file   
-   objTextFile.Close
-   
+	 
 
 end sub

@@ -3,4 +3,6 @@ node_modules/
 obj/
 bin/
 data/
+.idea
 config.json
+kflip_show_calendar.json
