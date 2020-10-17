@@ -33,8 +33,43 @@ $(function() {
     var $albumimage = $(".albumimage");
     var $livelinkarea = $(".livelinkarea");
     var $livelink = $(".livelinkarea a");
+    var $nowPlayingBar = $(".nowplaying-bar .nowplaying-text");
 
-    // Prompt for setting a username
+    var $player = $("#mobile_player")[0]; // id for audio element
+    var $btnPlayPause = $("#btnPlayPause");
+
+    $btnPlayPause.click(function () {
+        if ($player.paused || $player.ended) {
+            // Change the button to a pause button
+            changeButtonType(btnPlayPause, 'pause');
+            $player.play();
+        }
+        else {
+            // Change the button to a play button
+            changeButtonType(btnPlayPause, 'play');
+            $player.pause();
+        }
+    });
+
+    if ($player) {
+        // Add a listener for the play and pause events so the buttons state can be updated
+        $player.addEventListener('play', function () {
+            // Change the button to be a pause button
+            changeButtonType(btnPlayPause, 'Pause');
+        }, false);
+
+        $player.addEventListener('pause', function () {
+            // Change the button to be a play button
+            changeButtonType(btnPlayPause, 'Play');
+        }, false);
+    }
+
+    // Updates a button's title, innerHTML and CSS class
+    function changeButtonType(btn, value) {
+        btn.title = value.toLowerCase();
+        btn.innerHTML = value;
+        btn.className = value.toLowerCase();
+    }
 
     let kflipListeners = 0;
     let shoutingFireListeners = 0;
@@ -266,11 +301,17 @@ $(function() {
     }
 
 
+    function updateNowPlaying(title) {
+        console.log(`Now playing - ${title}`);
+        $nowPlayingBar.text(title);
+    }
+
     socket.on('nowplaying', (data) => {
         if (!data.stream) {
             $currentDj.text(" - OFF AIR");
             whichStreamIsBroadcasting = null;
             updateListeners();
+            updateNowPlaying("Now Playing - silence...");
         } else {
 
             let mustUpdateListeners = false;
@@ -287,8 +328,9 @@ $(function() {
                 setHeaderText('Otto-mation');
                 updateListeners();
             }
-
+            updateNowPlaying(data.stream.title);
         }
+
     });
 
 
