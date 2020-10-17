@@ -25,6 +25,7 @@
     <Content Include="icecastinfo.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="kflip_show_calendar.json.example" />
     <Content Include="lastfm.js">
       <SubType>Code</SubType>
     </Content>

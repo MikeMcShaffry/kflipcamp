@@ -19,6 +19,7 @@
     "nowplayingfile": "C:/temp/MediaMonkey_NowPlaying.txt"
   },
   "googlecalendar": {
+    "auth_keyfile": "--YOUR GOOGLE CALENDAR AUTH KEY FILE--",
     "auth": "--YOUR GOOGLE CALENDAR AUTH TOKEN--",
     "calendarId": "--YOUR CALENDAR ID--@group.calendar.google.com",
     "checkdelay": 15,
