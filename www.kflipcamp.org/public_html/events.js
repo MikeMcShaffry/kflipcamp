@@ -8,7 +8,7 @@
 // Here we load the config.json file that contains our token and our prefix values. 
 
 const config = require("./config.json").googlecalendar;			// <<<<<<< I added a google calendar section to the config file
-
+const moment = require("moment");
 
 const { google } = require('googleapis');
 
@@ -26,8 +26,8 @@ const cal = google.calendar({
 
 async function getEventList() {
 
-    // Set beginning of query to yesterday
-    let startDate = new Date().getTime() - (config.extraEndTime * 1000);
+    // Set beginning of query to now minus three hours - a typical long show)
+    let startDate = new Date().getTime() - (3 * 60 * 60 * 1000);
 
     let list = await cal.events.list({
         // Set times to ISO strings as such
@@ -43,6 +43,37 @@ async function getEventList() {
     list.data.items = sortedItems;
     return list;
 }
+
+async function getEventArchive(year, month) {
+
+    try {
+        // Set beginning of query to now minus three hours - a typical long show)
+        let startDate = moment(new Date(year, month, 1));
+        let endDate = moment(startDate).endOf('month');
+
+        let list = await cal.events.list({
+            // Set times to ISO strings as such
+            timeMin: startDate.toISOString(),
+            timeMax: endDate.toISOString(),
+            calendarId: config.calendarId
+        });
+
+        list.data.items.forEach(function (event) {
+            event.startDate = new Date(event.start.dateTime);
+        });
+
+        let sortedItems = list.data.items.sort(function (a, b) {
+            return a.startDate - b.startDate;
+        });
+        list.data.items = sortedItems;
+        return list;
+    }
+    catch(error) {
+        console.log("Something bad happened");
+    }
+    return [];
+}
+
 
 async function getEvent(id) {
     return await cal.events.get({
@@ -99,7 +130,7 @@ async function getEventsAsync() {
             lastScheduleItemCount = itemCount;
 
             if (onScheduleChange) {
-                onScheduleChange(eventList);
+                onScheduleChange(config.calendarId, eventList);
             }
         }
 
@@ -174,6 +205,7 @@ async function getEventsAsync() {
 // getEvents() - calls the asynchronous getEventsAsync from a normal function
 //
 function getEvents() {
+    // TODO - this should be converted to the .then().catch() syntax
     (async () => {
         await getEventsAsync();
     })();
@@ -191,6 +223,8 @@ async function addDetails(id, details) {
 
     await updateEventDescription(event);
 }
+
+
 
 function start(scheduleChangeCallback, onStartCallback, onEndCallback) {
 
@@ -219,5 +253,6 @@ if (!module.exports.Start) {
     module.exports.GetEventDescription = getEvent;
     module.exports.UpdateEventDescription = updateEventDescription;
     module.exports.AddDetails = addDetails;
+    module.exports.GetEventArchive = getEventArchive;
 }
 

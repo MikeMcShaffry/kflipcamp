@@ -70,7 +70,7 @@ function onAlbumInfoChange(albumSummary, albumImage) {
 // onScheduleChange - called by the events.js module whenever the schedule cahnges - it emits the new schedule to all connected browsers
 //
 var kflipShowString = null;
-function onScheduleChange(eventList) {
+function onScheduleChange(calendarId, eventList) {
 
     kflipShowString = JSON.stringify(eventList);
 
@@ -81,6 +81,7 @@ function onScheduleChange(eventList) {
         connectedSocket.emit('schedule',
             {
                 username: 'KFLIP',
+                calendarId: calendarId,
                 message: kflipShowString
             });
     });
@@ -211,6 +212,22 @@ app.get('/search', async function (req, res) {
     res.end(JSON.stringify(results));
 });
 
+
+//
+// GET /search
+//
+app.get('/archive/:year/:month', async function (req, res) {
+    let results = [];
+    try {
+        // TODO validate parameters!
+        results = await events.GetEventArchive(req.params.year, req.params.month);
+    }
+    catch (err) {
+        console.log('Error detected in POST /search: ' + err.message);
+    }
+
+    res.end(JSON.stringify(results));
+});
 
 
 //

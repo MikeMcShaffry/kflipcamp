@@ -110,6 +110,7 @@ div.column-content .livelinkarea a:visited {
     padding-right: 15px;
     background-color: rgb(54, 57, 62);
     border-radius: 5px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.2);
 
     font-family: 'Oswald';
     font-size: 1.3em;

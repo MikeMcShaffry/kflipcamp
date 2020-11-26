@@ -25,7 +25,7 @@ $(function() {
    });
 
 
-    // Initialize variables
+    // Initialize variables - listen and chat page
     var $eventList = $(".event-calendar");   // Google calender event-list
     var $listeners = $(".title-bar .count");
     var $currentDj = $(".title-bar .dj");
@@ -34,7 +34,7 @@ $(function() {
     var $livelinkarea = $(".livelinkarea");
     var $livelink = $(".livelinkarea a");
     var $nowPlayingBar = $(".nowplaying-bar .nowplaying-text");
-
+    
     var $player = $("#mobile_player")[0]; // id for audio element
     var $btnPlayPause = $("#btnPlayPause");
 
@@ -78,8 +78,8 @@ $(function() {
     var socket = io();
 
 
-  // Adds the visual chat message to the message list
-  const addEvent = (event) => {
+    // Adds the visual chat message to the message list
+    const addEvent = (event) => {
 
       /* For each event, we want to add something like this:
      
@@ -90,15 +90,15 @@ $(function() {
                       <span class="dia">TUE</span>
                   </span>
                   <span class="detail-container">
-                      <span class="title">Los días de diciembre</span>
-                      <span class="description">Pequeña descripción del evento</span>
+                      <span class="title">Los dï¿½as de diciembre</span>
+                      <span class="description">Pequeï¿½a descripciï¿½n del evento</span>
 
                   </span>
                   </span>
               </div>
           </a>
           <div class='openEv'>
-              <span><b>Dia:</b> 06 de Diciembre, 2015</br><b>Hora:</b> 20:30 hrs</br><b>Lugar:</b> Constitución, CL</br><b>Descripción:</b> Tocata Show: Super Buena es una actividad al aire libre con plena disposición de droga.</span>
+              <span><b>Dia:</b> 06 de Diciembre, 2015</br><b>Hora:</b> 20:30 hrs</br><b>Lugar:</b> Constituciï¿½n, CL</br><b>Descripciï¿½n:</b> Tocata Show: Super Buena es una actividad al aire libre con plena disposiciï¿½n de droga.</span>
           </div>
           <div class="spacer"></div>
      */
@@ -164,7 +164,7 @@ $(function() {
           $(this).next().toggleClass('open');
       });
 
-  };
+    };
 
 
     const updateSchedule = (data, options) => {
@@ -183,9 +183,6 @@ $(function() {
         schedule.data.items.forEach(function(event) {
             addEvent(event);
         });
-
-        //$eventList[0].scrollTop = 0;
-
     };
 
     const updateListeners = () => {
@@ -194,7 +191,7 @@ $(function() {
         let listeners = kflipListeners; 
 
         let onShoutingFire = (whichStreamIsBroadcasting &&
-            whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire');
+            whichStreamIsBroadcasting.listenurl === '/www.kflipcamp.org:8000/shoutingfire');
         if (onShoutingFire) {
             listeners += shoutingFireListeners;
         }
@@ -220,10 +217,21 @@ $(function() {
         $listeners.text(t);
     };
 
-  // Socket events
+    const updateEventArchive = () => {
 
-
-
+        let year = 2019;
+        let month = 4;   // May?
+        
+        $.get(`/archive/${year}/${month}`, function(data, status) {
+            console.log(`updateEventArchive reports status:${status} - data:${data}`);
+        });
+        
+        
+    }
+    
+    
+    // Socket events
+    
     // Whenever the server emits 'new message', update the chat body
     socket.on('schedule', (data) => {
         updateSchedule(data);
@@ -274,11 +282,11 @@ $(function() {
 
         } else if (whichStreamIsBroadcasting && whichStreamIsBroadcasting.listenurl) {
 
-            if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip') {
+            if (whichStreamIsBroadcasting.listenurl.includes("8000/kflip")) {
                 $currentDj.text('- A Human DJ is LIVE!');
-            } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip_auto') {
+            } else if (whichStreamIsBroadcasting.listenurl.includes("8000/kflip_auto")) {
                 $currentDj.text('- on Otto-mation');
-            } else if (whichStreamIsBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire') {
+            } else if (whichStreamIsBroadcasting.listenurl.includes("8000/shoutingfire")) {
                 $currentDj.text('- on SHOUTINGFIRE!');
             }
         }
@@ -357,4 +365,6 @@ $(function() {
 
   });
 
+  updateEventArchive();
+  
 });

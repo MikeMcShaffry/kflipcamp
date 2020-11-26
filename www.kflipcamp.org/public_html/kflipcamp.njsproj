@@ -39,6 +39,8 @@
     </Content>
     <Content Include="public\favicon.ico" />
     <Content Include="public\mobile.html" />
+    <Content Include="public\new.html" />
+    <Content Include="public\tabs.css" />
     <Content Include="Readme.md" />
     <Content Include="postinstall.js" />
     <Content Include="docs\API.md" />
@@ -64,7 +66,6 @@
     <Folder Include="docs" />
     <Folder Include="kflipcamp" />
     <Folder Include="lib" />
-    <Folder Include="public" />
     <Folder Include="public\js" />
     <Folder Include="scripts\" />
     <Folder Include="test" />
