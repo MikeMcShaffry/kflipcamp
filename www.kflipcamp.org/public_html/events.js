@@ -44,12 +44,12 @@ async function getEventList() {
     return list;
 }
 
-async function getEventArchive(year, month) {
+async function getEventArchive(start, end) {
 
     try {
         // Set beginning of query to now minus three hours - a typical long show)
-        let startDate = moment(new Date(year, month, 1));
-        let endDate = moment(startDate).endOf('month');
+        let startDate = moment(start);
+        let endDate = moment(end);
 
         let list = await cal.events.list({
             // Set times to ISO strings as such

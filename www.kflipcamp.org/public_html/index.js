@@ -216,11 +216,11 @@ app.get('/search', async function (req, res) {
 //
 // GET /search
 //
-app.get('/archive/:year/:month', async function (req, res) {
+app.get('/archive/:start/:end', async function (req, res) {
     let results = [];
     try {
         // TODO validate parameters!
-        results = await events.GetEventArchive(req.params.year, req.params.month);
+        results = await events.GetEventArchive(req.params.start, req.params.end);
     }
     catch (err) {
         console.log('Error detected in POST /search: ' + err.message);

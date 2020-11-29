@@ -11,4 +11,7 @@ function archive() {
 
 export -f archive
 
-find {{tmpDir}}*.mp3 -mmin +5 -exec /bin/bash -c 'archive "$0"' {} \;
+# The below code finds all the *.mp3 files in the tempDir, and runs the archive function on each one.0
+# The last bit with 'grep' filters the error message if no mp3 files are found, but allows other messages to 
+#   be sent to stderr
+find {{tmpDir}}*.mp3 -mmin +5 -exec /bin/bash -c 'archive "$0"' {} \; 2> >(grep -v 'No such file or directory' >&2)

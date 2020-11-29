@@ -18,6 +18,12 @@
 }
 
 
+.event-archive-scroll {
+    height: 85%;
+    overflow-y: scroll;
+}
+
+
 .head {
     margin-bottom: 0px;
 }
@@ -143,6 +149,7 @@ ss {
 }
 
 
+
 .event-container .click-for-details {
     font-size: .7em;
     float: right;
@@ -255,6 +262,30 @@ ss {
     white-space: normal;
 }
 
-    .openEv.open {
-        display: block;
-    }
+.openEv.open {
+    display: block;
+}
+
+
+/* Archive Page */
+
+.archive-audio-container {
+    padding-top: 5px;
+    padding-right: 10px;
+    float: right;
+}
+
+
+.event-container .archive-detail-container {
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 3px;
+    padding-left: 15px;
+}
+
+input#archive-date-range {
+    font-family: Oswald;
+    font-weight: 300;
+    font-size: 1em;
+    margin-bottom: 15px;
+}

@@ -38,6 +38,10 @@ $(function() {
     var $player = $("#mobile_player")[0]; // id for audio element
     var $btnPlayPause = $("#btnPlayPause");
 
+    var $archiveList = $(".event-archive");
+    var $archiveEnd = moment().endOf("day").toDate();
+    var $archiveStart = moment().subtract(7, "day").endOf("day").toDate();
+    
     $btnPlayPause.click(function () {
         if ($player.paused || $player.ended) {
             // Change the button to a pause button
@@ -217,18 +221,176 @@ $(function() {
         $listeners.text(t);
     };
 
-    const updateEventArchive = () => {
+    const addArchiveEvent = (event) => {
+        
+        /* For each event, we want to add something like this:
+       
+            <a href="#" class="event">
+                <div class="event-container">
+                    <span class="date-container">
+                        <span class="date">06<span class="month">Diciembre</span></span>
+                        <span class="dia">TUE</span>
+                    </span>
+                    <span class="detail-container">
+                        <span class="title">Los d�as de diciembre</span>
+                        <span class="description">Peque�a descripci�n del evento</span>
+                    </span>
+                    </span>
+                </div>
+                <div class="archive-audio-container">
+                    <audio controls>
+                    ...
+                    </audio>
+                </div>
+            </a>
+            <div class='openEv'>
+                <span><b>Dia:</b> 06 de Diciembre, 2015</br><b>Hora:</b> 20:30 hrs</br><b>Lugar:</b> Constituci�n, CL</br><b>Descripci�n:</b> Tocata Show: Super Buena es una actividad al aire libre con plena disposici�n de droga.</span>
+            </div>
+            <div class="spacer"></div>
+       */
 
-        let year = 2019;
-        let month = 4;   // May?
+        var startDate = new Date(event.start.dateTime);
+        var endDate = new Date(event.end.dateTime);
+        var $audio;
+        var playlist;
+        var description = "";
         
-        $.get(`/archive/${year}/${month}`, function(data, status) {
-            console.log(`updateEventArchive reports status:${status} - data:${data}`);
+        if (event.description) {
+
+            var lines = event.description.match(/^.*((\r\n|\n|\r)|$)/gm);
+            var index = 0;
+            while (index < lines.length && lines[index][0] !== '-') {
+                description += lines[index];
+                index++;
+            }
+            if (index < lines.length && lines[index][0] === '-') {
+                // We have an mp3 link and a playlist
+                index++;
+                var mp3Line = lines[index].match(/^.*(https.*)/);
+                if (mp3Line.length === 2) {
+                    mp3Link = mp3Line[1];
+                    
+                    $audio = $(`<span class="archive-audio-container"/>`)
+                    $audioControls = $('<audio controls/>');
+                    var $src = $(`<source src="${mp3Link}"/>`);
+                    $audioControls.append($src);
+                    $audio.append($audioControls);
+                }
+
+                playlist = "";
+                index+=2;
+                while(index < lines.length && !lines[index].includes("Playlist") ) {
+                    index++;
+                }
+                
+                playlist += "Playlist:<br>";
+                ++index;
+                while(index < lines.length) {
+
+                    var findAlbum = lines[index].match(/(.*) off \*(.*)\*|$/);
+                    if (findAlbum[0] !== "") {
+                        playlist += `${findAlbum[1]} off <i>${findAlbum[2]}</i>\n`;
+                    }
+                    else {
+                        playlist += lines[index];
+                    }
+                    index++;
+                }
+                playlist = playlist.replaceAll("\n", "<br>");
+                playlist = playlist.replaceAll("[Shouting Fire]", "");
+            }
+        }
+        
+        
+        var $a = $('<a href="#" class="event"/>');
+        var $eventContainer = $('<div class="event-container"/>');
+        $a.append($eventContainer);
+
+        var $dateContainer = $('<span class="date-container"/>');
+        $eventContainer.append($dateContainer);
+
+        var $date = $('<span class="date"/>')
+            .text(startDate.getDate());
+        var $month = $('<span class="month"/>')
+            .text(monthNames[startDate.getMonth()]);
+        var $dia = $('<span class="dia"/>')
+            .text(dowNames[startDate.getDay()]);
+
+        $date.append($month);
+        $dateContainer.append($date);
+        $dateContainer.append($dia);
+
+
+        var $detailContainer = $('<span class="archive-detail-container"/>');
+        $eventContainer.append($detailContainer);
+
+        var $title = $('<span class="title"/>')
+            .text(event.summary);
+        $detailContainer.append($title);
+
+        var localStart = moment(startDate).local();
+        var localEnd = moment(endDate).local();
+        var $description = $('<span class="description"/>')
+            .text(localStart.format('hh:mm a') + ' - ' + localEnd.format('hh:mm a'));
+        $detailContainer.append($description);
+        
+        if ($audio) {
+            $eventContainer.append($audio);
+        }
+
+        var $spacer = $('<div class="spacer"/>');
+        $eventContainer.append($spacer);
+
+        $archiveList.append($a);
+
+        if (playlist) {
+            var $openEv = $('<div class="openEv"/>');
+            $openEv.append(playlist);
+            $archiveList.append($openEv);
+        }
+        
+        $archiveList.append($spacer);
+
+        $a.click(function() {
+            var clickOnMe = $(this).next().hasClass('open');
+            if (!clickOnMe) {
+                $('.event-calendar').find('.openEv').removeClass('open');
+            }
+            $(this).next().toggleClass('open');
         });
-        
-        
+
+
+
     }
     
+    
+    const updateEventArchive = (start, end) => {
+        
+        $.get(`/archive/${start}/${end}`, function(data, status) {
+            if (status === "success") {
+                $archiveList.empty();
+                try {
+                    var searchResults = JSON.parse(data);
+                    searchResults.data.items.forEach( event => {
+                        addArchiveEvent(event);
+                    });
+                    
+                }
+                catch(err) {
+                    console.log(`Parse error in results from GET /archive - ${err}`)
+                }
+            }
+        });
+    }
+
+
+    $('#archive-date-range').daterangepicker({
+        opens: 'left'
+    }, function(start, end, label) {
+        $archiveStart = start;
+        $archiveEnd = end;
+        updateEventArchive($archiveStart, $archiveEnd);
+    });
     
     // Socket events
     
@@ -365,6 +527,6 @@ $(function() {
 
   });
 
-  updateEventArchive();
+  updateEventArchive($archiveStart, $archiveEnd);
   
 });
