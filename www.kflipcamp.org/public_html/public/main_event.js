@@ -383,14 +383,16 @@ $(function() {
         });
     }
 
-
-    $('#archive-date-range').daterangepicker({
-        opens: 'left'
-    }, function(start, end, label) {
-        $archiveStart = start;
-        $archiveEnd = end;
-        updateEventArchive($archiveStart, $archiveEnd);
-    });
+    let archiveDateRange = $('#archive-date-range');
+    if (archiveDateRange && archiveDateRange.daterangepicker) {
+        archiveDateRange.daterangepicker({
+            opens: 'left'
+        }, function(start, end, label) {
+            $archiveStart = start;
+            $archiveEnd = end;
+            updateEventArchive($archiveStart, $archiveEnd);
+        });
+    }
     
     // Socket events
     
