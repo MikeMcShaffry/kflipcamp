@@ -115,7 +115,7 @@ function checkForSomethingNew(newIcecastStatsJson) {
                 console.log('Stream has changed - We are off the air!');
             } else {
                 sameOldSong = false;
-
+              
                 // TODO CONFIGURATION - these streams should be in a configuration file somewhere
                 if (firstStreamBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip') {
                     console.log('Stream has changed - A live DJ is broadcasting');
@@ -123,7 +123,10 @@ function checkForSomethingNew(newIcecastStatsJson) {
                     console.log('Stream has changed - Otto has the KFLIP stream');
                 } else if (firstStreamBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire') {
                     console.log('Stream has changed - KFLIP is broadcasting ShoutingFire');
+                } else {
+                    console.log('Stream has changed - but I have no idea what stream is broadcasting');
                 }
+                
             }
 
             broadcastingStream = firstStreamBroadcasting;

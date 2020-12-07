@@ -445,11 +445,10 @@ $(function() {
             $("head title").text(`KFLIP CAMP - LIVE - ${dj}`);
 
         } else if (whichStreamIsBroadcasting && whichStreamIsBroadcasting.listenurl) {
-
-            if (whichStreamIsBroadcasting.listenurl.includes("8000/kflip")) {
-                $currentDj.text('- A Human DJ is LIVE!');
-            } else if (whichStreamIsBroadcasting.listenurl.includes("8000/kflip_auto")) {
+            if (whichStreamIsBroadcasting.listenurl.includes("8000/kflip_auto")) {
                 $currentDj.text('- on Otto-mation');
+            } else if (whichStreamIsBroadcasting.listenurl.includes("8000/kflip")) {
+                $currentDj.text('- A Human DJ is LIVE!');
             } else if (whichStreamIsBroadcasting.listenurl.includes("8000/shoutingfire")) {
                 $currentDj.text('- on SHOUTINGFIRE!');
             }
