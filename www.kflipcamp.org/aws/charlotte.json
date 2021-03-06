@@ -1,0 +1,183 @@
+{ 		
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Charlotte ", 
+  "Parameters" : { 	
+	"InstanceTypeParameter": {
+		"Type": "String",
+		"Default": "c5.xlarge",
+		"AllowedValues": [
+			"t3.micro", "t3.small", "t3.medium", "t3.large", 
+			"t3a.micro", "t3a.small", "t3a.medium", "t3a.large", 
+			"c5.large", "c5.xlarge", "c5.2xlarge", "c5.4xlarge", "c5.9xlarge", "c5.18xlarge", 
+			"m5.large", "m5.xlarge", "m5.2xlarge", "m5.4xlarge", "m5.12xlarge", "m5.24xlarge" ],
+		"Description": "Enter t3.micro-t3.large,  t3a.micro-t3a.2xlarge, c5.large-c5.18xlarge, m5.large-m5.24xlarge"		
+	},
+	"ImageIdParameter": {
+			"Type": "String",
+			"Default": "ami-056824f6843c46eab",		
+			"Description": "Enter the Image Id for the AMI you are using to build this server"	
+	}
+  }, 	
+  "Mappings" : {  
+  },
+  "Conditions": {
+	"CreateCPUCreditBalanceAlarm" : 
+	{ "Fn::Or": 
+	  [
+		{ "Fn::Equals": [ "t3", 
+			{ "Fn::Select" : [ "0", { "Fn::Split" : [ "." , { "Ref": "InstanceTypeParameter" } ] } ] }
+		  ]
+		},
+		{ "Fn::Equals": [ "t3a", 
+			{ "Fn::Select" : [ "0", { "Fn::Split" : [ "." , { "Ref": "InstanceTypeParameter" } ] } ] }
+		  ]
+		},
+		{ "Fn::Equals": [ "t4g", 
+			{ "Fn::Select" : [ "0", { "Fn::Split" : [ "." , { "Ref": "InstanceTypeParameter" } ] } ] }
+		  ]
+		}		
+	  ]
+	}
+  },  
+  "Resources": {
+ 
+	"IAMServerProfile": {
+		"Type": "AWS::IAM::InstanceProfile",
+		"Properties": {
+			"Path": "/",
+			"Roles": ["popcorn-net-server"]
+		}
+	},	
+    "PublicServer": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+		"AvailabilityZone": "us-east-1a",
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+		"IamInstanceProfile": {	"Ref": "IAMServerProfile"	},	
+        "ImageId" : {  "Ref": "ImageIdParameter"	 },
+		"InstanceType" : { "Ref" : "InstanceTypeParameter" },
+        "Monitoring": "false",
+        "Tenancy": "default",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": "popcornandrobin-cwp7"
+          },
+          {
+          	"Key": "Project",
+          	"Value": "popcornandrobin"
+          },		  
+		  {
+			"Key": "Name",
+			"Value": "charlotte" 
+		  }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,	
+			"AssociatePublicIpAddress": "true",					
+            "SubnetId": "subnet-305d866c",
+            "GroupSet": [
+              {
+                "Ref": "SecurityGroup"
+              }
+            ]
+          }
+        ]
+      }
+    },
+	"SecurityGroup": {
+		"Type": "AWS::EC2::SecurityGroup",
+		"Properties": {
+			"GroupDescription": "Public Server Security Group",
+			"VpcId": "vpc-16c1226c",				
+			"Tags": [{
+				"Key": "Name",
+				"Value": { "Fn::Join": [ "-", [ 
+					"sg",
+					"cwp7"
+					] ] }
+				}, 
+				{
+					"Key": "Application",
+					"Value": "popcornandrobin-cwp7"
+				},
+				{
+					"Key": "Project",
+					"Value": "popcornandrobin"
+				}
+			],
+			"SecurityGroupIngress": [ { "IpProtocol": "-1", "CidrIp": "0.0.0.0/0" }, { "IpProtocol": "-1", "CidrIpv6": "::/0" }	],
+			"SecurityGroupEgress": [ { "IpProtocol": "-1", "CidrIp": "0.0.0.0/0" }, { "IpProtocol": "-1", "CidrIpv6": "::/0" } ]			
+		}
+	},
+    "InstanceReachabilityAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "AlarmDescription":
+		{ "Fn::Join": [ " ", 
+			[
+				"charlotte",
+				"has failed an AWS instance reachability or system check"
+			] ]
+		},
+        "Namespace": "AWS/EC2" ,
+        "MetricName": "StatusCheckFailed",
+        "Statistic": "Minimum",
+        "Period": "60",
+        "EvaluationPeriods": "3",
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Threshold": "0",
+        "AlarmActions": [ "arn:aws:sns:us-east-1:925343309615:PopcornAndRobinOps" ],
+        "OKActions": [ "arn:aws:sns:us-east-1:925343309615:PopcornAndRobinOps" ],			
+        "Dimensions": [{"Name": "InstanceId","Value": {"Ref": "PublicServer"}}]
+      }
+    },
+	"CPUCreditBalanceAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",	
+      "Condition" : "CreateCPUCreditBalanceAlarm",
+      "Properties": {
+        "AlarmDescription": 
+		{ "Fn::Join": [ " ", 
+			[
+				"charlotte",
+				"has ZERO CPU credits"
+			] ]
+		},
+        "Namespace": "AWS/EC2" ,
+        "MetricName": "CPUCreditBalance",
+        "Statistic": "Minimum",
+        "Period": "300",
+        "EvaluationPeriods": "3",
+        "ComparisonOperator": "LessThanThreshold",
+        "Threshold": "10",
+        "AlarmActions": [ "arn:aws:sns:us-east-1:925343309615:PopcornAndRobinOps" ],
+        "OKActions": [ "arn:aws:sns:us-east-1:925343309615:PopcornAndRobinOps" ],				
+        "Dimensions": [{"Name": "InstanceId","Value": {"Ref": "PublicServer"}}]
+      }
+	},
+    "EIP": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"		
+      }
+    },
+    "EIPAssociation": {
+      "Type": "AWS::EC2::EIPAssociation",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "EIP",
+            "AllocationId"
+          ]
+        },
+        "InstanceId": {
+          "Ref": "PublicServer"
+        }
+      }
+    }		
+  }
+}

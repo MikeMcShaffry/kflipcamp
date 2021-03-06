@@ -1,5 +1,5 @@
 //
-// library.js - Open and search a SQLLite database used by MediaMonkey
+// lastfm.js - Query LastFM to find album art
 //
 // COPYRIGHT (c) 2020 by Michael L. McShaffry - All rights reserved
 //
@@ -73,14 +73,10 @@ async function UpdateNowPlaying(title) {
             return;
         }
 
-        if (title.includes('[Shouting Fire]')) {
-            SetToUnknown();
-            return;
-        }
+        title = title.replace('[Shouting Fire]', '');
 
-
-        // JingleRotation script sends title string like - The Beatles - All Together Now off *The Yellow Submarine*
-        allParts = title.match(/(.+) - (.+) off \*(.+)\*$/);
+        // OutputNowPlaying script sends title string like - The Beatles - All Together Now off *The Yellow Submarine*
+        allParts = title.match(/(.+) - (.+) off *(.+)*$/);
         if (!allParts || allParts.length !== 4) {
             SetToUnknown();
             return;
@@ -88,8 +84,13 @@ async function UpdateNowPlaying(title) {
 
         lastArtist = allParts[1];
         lastAlbum = allParts[3];
+        lastAlbum = lastAlbum.replace('*', '');         // WHY DO I HAVE TO DO THIS????
+        lastAlbum = lastAlbum.replace('*', '');         // WHY DO I HAVE TO DO THIS????
 
-        var url = encodeURI(`http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${config.apikey}&artist=${lastArtist}&album=${lastAlbum}&format=json`);
+        let query = `http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${config.apikey}&artist=${lastArtist}&album=${lastAlbum}&format=json`;
+        //console.log('Sending query ' + query);
+
+        var url = encodeURI(query);
 
     //console.log(`Asking LastFM about ${lastArtist} - ${allParts[2]} off *${lastAlbum}*`);
     //console.log(url);

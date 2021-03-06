@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Last update to this file was 2021-Mar-06
+
+function archive() {
+   JUSTFILE=`basename "$0"`
+   year=`/bin/date +"%Y"`
+   /bin/logger -s "Copying archive file to s3://{{s3bucket}}/${year}/$0"
+   /usr/local/bin/aws s3 cp "$0" "s3://{{s3bucket}}/${year}/$JUSTFILE"
+   rm -f "$0"
+   /bin/logger -s "Removed archive file $0"
+}
+
+export -f archive
+
+# The below code finds all the *.mp3 files in the tempDir, and runs the archive function on each one.0
+# The last bit with 'grep' filters the error message if no mp3 files are found, but allows other messages to 
+#   be sent to stderr
+find {{tmpDir}}*.mp3 -mmin +5 -exec /bin/bash -c 'archive "$0"' {} \; 2> >(grep -v 'No such file or directory' >&2)

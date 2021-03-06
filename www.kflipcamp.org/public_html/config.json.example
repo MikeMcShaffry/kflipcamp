@@ -1,21 +1,39 @@
 {
-	"lastfm": {
-		"enabled": false,
-		"apikey": "--YOUR LASTFM API KEY--",
-		"apisecret": "--YOUR LASTFM API SECRET--",
-		"applicationName": "",
-		"registeredTo": "--YOUR LASTFM USERNAME--",
-		"noAlbumImageAvailable":  "http://MYDOMAIN/logo.png"
-	},
-	"library": {
-		"databasefile": "./data/MM.DB"
-	},
-	"otto": {
-		"enabled": false,
-		"token": "--YOUR DISCORD TOKEN--",
-		"prefix" : "!",
-		"mychannelID" : "--YOUR CHANNEL ID--",		               
-		"use_nowplayingfile": false,
-		"nowplayingfile" : "C:/temp/MediaMonkey_NowPlaying.txt"
-	}
+  "lastfm": {
+    "enabled": false,
+    "apikey": "--YOUR LASTFM API KEY--",
+    "apisecret": "--YOUR LASTFM API SECRET--",
+    "applicationName": "",
+    "registeredTo": "--YOUR LASTFM USERNAME--",
+    "noAlbumImageAvailable": "http://MYDOMAIN/logo.png"
+  },
+  "library": {
+    "databasefile": "./data/MM.DB"
+  },
+  "otto": {
+    "enabled": false,
+    "token": "--YOUR DISCORD TOKEN--",
+    "prefix": "!",
+    "mychannelID": "--YOUR CHANNEL ID--",
+    "use_nowplayingfile": false,
+    "nowplayingfile": "C:/temp/MediaMonkey_NowPlaying.txt"
+  },
+  "googlecalendar": {
+    "auth_keyfile": "--YOUR GOOGLE CALENDAR AUTH KEY FILE--",
+    "auth": "--YOUR GOOGLE CALENDAR AUTH TOKEN--",
+    "calendarId": "--YOUR CALENDAR ID--@group.calendar.google.com",
+    "checkdelay": 15,
+    "extraStartTime": 300,
+    "extraEndTime": 300
+  },
+  "studioinfo": {
+    "phone": "+1-999-867-5309"
+  },
+  "archive": {
+    "enabled": true,
+    "recordMount": "http://MYDOMAIN:PORT/MOUNT",
+    "tmpDir": "/tmp/",
+    "s3bucket": "S3BUCKET",
+    "url": "https://S3BUCKET.s3-REGION.amazonaws.com/"
+  }
 }

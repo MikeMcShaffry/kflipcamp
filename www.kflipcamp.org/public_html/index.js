@@ -18,16 +18,18 @@ const server = require('http').createServer(app);
 const io = require('.')(server);
 var port = process.env.PORT || 3000;
 
+const config = require('./config.json').studio;
 
 const events = require('./events.js');
 const icecastInfo = require('./icecastinfo.js');
 const otto = require('./otto.js');
 const library = require('./library.js');
 const lastfm = require('./lastfm.js');
+const archive = require('./archive.js');
 
 
 // Stores the last title information from icecast stats - it is in the form of artist - song - album
-let title = '';
+let streamInfo = null;
 
 //
 // updateKflipListenerCount(listeners) - emits the number of current listeners to any connected browser
@@ -68,7 +70,7 @@ function onAlbumInfoChange(albumSummary, albumImage) {
 // onScheduleChange - called by the events.js module whenever the schedule cahnges - it emits the new schedule to all connected browsers
 //
 var kflipShowString = null;
-function onScheduleChange(eventList) {
+function onScheduleChange(calendarId, eventList) {
 
     kflipShowString = JSON.stringify(eventList);
 
@@ -79,6 +81,7 @@ function onScheduleChange(eventList) {
         connectedSocket.emit('schedule',
             {
                 username: 'KFLIP',
+                calendarId: calendarId,
                 message: kflipShowString
             });
     });
@@ -86,9 +89,11 @@ function onScheduleChange(eventList) {
 
 
 // onSomethingNewPlaying() - called by icecastinfo.js whenever a stream change happens or something new is playing
-function onSomethingNewPlaying(streamInfo, listenerCount, streamChanged) {
+function onSomethingNewPlaying(newStreamInfo, listenerCount, streamChanged) {
 
-    title = streamInfo.title;
+    streamInfo = newStreamInfo;
+
+    archive.AddToLog(streamInfo.title);
 
     console.log('Now playing: ' + streamInfo.title + ' (' + listenerCount + ') listeners');
     io.emit('nowplaying', { stream: streamInfo });
@@ -115,19 +120,28 @@ function onCurrentDjChanged(newDj) {
 }
 
 
+let phoneDisplayed = false;
+function onPhoneDisplayChanged(phoneOn) {
+    phoneDisplayed = phoneOn;
+
+    io.emit('phone', { displayed: phoneDisplayed, number: config.phone });
+};
+
 //
 // server.listen - launches the listen port for the website
 //
 server.listen(port, async () => {
 
     try {
-        otto.Start(onCurrentDjChanged);
+
+        await archive.Start(events.AddDetails);
+        otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
         currentDj = otto.CurrentDJ;
-        events.Start(onScheduleChange);
+        events.Start(onScheduleChange, archive.OnStartEvent, archive.OnEndEvent);
         icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
         icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
-        library.Start();
-        lastfm.Start(onAlbumInfoChange);
+        await library.Start();
+        await lastfm.Start(onAlbumInfoChange);
 
         console.log('Server listening at port %d', port);
     }
@@ -140,7 +154,6 @@ server.listen(port, async () => {
 // Routing API calls for the web site - first the static routes that serve files and directories of files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/js', express.static(path.join(__dirname, 'public/js')));
-app.use('/controllers', express.static(path.join(__dirname, 'public/controllers')));
 
 // Add a parser to manage POST data
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -172,7 +185,12 @@ app.get('/nowplaying/albumsummary',
 app.get('/nowplaying/title',
     async function(req, res) {
         res.set('Content-Type', 'text/html');
-        res.end(title);
+        if (streamInfo && streamInfo.title) {
+            res.end(streamInfo.title);
+        }
+        else {
+            res.end();
+        }
     });
 
 
@@ -194,6 +212,22 @@ app.get('/search', async function (req, res) {
     res.end(JSON.stringify(results));
 });
 
+
+//
+// GET /search
+//
+app.get('/archive/:start/:end', async function (req, res) {
+    let results = [];
+    try {
+        // TODO validate parameters!
+        results = await events.GetEventArchive(req.params.start, req.params.end);
+    }
+    catch (err) {
+        console.log('Error detected in POST /search: ' + err.message);
+    }
+
+    res.end(JSON.stringify(results));
+});
 
 
 //
@@ -220,15 +254,18 @@ io.on('connection',
                 });
         }
 
-        var currentStream = icecastInfo.GetCurrentStream();
-        if (currentStream) {
-            socket.emit('nowplaying', { stream: currentStream });
+
+        if (streamInfo) {
+            socket.emit('nowplaying', { stream: streamInfo });
+            socket.emit('listeners', { count: streamInfo.listeners });
         }
+
         if (shoutingFireListeners) {
             socket.emit('shoutingfire', { listeners: shoutingFireListeners });
         }
 
         socket.emit('newdj', currentDj);
+        socket.emit('phone', { displayed: phoneDisplayed, number: config.phone });
 
     });
 

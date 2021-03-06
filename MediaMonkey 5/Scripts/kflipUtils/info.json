@@ -1,0 +1,9 @@
+{
+    "title": "KFLIP Utilities",
+    "id": "kflipUtilities",
+    "description": "Installs KFLIP utilities: outputNowPlaying and jingleRotation",
+    "version": "1.0.0",
+    "type": "general",
+    "author": "KFLIP Camp",
+    "icon": "icon.png"
+}
