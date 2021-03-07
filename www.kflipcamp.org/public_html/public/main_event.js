@@ -39,8 +39,8 @@ $(function() {
     var $btnPlayPause = $("#btnPlayPause");
 
     var $archiveList = $(".event-archive");
-    var $archiveEnd = moment().endOf("day").toDate();
-    var $archiveStart = moment().subtract(7, "day").endOf("day").toDate();
+    var $archiveEnd = moment().endOf("day").toISOString();
+    var $archiveStart = moment().subtract(7, "day").endOf("day").toISOString();
     
     $btnPlayPause.click(function () {
         if ($player.paused || $player.ended) {
