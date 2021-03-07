@@ -46,11 +46,6 @@
     <Content Include="docs\API.md" />
     <Content Include="docs\emit.md" />
     <Content Include="docs\README.md" />
-    <Content Include="lib\client.js" />
-    <Content Include="lib\index.js" />
-    <Content Include="lib\namespace.js" />
-    <Content Include="lib\parent-namespace.js" />
-    <Content Include="lib\socket.js" />
     <Content Include="public\index.html" />
     <Content Include="public\kflip_background.png" />
     <Content Include="public\logo.png" />
@@ -65,7 +60,6 @@
   <ItemGroup>
     <Folder Include="docs" />
     <Folder Include="kflipcamp" />
-    <Folder Include="lib" />
     <Folder Include="public\js" />
     <Folder Include="scripts\" />
     <Folder Include="test" />
