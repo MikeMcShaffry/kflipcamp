@@ -63,7 +63,7 @@ async function OnStartEvent_Internal(event) {
     }
     catch(error) {
         ++consecutiveErrors;
-        console.log(`ERROR - twitter - exception in OnStartEvent_Internal - ${error.message}`);
+        console.log(`ERROR - twitter - exception in OnStartEvent_Internal - ${error.data}`);
     }
     
     if (consecutiveErrors > MAX_CONSECUTIVE_ERRORS) {
