@@ -59,7 +59,7 @@ let localFileNowPlayingInterval = null;						// If Otto is scanning a local Medi
 Otto.on("ready", () => {
 
 	try {
-		console.log('Otto starting up. Version 0.11a - local only');
+		console.log('INFO - otto - Otto starting up. Version 0.11a - local only');
 		//console.log('Otto is up and running, with ' +
 		//	Otto.users.size + ' users, in ' +
 		//	Otto.channels.size + ' channels of ' +
@@ -67,14 +67,14 @@ Otto.on("ready", () => {
 
 		(async () => {
 			mychannelID = await Otto.channels.fetch(config.mychannelID);
-			console.log(`Otto Logged in as ${Otto.user.tag}!`);
+			console.log(`INFO - otto - Otto Logged in as ${Otto.user.tag}!`);
 			talk = 1;
 		})();
 
 	}
 
 	catch (err) {
-		console.log('Exception in Otto on ready - ' + err.message);
+		console.log('ERROR - otto - Exception in Otto on ready - ' + err.message);
     }
 });
 
@@ -172,7 +172,7 @@ DJ Commands are\n\
 		if (command === "ping") {
 			talk = 1;
 			mychannelID = message.channel;
-			console.log('Active channel ID now: ' + mychannelID);
+			console.log('INFO - otto - Active channel ID now: ' + mychannelID);
 			message.channel.send('pong.');
 			if (config.use_nowplayingfile) {
 				clearInterval(localFileNowPlayingInterval);
@@ -246,13 +246,13 @@ DJ Commands are\n\
 				process.exit();
 				return true;
 			}
-			console.log('Otto Exit command not supported on this configuration');
+			console.log('INFO - otto - Otto Exit command not supported on this configuration');
 		}
 
 	}
 
 	catch (err) {
-		console.log('Exception in Otto on message - ' + err.message);
+		console.log('ERROR - otto - Exception in Otto on message - ' + err.message);
     }
 });	// end of on.message handling
 
@@ -293,7 +293,7 @@ function localFileNowPlaying() {
 		}
 	}
 	catch (err) {
-		console.log('Exception in Otto.localFileNowPlaying - ' + err.message);
+		console.log('ERROR - otto - Exception in Otto.localFileNowPlaying - ' + err.message);
     }
 }
 
@@ -344,7 +344,7 @@ function UpdateNowPlaying(newsong, streamChanged) {
         }
 	}
 	catch (err) {
-		console.log('Exception in Otto.UpdateNowPlaying', err);
+		console.log('ERROR - otto - Exception in Otto.UpdateNowPlaying', err);
 	}
 
 }
@@ -370,11 +370,11 @@ function start(onCurrentDJChangedCallback, onPhoneDisplayedCallback) {
             }
         }
 		else {
-			console.log('Otto Discord integration is NOT enabled - check config.json');
+			console.log('WARNING - otto - Otto Discord integration is NOT enabled - check config.json');
 		}
 	}
 	catch (err) {
-		console.log('Exception in Otto.start', err);
+		console.log(`ERROR - otto - Exception in Otto.start ${err.message}`);
 	}
 
 }
@@ -383,7 +383,7 @@ function start(onCurrentDJChangedCallback, onPhoneDisplayedCallback) {
 // Running otto locally - node otto.js will execute this code and check the use_nowplayingfile config setting
 //
 if (config.use_nowplayingfile) {
-	console.log('Running Otto locally');
+	console.log('INFO - otto - Running Otto locally');
 	Start();
 }
 

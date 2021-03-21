@@ -44,17 +44,14 @@ async function getEventList() {
     return list;
 }
 
-async function getEventArchive(start, end) {
+async function getEventsByDate(startISOString, endISOString) {
 
     try {
         // Set beginning of query to now minus three hours - a typical long show)
-        let startDate = moment(start);
-        let endDate = moment(end);
-
         let list = await cal.events.list({
             // Set times to ISO strings as such
-            timeMin: startDate.toISOString(),
-            timeMax: endDate.toISOString(),
+            timeMin: startISOString,
+            timeMax: endISOString,
             calendarId: config.calendarId
         });
 
@@ -69,7 +66,7 @@ async function getEventArchive(start, end) {
         return list;
     }
     catch(error) {
-        console.log("Something bad happened");
+        console.log(`ERROR - events - Exception in getEventsByDate - ${error.message}`);
     }
     return [];
 }
@@ -91,9 +88,9 @@ async function updateEventDescription(event) {
             requestBody: { description: event.data.description },
             auth: auth
         });
-        console.log('Event updated - ' + event.data.summary);
+        console.log('INFO - events - event updated - ' + event.data.summary);
     } catch (err) {
-        console.log('Exception in updateEventDescription -' + err.message);
+        console.log('ERROR - events - exception in updateEventDescription -' + err.message);
     }
 }
 
@@ -123,7 +120,7 @@ async function getEventsAsync() {
             lastScheduleSentWasUpdated < currentUpdated ||
             lastScheduleItemCount !== itemCount) {
             //if (true) {
-            console.log('A new schedule for everyone! Sending the latest schedule with ' +
+            console.log('INFO - events - a calendar has an update - sending ' +
                 eventList.data.items.length +
                 ' events');
             lastScheduleSentWasUpdated = currentUpdated;
@@ -139,11 +136,11 @@ async function getEventsAsync() {
 
             let event = eventList.data.items[n];
             if (!event.start || !event.start.dateTime) {
-                console.log('No start time - ' + event.summary);
+                console.log('WARNING - events - missing start time - ' + event.summary);
                 continue;
             }
             if (!event.end || !event.end.dateTime) {
-                console.log('No end time - ' + event.summary);
+                console.log('WARNING - events - missing end time - ' + event.summary);
                 continue;
             }
             var start = new Date(event.start.dateTime).getTime();
@@ -197,7 +194,7 @@ async function getEventsAsync() {
 
 
     } catch (err) {
-        console.log('Exception in getEventsAsync -' + err.message);
+        console.log('ERROR - events - exception in getEventsAsync -' + err.message);
     }
 }
 
@@ -230,7 +227,7 @@ function start(scheduleChangeCallback, onStartCallback, onEndCallback) {
 
     onScheduleChange = scheduleChangeCallback;
     if (!onScheduleChange) {
-        console.log('WARNING - events.js would be more useful if there was a handler for schedule change events');
+        console.log('WARNING - events - this module has no onScheduleChange handler');
     }
 
     onEventStart = onStartCallback;
@@ -253,6 +250,6 @@ if (!module.exports.Start) {
     module.exports.GetEventDescription = getEvent;
     module.exports.UpdateEventDescription = updateEventDescription;
     module.exports.AddDetails = addDetails;
-    module.exports.GetEventArchive = getEventArchive;
+    module.exports.GetEventsByDate = getEventsByDate;
 }
 

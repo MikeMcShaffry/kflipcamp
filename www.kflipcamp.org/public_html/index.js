@@ -8,7 +8,8 @@
 
 // Setup basic express server
 const express = require('express');
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
+const moment = require('moment');
 const app = express();
 
 const path = require('path');
@@ -26,7 +27,7 @@ const otto = require('./otto.js');
 const library = require('./library.js');
 const lastfm = require('./lastfm.js');
 const archive = require('./archive.js');
-
+const twitter = require('./twitter.js');
 
 // Stores the last title information from icecast stats - it is in the form of artist - song - album
 let streamInfo = null;
@@ -87,6 +88,16 @@ function onScheduleChange(calendarId, eventList) {
     });
 }
 
+function onStartEvent(event) {
+    archive.OnStartEvent(event);
+    twitter.OnStartEvent(event);
+}
+
+function onEndEvent(event) {
+    archive.OnEndEvent(event);
+}
+
+
 
 // onSomethingNewPlaying() - called by icecastinfo.js whenever a stream change happens or something new is playing
 function onSomethingNewPlaying(newStreamInfo, listenerCount, streamChanged) {
@@ -95,7 +106,7 @@ function onSomethingNewPlaying(newStreamInfo, listenerCount, streamChanged) {
 
     archive.AddToLog(streamInfo.title);
 
-    console.log('Now playing: ' + streamInfo.title + ' (' + listenerCount + ') listeners');
+    console.log('INFO - Now playing [' + streamInfo.title + '] Listeners [' + listenerCount + ']');
     io.emit('nowplaying', { stream: streamInfo });
 
     if (otto.Enabled) {
@@ -137,13 +148,13 @@ server.listen(port, async () => {
         await archive.Start(events.AddDetails);
         otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
         currentDj = otto.CurrentDJ;
-        events.Start(onScheduleChange, archive.OnStartEvent, archive.OnEndEvent);
+        events.Start(onScheduleChange, onStartEvent, onEndEvent);
         icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
         icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
         await library.Start();
         await lastfm.Start(onAlbumInfoChange);
-
-        console.log('Server listening at port %d', port);
+        await twitter.Start(config.site_url);
+        console.log('INFO - server listening at port %d', port);
     }
     catch (err) {
         console.log('CRITICAL ERROR - Exception in server.listen', err);
@@ -206,7 +217,7 @@ app.get('/search', async function (req, res) {
         }
     }
     catch (err) {
-        console.log('Error detected in POST /search: ' + err.message);
+        console.log('ERROR - POST /search: ' + err.message);
     }
 
     res.end(JSON.stringify(results));
@@ -219,11 +230,14 @@ app.get('/search', async function (req, res) {
 app.get('/archive/:start/:end', async function (req, res) {
     let results = [];
     try {
-        // TODO validate parameters!
-        results = await events.GetEventArchive(req.params.start, req.params.end);
+        if ( (moment(req.params.start, moment.ISO_8601).isValid() === false) ||
+             (moment(req.params.end, moment.ISO_8601).isValid() === false) ) {
+            res.status(400).send({message:'Invalid parameters'});         
+        }
+        results = await events.GetEventsByDate(req.params.start, req.params.end);
     }
     catch (err) {
-        console.log('Error detected in POST /search: ' + err.message);
+        console.log('ERROR - GET /archive/:start/:end - ' + err.message);
     }
 
     res.end(JSON.stringify(results));
@@ -274,12 +288,12 @@ io.on('connection',
 // Avoids the process shutting down due to an unhandled promise rejection or unhandled exceptions
 //
 process.on('unhandledRejection', error => {
-    console.log('unhandledRejection', error);
+    console.log('CRITICAL ERROR - unhandledRejection', error);
 });
 
 
 process.on('uncaughtException', error => {
-    console.log('unchaughtException ', error);
+    console.log('CRITICAL ERROR - unchaughtException ', error);
 });
 
 

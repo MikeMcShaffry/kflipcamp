@@ -35,5 +35,15 @@
     "tmpDir": "/tmp/",
     "s3bucket": "S3BUCKET",
     "url": "https://S3BUCKET.s3-REGION.amazonaws.com/"
+  },
+  "twitterapp_otto": {
+    "auth": {
+      "apiKey": "YOUR_TWITTER_APP_API_KEY",
+      "apiSecret": "YOUR_TWITTER_APP_API_SECRET",
+      "accessToken": "YOUR_TWITTER_APP_ACCESS_TOKEN",
+      "accessTokenSecret": "YOUR_TWITTER_APP_ACCESS_TOKEN_SECRET"
+    },
+    "dailyAnnnouncementHourUTC": "13",
+    "enabled": true      
   }
 }

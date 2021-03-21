@@ -38,7 +38,7 @@ const divider = '\n---------------------------------------\n';
 
 async function onStartEvent(event) {
 
-    console.log(`Starting event ${event.id}:${event.summary}`);
+    console.log(`INFO - archive - starting event ${event.id}:${event.summary}`);
 
     if (!archiveConfig.enabled) {
         return;
@@ -51,7 +51,7 @@ async function onStartEvent(event) {
     eventDetails[event.id] = `${existing}\n---------------------------------------\n   Playlist:\n`;
 
     if (eventProcesses[event.id]) {
-        console.log(`Event ${event.id} already exists - killing the old one`);
+        console.log(`WARNING - archive - event ${event.id} already exists - killing the old one`);
 
         if (os.platform() !== 'win32') {
             eventProcesses[event.id].kill();
@@ -65,7 +65,7 @@ async function onStartEvent(event) {
     }
 
     if (os.platform() === 'win32') {
-        console.log(`(skipped) /bin/ffmpeg -nostdin -hide_banner -nostats -loglevel panic -y -i ${archiveConfig.recordMount} ${filename}`);
+        console.log(`INFO - archive - (skipped) /bin/ffmpeg -nostdin -hide_banner -nostats -loglevel panic -y -i ${archiveConfig.recordMount} ${filename}`);
         eventProcesses[event.id] = event;
         return;
     }
@@ -105,7 +105,7 @@ async function finalizeRecording(event) {
     const seconds = now.getHours() * 3600 + now.getMinutes();
 
     if (os.platform() === 'win32') {
-        console.log(`(skipped) /bin/mv ${archiveConfig.tmpDir}${event.id}.mp3 ${archiveConfig.tmpDir}${datestamp}-${event.summary}-${seconds}.mp3`);
+        console.log(`INFO - archive - (skipped) /bin/mv ${archiveConfig.tmpDir}${event.id}.mp3 ${archiveConfig.tmpDir}${datestamp}-${event.summary}-${seconds}.mp3`);
     }
     else {
         fs.renameSync(`${archiveConfig.tmpDir}${event.id}.mp3`, `${archiveConfig.tmpDir}${datestamp}-${event.summary}-${seconds}.mp3`);
@@ -133,7 +133,7 @@ async function onEndEvent(event) {
     }
 
     if (!eventProcesses[event.id]) {
-        console.log(`Event ${event.id} ended but recording process doesn't exist anymore.`);
+        console.log(`WARNING - archive - event ${event.id} ended but recording process doesn't exist anymore.`);
         return;
     }
 
@@ -171,7 +171,7 @@ async function postInstall() {
         var archiveScript = template(archiveConfig);
         await writeFile('scripts/archive.sh', archiveScript);
         fs.chmodSync('scripts/archive.sh', '0770');
-        console.log('Archive script has been created');
+        console.log('INFO - archive - postInstall has run');
     }
 }
 

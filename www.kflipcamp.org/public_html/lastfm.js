@@ -26,11 +26,11 @@ async function Start(_onAlbumInfoChange) {
 
     onAlbumInfoChange = _onAlbumInfoChange;
     if (!onAlbumInfoChange) {
-        console.log('WARNING - lastfm.js would be more useful if there was a handler for album info change events');
+        console.log('WARNING - lastfm - onAlbumInfoChange is not set');
     };
 
     if (config.enabled) {
-        console.log('LastFm module is started')
+        console.log('INFO - lastfm - module is started')
     }
 }
 
@@ -39,7 +39,7 @@ async function Start(_onAlbumInfoChange) {
 // SetToUnkown() - Called when the album info is not available
 //
 function SetToUnknown() {
-    console.log(`No LastFM album information for artist ${lastArtist} off ${lastAlbum}`);
+    console.log(`INFO - lastfm - no album info for artist ${lastArtist} off ${lastAlbum}`);
     let sendUpdate = false;
 
     if (AlbumSummary !== Strings.NoAlbumSummaryAvailable) {
@@ -65,6 +65,8 @@ function SetToUnknown() {
 
 let lastArtist = '';
 let lastAlbum = '';
+let lastTrack = '';
+
 async function UpdateNowPlaying(title) {
     let allParts = null;
 
@@ -75,21 +77,52 @@ async function UpdateNowPlaying(title) {
 
         title = title.replace('[Shouting Fire]', '');
 
-        // OutputNowPlaying script sends title string like - The Beatles - All Together Now off *The Yellow Submarine*
-        allParts = title.match(/(.+) - (.+) off *(.+)*$/);
-        if (!allParts || allParts.length !== 4) {
+        let query = null;
+        title = title.replace(/\"/g,"");     // remove all internal quotes with nothing
+
+        let hasAlbum = title.match(/\s*(.+) - (.+) off *(.+)*$/);
+        
+        // OutputNowPlaying script sends title string like - "The Beatles - All Together Now off *The Yellow Submarine*"
+        if (hasAlbum && hasAlbum.length === 4) {
+            lastArtist = hasAlbum[1];
+            lastTrack = hasAlbum[2];
+            lastAlbum = hasAlbum[3];
+
+            lastAlbum = lastAlbum.replace(/\*/g,"");     // remove all internal quotes with nothing
+
+            query = `http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${config.apikey}&artist=${lastArtist}&album=${lastAlbum}&format=json`;
+            //console.log('Sending query ' + query);
+        }
+        else
+        {
+            // Some metadata looks like "All Together Now by The Beatles off *The Yellow Submarine*"
+            hasAlbum = title.match(/\s*(.+) by (.+) off *(.+)*$/);
+            if (hasAlbum && hasAlbum.length === 4) {
+                lastTrack = hasAlbum[1];
+                lastArtist = hasAlbum[2];
+                lastAlbum = hasAlbum[3];
+
+                lastAlbum = lastAlbum.replace(/\*/g, "");     // remove all internal quotes with nothing
+
+                query = `http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${config.apikey}&artist=${lastArtist}&album=${lastAlbum}&format=json`;
+                //console.log('Sending query ' + query);
+            } else {
+                let hasOnlyTitle = title.match(/(.+) - (.+)$/);
+                if (hasOnlyTitle && hasOnlyTitle.length !== 3) {
+                    lastArtist = hasAlbum[1];
+                    lastTrack = hasAlbum[2];
+
+                    query = `http://ws.audioscrobbler.com/2.0/?method=track.getinfo&api_key=${config.apikey}&artist=${lastArtist}&track=${lastTrack}&format=json`;
+                    //console.log('Sending query ' + query);
+                }
+            }
+        }
+        
+        if (!query) {
             SetToUnknown();
             return;
         }
-
-        lastArtist = allParts[1];
-        lastAlbum = allParts[3];
-        lastAlbum = lastAlbum.replace('*', '');         // WHY DO I HAVE TO DO THIS????
-        lastAlbum = lastAlbum.replace('*', '');         // WHY DO I HAVE TO DO THIS????
-
-        let query = `http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${config.apikey}&artist=${lastArtist}&album=${lastAlbum}&format=json`;
-        //console.log('Sending query ' + query);
-
+        
         var url = encodeURI(query);
 
     //console.log(`Asking LastFM about ${lastArtist} - ${allParts[2]} off *${lastAlbum}*`);
@@ -119,10 +152,10 @@ async function UpdateNowPlaying(title) {
 
         req.on('error',
             function (e) {
-                console.log('Error calling GET http://ws.audioscrobbler.com/ - ' + e.message);
+                console.log('ERROR - lastfm - error returned from calling GET http://ws.audioscrobbler.com/ - ' + e.message);
             });
     } catch (err) {
-        console.log('Exception in lastfm.UpdateNowPlaying - ' + err.message);
+        console.log('ERROR - lastfm - exception in UpdateNowPlaying - ' + err.message);
     }
 
 }
@@ -202,7 +235,7 @@ function ParseLastFmAlbumInfo(lastFmJson) {
         }
 
         if (lastFmResults.error) {
-            console.log('LastFM returned an error', lastFmResults);
+            console.log(`ERROR - lastfm - LastFM returned an error - ${lastFmResults.error}`);
             SetToUnknown();
             return;
         }
@@ -255,7 +288,7 @@ function ParseLastFmAlbumInfo(lastFmJson) {
         }
     }
     catch (err) {
-        console.log('Exception in parseLastFmAlbumInfo', err);
+        console.log('ERROR - lastfm - Exception in parseLastFmAlbumInfo', err);
         SetToUnknown();
     }
 }
