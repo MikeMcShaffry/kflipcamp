@@ -16,7 +16,7 @@ const path = require('path');
 const server = require('http').createServer(app);
 
 // Socket.io listens on port 3000 (or configured environment variable) for events like the song or DJ calendar changing
-const io = require('.')(server);
+const io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
 
 const config = require('./config.json').studio;

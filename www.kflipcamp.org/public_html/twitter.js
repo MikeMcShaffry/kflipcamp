@@ -15,6 +15,9 @@ let twitterClient = null;
 let site_url = null;
 
 const MAX_CONSECUTIVE_ERRORS = 5;
+const MAX_TWEET_LENGTH = 270;
+const MAX_EVENT_SUMMARY_LENGTH = 80;
+const ONE_DAY_MILLISECONDS = 1000 * 60 * 60 * 24
 let consecutiveErrors = 0;
 
 
@@ -85,9 +88,10 @@ async function MakeAnnouncementAsync() {
     
     try {
         const now = new Date();
-        const tomorrow = new Date(now.getTime() + (1000 * 60 * 60 * 24));
+        const tomorrow = new Date(now.getTime() + ONE_DAY_MILLISECONDS);
         let results = await events.GetEventsByDate(now.toISOString(), tomorrow.toISOString())
 
+        
         if (!results || !results.data || !results.data.items || results.data.items.length == 0) {
             console.log("INFO - twitter - module detects no events today");
             return;
@@ -99,11 +103,16 @@ async function MakeAnnouncementAsync() {
         while (i<results.data.items.length) {
             const event = results.data.items[i];
             const time = moment(event.startDate).format("ha");
-            let eventDesc = `${time}  - ${event.summary}\n`;
+            let eventDesc = `${time} - ${event.summary}\n`;
 
-            if (message.length + eventDesc.length > 270) {
+            if (eventDesc.length > MAX_EVENT_SUMMARY_LENGTH) {
+                eventDesc = `${eventDesc.substring(0, MAX_EVENT_SUMMARY_LENGTH)}...`;    
+            }
+            
+            if (message.length + eventDesc.length > MAX_TWEET_LENGTH) {
                 await twitterClient.tweets.statusesUpdate({status: message});
                 message = header;
+                continue;
             }
             message += eventDesc;
             ++i;
