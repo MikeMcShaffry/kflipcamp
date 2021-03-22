@@ -52,17 +52,11 @@ var albumInfo = null;
 function onAlbumInfoChange(albumSummary, albumImage) {
 
     albumInfo = { summary: albumSummary, image: albumImage };
-
-    let keys = Object.keys(io.sockets.sockets);
-
-    keys.forEach(function (key) {
-        const connectedSocket = io.sockets.sockets[key];
-        connectedSocket.emit('albuminfo',
-            {
-                username: 'KFLIP',
-                message: albumInfo
-            });
-    });
+    io.emit('albuminfo',
+        {
+            username: 'KFLIP',
+            message: albumInfo
+        });
 }
 
 
@@ -74,18 +68,12 @@ var kflipShowString = null;
 function onScheduleChange(calendarId, eventList) {
 
     kflipShowString = JSON.stringify(eventList);
-
-    let keys = Object.keys(io.sockets.sockets);
-
-    keys.forEach(function (key) {
-        const connectedSocket = io.sockets.sockets[key];
-        connectedSocket.emit('schedule',
-            {
-                username: 'KFLIP',
-                calendarId: calendarId,
-                message: kflipShowString
-            });
-    });
+    io.emit('schedule',
+        {
+            username: 'KFLIP',
+            calendarId: calendarId,
+            message: kflipShowString
+        });
 }
 
 function onStartEvent(event) {
@@ -153,7 +141,7 @@ server.listen(port, async () => {
         icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
         await library.Start();
         await lastfm.Start(onAlbumInfoChange);
-        await twitter.Start(config.site_url);
+        await twitter.Start(config.site_url, config.tz);
         console.log('INFO - server listening at port %d', port);
     }
     catch (err) {

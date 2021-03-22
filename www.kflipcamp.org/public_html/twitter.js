@@ -13,6 +13,7 @@ const events = require('./events.js');
 
 let twitterClient = null;
 let site_url = null;
+let tz = null;
 
 const MAX_CONSECUTIVE_ERRORS = 5;
 const MAX_TWEET_LENGTH = 270;
@@ -25,7 +26,7 @@ let consecutiveErrors = 0;
 //
 // Start - creates the Twitter client 
 //
-async function Start(_site_url) {
+async function Start(_site_url, _timezone) {
     try {
         if (config.enabled === false) {
             console.log("INFO - twitter - module is disabled");
@@ -33,6 +34,7 @@ async function Start(_site_url) {
         }
         
         site_url = _site_url;
+        tz = _timezone;
         twitterClient = new TwitterClient.TwitterClient(config.auth);
         console.log("INFO - twitter - module is initialized");
 
@@ -87,6 +89,9 @@ function MakeAnnouncement() {
 async function MakeAnnouncementAsync() {
     
     try {
+        if (!config.enabled) {
+            return;
+        }
         const now = new Date();
         const tomorrow = new Date(now.getTime() + ONE_DAY_MILLISECONDS);
         let results = await events.GetEventsByDate(now.toISOString(), tomorrow.toISOString())
@@ -102,8 +107,10 @@ async function MakeAnnouncementAsync() {
         let i = 0;
         while (i<results.data.items.length) {
             const event = results.data.items[i];
-            const time = moment(event.startDate).format("ha");
-            let eventDesc = `${time} - ${event.summary}\n`;
+            
+            let studioTime = moment(event.startDate).tz(tz);
+            const hourText = moment(studioTime).format("ha");
+            let eventDesc = `${hourText} - ${event.summary}\n`;
 
             if (eventDesc.length > MAX_EVENT_SUMMARY_LENGTH) {
                 eventDesc = `${eventDesc.substring(0, MAX_EVENT_SUMMARY_LENGTH)}...`;    
