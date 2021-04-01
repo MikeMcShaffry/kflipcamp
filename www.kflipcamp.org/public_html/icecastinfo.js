@@ -2,6 +2,7 @@
 // icecastinfo.js - Can grab now player and listener count information from an icecast server
 //
 // COPYRIGHT (c) 2020 by Michael L. McShaffry - All rights reserved
+//   NOTE: COPYRIGHT will be assigned to KFLIPCAMP as soon as the legal entity is created! 
 //
 // The source code contained herein is open source under the MIT licence
 
@@ -268,7 +269,7 @@ function checkShoutingFire() {
                                 if (h3) {
                                     const parents = h3.parentsUntil('.newscontent');
                                     if (parents.length) {
-                                        const divStreamHeader = parents[parents.length - 1];
+                                        const divStreamHeader = parents[4];
                                         const infoTable = divStreamHeader.nextSibling;
 
                                         $('td', infoTable).each(function (i, e) {
