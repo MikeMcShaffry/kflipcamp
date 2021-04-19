@@ -2,6 +2,7 @@
 // index.js - Entry point for the kflipcamp.org web site
 //
 // COPYRIGHT (c) 2020 by Michael L. McShaffry - All rights reserved
+//   NOTE: COPYRIGHT will be assigned to KFLIPCAMP as soon as the legal entity is created! 
 //
 // The source code contained herein is open source under the MIT license, with the EXCEPTION of embedded passwords and authentication keys.
 
@@ -11,6 +12,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const moment = require('moment');
 const app = express();
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 
 const path = require('path');
 const server = require('http').createServer(app);
@@ -28,6 +31,7 @@ const library = require('./library.js');
 const lastfm = require('./lastfm.js');
 const archive = require('./archive.js');
 const twitter = require('./twitter.js');
+const patreon = require('./patreon.js');
 
 // Stores the last title information from icecast stats - it is in the form of artist - song - album
 let streamInfo = null;
@@ -157,6 +161,25 @@ app.use('/js', express.static(path.join(__dirname, 'public/js')));
 // Add a parser to manage POST data
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(session({
+    secret: config.session_secret,
+    resave: false,
+    saveUninitialized: true
+}))
+
+patreon.ConfigureApp(app);
+
+//
+// Middleware for checking if a user has been authenticated as a Patreon user
+// via Passport and OneLogin OpenId Connect
+function checkAuthentication(req,res,next){
+    if(req.isAuthenticated()){
+        next();
+    } else{
+        res.redirect("/");
+    }
+}
 
 
 //
@@ -229,6 +252,40 @@ app.get('/archive/:start/:end', async function (req, res) {
     }
 
     res.end(JSON.stringify(results));
+});
+
+//
+// GET /auth/patreon - called when someone clicks the "I'm a patreon person" button
+//
+app.get('/auth/patreon', patreon.passport.authenticate('patreon', {
+    successReturnToOrRedirect: "/"
+}));
+
+//
+// GET /auth/patreon/redirect - Patreon calls this redirect after a person attempts to auth via Patreon
+app.get('/oauth/callback', patreon.passport.authenticate('patreon', {
+    callback: true,
+    successReturnToOrRedirect: '/',
+    failureRedirect: '/'
+}))
+
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+    // render the error page
+    res.status(err.status || 500);
+    //res.render('error');
 });
 
 

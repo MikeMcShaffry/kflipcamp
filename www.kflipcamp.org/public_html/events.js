@@ -2,6 +2,7 @@
 // events.js - Grabs a google calenadar and emits events to connected browsers
 //
 // COPYRIGHT (c) 2020 by Michael L. McShaffry - All rights reserved
+//   NOTE: COPYRIGHT will be assigned to KFLIPCAMP as soon as the legal entity is created! 
 //
 // The source code contained herein is open source under the MIT licence, with the EXCEPTION of embedded passwords and authentication keys.
 
