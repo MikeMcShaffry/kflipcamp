@@ -84,8 +84,13 @@
                     <iframe src="//titanembeds.com/embed/182283804726001664?theme=DiscordDark&scrollbartheme=3d-dark" height="90%" width="100%" frameborder="0"></iframe>
 
                     <div class="patreon-area">
-                        <a href="//www.patreon.com/bePatron?u=35895226" data-patreon-widget-type="become-patron-button">Become a Patron!</a>
-                        <script async src="//c6.patreon.com/becomePatronButton.bundle.js"></script>
+                        <div class="patreon-column">
+                            <a href="https://www.patreon.com/bePatron?u=35895226" data-patreon-widget-type="become-patron-button">Become a Patron!</a>
+                            <script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
+                        </div>
+                        <div class="patreon-column">
+                            <a href="auth/patreon"><img src="images/patreon_login.png" /></a>
+                        </div>
                     </div>
 
                 </div>
@@ -180,11 +185,9 @@
 
 
 
-</body>
-
-
-
 <script>
+    let nowplayingUrl = window.location.href +"nowplaying/title";
+    console.log('nowplayingurl is ' + nowplayingUrl);
     $("#myradiodivcontainer").flashradio({
         token: "eHh4L2xnbWpxZGJucS9wc2gB",
         userinterface: "small",
@@ -203,7 +206,7 @@
         getcoveroverradioco: "false",
         affiliatetoken: "1000lIPN",
         debug: "false",
-        ownsongtitleurl: "http://www.kflipcamp.org/nowplaying/title",
+        ownsongtitleurl: nowplayingUrl,
         radiocover: "",
         songgooglefontname: "Oswald:wght@300",
         songfontname: "Oswald",
@@ -252,6 +255,11 @@
 
 
 </script>
+
+</body>
+
+
+
 
 
 </html>

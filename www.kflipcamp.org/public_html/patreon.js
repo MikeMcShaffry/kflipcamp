@@ -24,7 +24,7 @@ passport.use(new PatreonStrategy(
     },
     (accessToken, refreshToken, profile, cb) => {
         Patreons[profile.id] = profile;
-        console.log(`INFO - patreon - user verified: ${profile.Name}`);
+        console.log(`INFO - patreon - user verified: ${profile.name}`);
         return cb(null, profile);
     }
 ));
