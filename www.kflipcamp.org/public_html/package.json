@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "body-parser": "^1.19.0",
-    "cheerio": "^1.0.0-rc.3",
+    "cheerio": "^1.0.0-rc.10",
     "cookie-parser": "^1.4.5",
     "cookie-session": "^1.4.0",
     "debug": "~4.1.0",
@@ -41,7 +41,7 @@
     "patreon": "^0.4.1",
     "socket.io": "^4.0.0",
     "socket.io-adapter": "~1.1.0",
-    "socket.io-client": "2.2.0",
+    "socket.io-client": "^2.4.0",
     "socket.io-parser": "~3.3.2",
     "sqlite-async": "^1.0.12",
     "sqlite3": "^4.1.1",
