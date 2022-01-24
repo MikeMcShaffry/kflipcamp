@@ -1,0 +1,14 @@
+[Unit]
+Description=KFLIP hasdedair service
+Documentation=
+After=network.target
+
+[Service]
+WorkingDirectory=/home/kflip/public_html/scripts
+Type=simple
+User=kflip
+ExecStart=/home/kflip/public_html/scripts/hasdedair.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

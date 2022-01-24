@@ -10,6 +10,10 @@
 //   - You must have AWS CLI installed on the server and have it configured to allow copying to the S3 bucket
 //   - You must have ffmpeg installed on the server
 //
+// OTHER NOTES:
+//
+//   - scripts/kflip_cron is a cronjob that runs every five minutes to copy the recorded MP3 files up to the S3 bucket
+//   - scripts.postinstall.sh  - runs after the app is installed to start the service and install kflip_cron
 
 
 const spawn = require('child_process').spawn;
@@ -96,30 +100,35 @@ async function onStartEvent(event) {
 //   from overwriting each other
 //
 async function finalizeRecording(event) {
-    const now = new Date();
-    const month = monthNames[now.getMonth()];
-    const day = now.getDate();
-    const year = now.getFullYear();
-    const datestamp = `${month}-${day}`;
-    const archiveUrl = `${archiveConfig.url}${year}`;
+    
+    try {
+        const now = new Date();
+        const month = monthNames[now.getMonth()];
+        const day = now.getDate();
+        const year = now.getFullYear();
+        const datestamp = `${month}-${day}`;
+        const archiveUrl = `${archiveConfig.url}${year}`;
 
-    const seconds = now.getHours() * 3600 + now.getMinutes();
+        const seconds = now.getHours() * 3600 + now.getMinutes();
 
-    if (os.platform() === 'win32') {
-        console.log(`INFO - archive - (skipped) /bin/mv ${archiveConfig.tmpDir}${event.id}.mp3 ${archiveConfig.tmpDir}${datestamp}-${event.summary}-${seconds}.mp3`);
+        if (os.platform() === 'win32') {
+            console.log(`INFO - archive - (skipped) /bin/mv ${archiveConfig.tmpDir}${event.id}.mp3 ${archiveConfig.tmpDir}${datestamp}-${event.summary}-${seconds}.mp3`);
+        } else {
+            fs.renameSync(`${archiveConfig.tmpDir}${event.id}.mp3`, `${archiveConfig.tmpDir}${datestamp}-${event.summary}-${seconds}.mp3`);
+        }
+
+        const link = encodeURI(`${archiveUrl}/${datestamp}-${event.summary}-${seconds}.mp3`);
+
+        eventDetails[event.id] = `${divider}Click here to listen to this show: ${link}\n${eventDetails[event.id]}`;
+        if (addDetails) {
+            await addDetails(event.id, eventDetails[event.id]);
+        }
+
+        console.log(eventDetails[event.id]);
     }
-    else {
-        fs.renameSync(`${archiveConfig.tmpDir}${event.id}.mp3`, `${archiveConfig.tmpDir}${datestamp}-${event.summary}-${seconds}.mp3`);
+    catch (error) {
+        console.log(`ERROR - archive - finalizeRecording - ${error.message}`);    
     }
-
-    const link = encodeURI(`${archiveUrl}/${datestamp}-${event.summary}-${seconds}.mp3`);
-
-    eventDetails[event.id] = `${divider}Click here to listen to this show: ${link}\n${eventDetails[event.id]}`;
-    if (addDetails) {
-        await addDetails(event.id, eventDetails[event.id]);
-    }
-
-    console.log(eventDetails[event.id]);
 }
 
 //

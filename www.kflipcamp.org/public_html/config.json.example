@@ -14,7 +14,8 @@
     "enabled": false,
     "token": "--YOUR DISCORD TOKEN--",
     "prefix": "!",
-    "mychannelID": "--YOUR CHANNEL ID--",
+    "listener_channel_id": "--YOUR LISTENER CHANNEL ID--",
+    "engineering_channel_id": "--YOUR ENGINEERING CHANNEL ID--",
     "use_nowplayingfile": false,
     "nowplayingfile": "C:/temp/MediaMonkey_NowPlaying.txt"
   },

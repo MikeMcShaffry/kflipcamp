@@ -83,15 +83,22 @@ function onScheduleChange(calendarId, eventList) {
 function onStartEvent(event) {
     archive.OnStartEvent(event);
     twitter.OnStartEvent(event);
+    otto.EngineeringLogEntry(`Recording just started for ${event.summary}`)
 }
 
 function onEndEvent(event) {
     archive.OnEndEvent(event);
+    otto.EngineeringLogEntry(`Recording ended for ${event.summary}`)
+}
+
+function addToEngineeringLog(logMessage) {
+    otto.EngineeringLogEntry(logMessage)
 }
 
 
 
 // onSomethingNewPlaying() - called by icecastinfo.js whenever a stream change happens or something new is playing
+//
 function onSomethingNewPlaying(newStreamInfo, listenerCount, streamChanged) {
 
     streamInfo = newStreamInfo;
@@ -130,6 +137,10 @@ function onPhoneDisplayChanged(phoneOn) {
     io.emit('phone', { displayed: phoneDisplayed, number: config.phone });
 };
 
+function delay(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
 //
 // server.listen - launches the listen port for the website
 //
@@ -138,15 +149,27 @@ server.listen(port, async () => {
     try {
 
         await archive.Start(events.AddDetails);
-        otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
+        await otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
+        
+        let waitingLoops = 0;
+        while (!otto.IsReady()) {
+            await delay(1000);
+            if (waitingLoops > 5) {
+                console.log(`ERROR - Otto could not initialize`);
+                break;
+            }
+            ++waitingLoops;
+        } 
+        
         currentDj = otto.CurrentDJ;
-        events.Start(onScheduleChange, onStartEvent, onEndEvent);
+        events.Start(onScheduleChange, onStartEvent, onEndEvent, addToEngineeringLog);
         icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
         icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
         await library.Start();
         await lastfm.Start(onAlbumInfoChange);
         await twitter.Start(config.site_url, config.tz);
         console.log('INFO - server listening at port %d', port);
+        addToEngineeringLog('INFO - KFLIP server has started');
     }
     catch (err) {
         console.log('CRITICAL ERROR - Exception in server.listen', err);
