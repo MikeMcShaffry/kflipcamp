@@ -9,7 +9,6 @@
 // Here we load the config.json file that contains our token and our prefix values. 
 
 const config = require("./config.json").googlecalendar;			// <<<<<<< I added a google calendar section to the config file
-const moment = require("moment");
 const { google } = require('googleapis');
 
 let knownBadEvents = {}
@@ -39,7 +38,7 @@ function checkIfBadEventsAreFixed(sortedEvents)
         Object.keys(knownBadEvents).forEach(function (key) {
             let badEventIsGone = true;
             sortedEvents.forEach((event) => {
-                if (event.id == key) {
+                if (event.id === key) {
                     badEventIsGone = false;
                 }
             });
@@ -135,10 +134,9 @@ async function getEventsByDate(startISOString, endISOString) {
             event.startDate = new Date(event.start.dateTime);
         });
 
-        let sortedItems = list.data.items.sort(function (a, b) {
+        list.data.items = list.data.items.sort(function (a, b) {
             return a.startDate - b.startDate;
         });
-        list.data.items = sortedItems;
         return list;
     }
     catch(error) {
@@ -158,7 +156,7 @@ async function getEvent(id) {
 
 async function updateEventDescription(event) {
     try {
-        const results = await cal.events.patch({
+        await cal.events.patch({
             calendarId: config.calendarId,
             eventId: event.data.id,
             requestBody: { description: event.data.description },
@@ -182,8 +180,6 @@ let currentEvents = {};                             // events where the start an
 let onEventStart = null;                            // callback for event start
 let onEventEnd = null;                              // callback for event end
 let addToEngineeringLog = null;                     // callback for reporting something important to the engineering log)
-
-let badCalendarEvents = {}                          // keeps a map of badCalendarEvents so we only see one error meessage
 
 //
 // getEventsAsync() -  Grab the KFLIP calendar and if there are any changes, emit them to any connected browsers

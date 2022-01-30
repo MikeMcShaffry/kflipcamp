@@ -6,6 +6,7 @@
 //
 // The source code contained herein is open source under the MIT licence
 
+const { decode } = require('html-entities');
 
 // Variables that hold listener counts and broadcast stream
 let lastReportedShoutingFireListeners = 0;
@@ -45,7 +46,8 @@ function checkForSomethingNew(newIcecastStatsJson) {
         if (newIcecastStatsJson.includes(': - ,')) {
             newIcecastStatsJson = newIcecastStatsJson.replace(': - ,', ': "-" ,');
         }
-
+ 
+        newIcecastStatsJson = decode(newIcecastStatsJson);
         var newIcecastStats = JSON.parse(newIcecastStatsJson);
 
         if (icecastStatsParseError) {
@@ -61,12 +63,10 @@ function checkForSomethingNew(newIcecastStatsJson) {
             console.log('ERROR - icecastinfo - Exception in checkForSomethingNew - ' + err.message + ' with ' + newIcecastStatsJson);
             icecastStatsParseError = true;
         }
-
         return;
     }
 
     try {
-
         let sameOldSong = true;
         let newTitle = '';
         let listeners = 0;

@@ -42,7 +42,7 @@ var isReady = false;
 var defaultDJ = 'Otto-mation';
 var currentDJ = defaultDJ;
 
-let currentIntro;
+let currentIntro = '';
 
 let onCurrentDJChanged = null;
 let onStreamChanged = null;
