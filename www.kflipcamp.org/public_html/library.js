@@ -6,7 +6,7 @@
 //
 // The source code contained herein is open source under the MIT licence
 
-const sqlite = require('sqlite-async');
+//const sqlite = require('sqlite-async');
 const fs = require('fs');
 
 const databaseFile = './data/MM.DB';
@@ -22,10 +22,10 @@ async function Start() {
         return;
     }
 
-    sqlite.open(databaseFile).then(_db => {
-        mmDb = _db
-        console.log('INFO - library - connected to the MM.DB database.');
-    });
+//    sqlite.open(databaseFile).then(_db => {
+//        mmDb = _db
+//        console.log('INFO - library - connected to the MM.DB database.');
+//    });
 }
 
 //
