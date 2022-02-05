@@ -24,22 +24,25 @@ const Otto = new Discord.Client();
 // Here we load the config.json file that contains our token and our prefix values. 
 const config = require("./config.json").otto;												// <<<<<<< I added an otto section to the config file
 
-// config.token contains the bot's token
-// config.prefix contains the message command prefix.
-// config.mychannelID 	
+// config.token - the bot's token
+// config.prefix - the message command prefix.
+// config.listener_channel_id - the ID of the channel the now playing song is posted
+// config.engineering_channel_id - the ID of the channel where Otto can post server messages
 // config.nowplayingfile	// full path & filename to NowPlaying file
 
 var fs = require('fs');
 
 var oldfiledata ='oldfiledata';
 var newfiledata ='newfiledata';
-var mychannelID ; 
+var listenerChannel;
+var engineeringChannel;
 var talk = 0 ;	// starting condition of silent
+var isReady = false;
 
 var defaultDJ = 'Otto-mation';
 var currentDJ = defaultDJ;
 
-let currentIntro;
+let currentIntro = '';
 
 let onCurrentDJChanged = null;
 let onStreamChanged = null;
@@ -59,22 +62,24 @@ let localFileNowPlayingInterval = null;						// If Otto is scanning a local Medi
 Otto.on("ready", () => {
 
 	try {
-		console.log('Otto starting up. Version 0.11a - local only');
+		console.log('INFO - otto - Otto starting up. Version 0.11a - local only');
 		//console.log('Otto is up and running, with ' +
 		//	Otto.users.size + ' users, in ' +
 		//	Otto.channels.size + ' channels of ' +
 		//	Otto.guilds.size + ' guilds.');
 
 		(async () => {
-			mychannelID = await Otto.channels.fetch(config.mychannelID);
-			console.log(`Otto Logged in as ${Otto.user.tag}!`);
+			listenerChannel = await Otto.channels.fetch(config.listener_channel_id);
+			console.log(`INFO - otto - Otto found the listener channel and logged in as ${Otto.user.tag}!`);
 			talk = 1;
+			engineeringChannel = await Otto.channels.fetch(config.engineering_channel_id);
+			console.log(`INFO - otto - Otto found the engineering channel and logged in as ${Otto.user.tag}!`);
+			isReady = true;
 		})();
-
 	}
 
 	catch (err) {
-		console.log('Exception in Otto on ready - ' + err.message);
+		console.log('ERROR - otto - Exception in Otto on ready - ' + err.message);
     }
 });
 
@@ -94,7 +99,7 @@ Otto.on("message", async message => {
 		// Any message w/o our command prefix resets the message ID,
 		// so it won't delete the most recent song announcement, because it was talked about.
 		if (message.content.indexOf(config.prefix) !== 0) {
-			if (message.channel === mychannelID) { // ONLY if the message was in the now-talking channel
+			if (message.channel === listenerChannel) { // ONLY if the message was in the now-talking channel
 				my_message = 0;		// set this to 0, so it won't delete the most recent song announcement, because it was talked about.
 			}
 			return;
@@ -171,8 +176,8 @@ DJ Commands are\n\
 		// Wake the bot up by setting the channel ID.
 		if (command === "ping") {
 			talk = 1;
-			mychannelID = message.channel;
-			console.log('Active channel ID now: ' + mychannelID);
+			listenerChannel = message.channel;
+			console.log('INFO - otto - Active channel ID now: ' + listenerChannel);
 			message.channel.send('pong.');
 			if (config.use_nowplayingfile) {
 				clearInterval(localFileNowPlayingInterval);
@@ -246,13 +251,13 @@ DJ Commands are\n\
 				process.exit();
 				return true;
 			}
-			console.log('Otto Exit command not supported on this configuration');
+			console.log('INFO - otto - Otto Exit command not supported on this configuration');
 		}
 
 	}
 
 	catch (err) {
-		console.log('Exception in Otto on message - ' + err.message);
+		console.log('ERROR - otto - Exception in Otto on message - ' + err.message);
     }
 });	// end of on.message handling
 
@@ -276,8 +281,8 @@ function localFileNowPlaying() {
                     // TODO: handle the error of edit failure due to the message not actually existing anymore
                 }
 				// If I do NOT have an active message, send a new one and save it.
-				else if (mychannelID) {
-                    mychannelID.send(currentIntro + ' ' + newfiledata)
+				else if (listenerChannel) {
+					listenerChannel.send(currentIntro + ' ' + newfiledata)
 						.then((sentMessage) => { my_message = sentMessage });
 				}
 			}
@@ -293,7 +298,7 @@ function localFileNowPlaying() {
 		}
 	}
 	catch (err) {
-		console.log('Exception in Otto.localFileNowPlaying - ' + err.message);
+		console.log('ERROR - otto - Exception in Otto.localFileNowPlaying - ' + err.message);
     }
 }
 
@@ -322,8 +327,8 @@ function UpdateNowPlaying(newsong, streamChanged) {
                     // TODO: handle the error of edit failure due to the message not actually existing anymore
                 }
 				// If I do NOT have an active message, send a new one and save it.
-				else if (mychannelID) {
-                    mychannelID.send(currentIntro + ' ' + newfiledata)
+				else if (listenerChannel) {
+					listenerChannel.send(currentIntro + ' ' + newfiledata)
 						.then((sentMessage) => { my_message = sentMessage });
 				}
 			}
@@ -344,9 +349,14 @@ function UpdateNowPlaying(newsong, streamChanged) {
         }
 	}
 	catch (err) {
-		console.log('Exception in Otto.UpdateNowPlaying', err);
+		console.log('ERROR - otto - Exception in Otto.UpdateNowPlaying', err);
 	}
+}
 
+function EngineeringLogEntry(message) {
+	if (engineeringChannel) {
+		engineeringChannel.send(message);
+	}
 }
 
 function start(onCurrentDJChangedCallback, onPhoneDisplayedCallback) {
@@ -370,11 +380,11 @@ function start(onCurrentDJChangedCallback, onPhoneDisplayedCallback) {
             }
         }
 		else {
-			console.log('Otto Discord integration is NOT enabled - check config.json');
+			console.log('WARNING - otto - Otto Discord integration is NOT enabled - check config.json');
 		}
 	}
 	catch (err) {
-		console.log('Exception in Otto.start', err);
+		console.log(`ERROR - otto - Exception in Otto.start ${err.message}`);
 	}
 
 }
@@ -383,16 +393,22 @@ function start(onCurrentDJChangedCallback, onPhoneDisplayedCallback) {
 // Running otto locally - node otto.js will execute this code and check the use_nowplayingfile config setting
 //
 if (config.use_nowplayingfile) {
-	console.log('Running Otto locally');
+	console.log('INFO - otto - Running Otto locally');
 	Start();
 }
 
 
+function IsReady() {
+	return isReady;
+}
+
 if (!module.exports.UpdateNowPlaying) {
 	module.exports.Start = start;
     module.exports.UpdateNowPlaying = UpdateNowPlaying;
+    module.exports.EngineeringLogEntry = EngineeringLogEntry;
     module.exports.CurrentDJ = currentDJ;
     module.exports.DefaultDJ = defaultDJ;
+    module.exports.IsReady = IsReady;
 	module.exports.Enabled = config.enabled;
 }
 

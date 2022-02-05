@@ -14,7 +14,7 @@
 	},
 	"ImageIdParameter": {
 			"Type": "String",
-			"Default": "ami-056824f6843c46eab",		
+			"Default": "ami-06706daa0f49054e9",		
 			"Description": "Enter the Image Id for the AMI you are using to build this server"	
 	}
   }, 	

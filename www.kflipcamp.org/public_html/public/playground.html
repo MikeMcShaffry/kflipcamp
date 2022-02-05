@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>KFLiP Camp</title>
+    <meta name="description" content="Listen to KFLiP's eclectic music library anytime, or listen to real humans Friday 9pm US Central or Monday 10pm US Central time.">
+    <meta name="robots" content="index, nofollow">
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700,700i" rel="stylesheet">
+
+    <link rel="stylesheet" href="mobile.css" type="text/css">
+
+
+    <link rel="stylesheet" href="event_calendar.css" type="text/css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.min.js" type="text/javascript"></script>
+
+    <script src="./main_event.js"></script>
+
+</head>
+
+
+
+
+<body id="container">
+
+
+<div id="myradiodivcontainer" style="height: 65px; border-radius: 5px; border: 0px none rgb(255, 255, 255); overflow: hidden; display: block;" class="sodahnativeflashradio4">
+    <div id="myradiodivcontainercontainerinside" style="position: relative; left: 0px; top: 0px; height: 100%; width: 100%; background: rgb(17, 21, 26);">
+        <div id="myradiodivcontainervolumecontroller" style="z-index: 20; position: absolute; background-color: rgba(173, 212, 255, 0.6); user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); width: 16.1021px; top: 0px; left: 65px; height: 65px; border-right: 1px solid rgb(173, 212, 255); border-bottom: none;"></div>
+        <div id="myradiodivcontainertemp_song" style="position: absolute; z-index: 0; font-family: Oswald; overflow: visible; opacity: 0; text-align: left; white-space: nowrap; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); font-size: 16.25px; line-height: 16.25px;">Riders in the Sky - Red River Valley off *The Best of the West Rides Again*</div>
+        <div id="myradiodivcontainertemp_radio" style="position: absolute; z-index: 0; font-family: Oswald; overflow: visible; opacity: 0; text-align: left; white-space: nowrap; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); font-size: 32.5px; line-height: 1;">KFLiP</div>
+        <canvas id="myradiodivcontainercanvas" width="16" height="65" style="z-index: 21; display: block; background: none; position: absolute; top: 0px; left: 65px;"></canvas>
+        <div id="myradiodivcontainerchannelname" style="position: absolute; z-index: 22; overflow: hidden; font-family: Oswald; color: rgb(255, 255, 255); white-space: nowrap; text-align: left; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); top: 0px; left: 65px; height: 43.3333px; font-size: 32.5px; line-height: 32.5px; margin-left: 6.5px; padding: 0px; transform: rotate(0rad); width: 146.984px;">KFLiP</div>
+        <div id="myradiodivcontainerstatustext" style="position: absolute; z-index: 22; overflow: hidden; font-family: Oswald; color: rgb(255, 255, 255); white-space: nowrap; text-align: left; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); font-size: 16.25px; line-height: 16.25px; height: 32.5px; top: 43.875px; left: 65px; margin-left: 6.5px; transform: rotate(0rad); width: 146.984px;">
+            <div style="width: 100000px; transform: translateX(-0px); animation: 17.738s linear 0s infinite normal none running marqueeAnimation-58017430;" class="js-marquee-wrapper">
+                <div class="js-marquee" style="margin-right: 138px; float: left;">Riders in the Sky - Red River Valley off *The Best of the West Rides Again*</div>
+                <div class="js-marquee" style="margin-right: 138px; float: left;">Riders in the Sky - Red River Valley off *The Best of the West Rides Again*</div>
+            </div>
+        </div>
+        <div id="myradiodivcontainervolumesetcontainer" style="position: absolute; z-index: 43; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); background-color: rgb(173, 212, 255); left: 211.984px; top: 0px; width: 65px; height: 65px;">
+            <div id="myradiodivcontainervolumeupbutton" style="position: absolute; fill: rgb(255, 255, 255); user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); visibility: visible; top: 3.25px; left: 16.25px; width: 32.5px; height: 32.5px; transform: rotate(0rad); opacity: 1;">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 800 800">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M545.676,86.489c14.686-2.451,25.617,5.51,36.586,10.976 c50.467,25.145,90.846,61.559,121.957,105.695c36.729,52.107,62.104,111.54,63.418,197.163 c0.619,40.392-6.879,78.427-18.293,110.574c-11.559,32.553-26.215,59.762-44.717,85.369 c-27.123,37.537-59.275,70.676-100.818,94.313c-6.74,3.836-13.5,8.24-20.732,11.789c-13.199,6.479-33.148,18.762-49.189,6.098 c-9.744-7.693-15.137-23.627-7.316-36.586c5.221-8.65,14.797-12.842,24.391-17.074c19.174-8.459,36.504-19.939,52.441-32.521 c42.008-33.164,74.291-75.611,93.092-132.932c8.752-26.68,17.211-60.645,14.23-97.159c-0.783-9.597-0.719-18.443-1.627-26.831 c-2.674-24.729-8.688-46.792-17.074-67.482c-10.945-26.999-23.814-50.801-40.652-72.36c-7.646-9.793-16.938-20.547-26.83-29.676 c-19.475-17.972-41.15-34.263-65.855-47.156c-14.627-7.633-34.898-12.01-36.182-33.741 C521.668,100.793,533.361,88.544,545.676,86.489z"></path>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M342.417,131.613c13.52-0.659,24.913,8.526,28.049,19.919 c2.251,8.171,1.22,19.046,1.22,30.083c0,145.936,0,287.211,0,434.165c0,10.596,1.203,21.74-0.407,30.488 c-2.75,14.943-20.474,27.541-38.619,19.92c-7.665-3.219-14.735-11.482-21.139-17.887c-42.516-42.516-83.082-83.488-126.021-126.428 c-3.266-3.268-7.283-7.953-10.569-8.539c-9.47-1.68-20.244,0-30.083,0c-19.667,0-39.878,0-60.166,0 c-10.165,0-20.518,1.055-29.27-0.813c-10.942-2.334-20.231-10.883-22.358-21.139c-1.349-6.498-0.407-14.875-0.407-22.764 c0-46.528,0-90.371,0-137.405c0-10.514-0.845-21.152,2.439-28.049c3.64-7.646,11.651-14.358,22.358-15.854 c17.026-2.38,39.482-0.407,58.133-0.407c21.264,0,40.268,0,58.539,0c5.924,0,17.312-14.872,21.139-18.7 c38.748-38.748,76.943-76.537,116.265-115.858C320.443,143.423,326.955,132.366,342.417,131.613z"></path>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M504.212,190.151c11.813-0.833,23.587,6.137,33.741,11.789 c28.867,16.071,53.221,37.1,71.547,62.604c12.014,16.717,24.061,35.695,31.709,57.726c7.678,22.119,12.268,47.98,13.414,75.207 c1.213,28.769-5.297,54.604-12.602,76.831c-14.658,44.607-41.742,77.303-74.393,104.477c-7.686,6.396-16.842,12.406-26.83,17.887 c-12.879,7.066-29.714,18.773-46.343,10.977c-12.367-5.799-21.715-23.805-12.604-39.434c5.439-9.326,16.416-13.232,25.611-18.293 c33.083-18.203,60.483-44.904,76.019-81.303c10.098-23.66,17.5-53.273,13.822-87.81c-2.361-22.174-9.406-41.17-17.074-56.913 c-8.992-18.46-23.578-37.04-38.619-50.002c-12.168-10.487-24.719-18.474-39.839-26.423c-12.549-6.597-28.033-16.262-22.766-37.4 C481.554,199.86,491.683,191.036,504.212,190.151z"></path>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M456.649,294.627c12.543-2.064,22.457,3.727,31.303,8.943 c18.758,11.064,33.714,28.004,43.089,48.376c5.629,12.23,10.859,30.956,10.57,47.969c-0.658,38.536-18.93,70.033-41.466,88.215 c-4.451,3.594-10.027,6.871-15.854,10.164c-5.461,3.084-11.988,6.908-17.887,7.723c-14.371,1.984-26.4-7.043-30.488-16.666 c-2.91-6.854-3.279-16.693,0.406-23.58c7.52-14.049,26.189-18.113,36.586-30.082c5.488-6.314,9.74-14.529,11.383-23.577	c4.76-26.199-5.623-44.244-19.512-54.475c-9.348-6.883-21.275-12.916-28.457-23.171 C428.942,315.932,439.655,297.505,456.649,294.627z"></path>
+                </svg>
+            </div>
+            <div id="myradiodivcontainervolumeoffbutton" style="position: absolute; fill: rgb(255, 255, 255); visibility: hidden; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); top: 3.25px; left: 16.25px; width: 32.5px; height: 32.5px; transform: rotate(0rad);">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 800 800">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M342.417,131.613c13.52-0.659,24.913,8.526,28.049,19.919 c2.251,8.171,1.22,19.046,1.22,30.083c0,145.936,0,287.211,0,434.165c0,10.596,1.203,21.74-0.407,30.488 c-2.75,14.943-20.474,27.541-38.619,19.92c-7.665-3.219-14.735-11.482-21.139-17.887c-42.516-42.516-83.082-83.488-126.021-126.428 c-3.266-3.268-7.283-7.953-10.569-8.539c-9.47-1.68-20.244,0-30.083,0c-19.667,0-39.878,0-60.166,0 c-10.165,0-20.518,1.055-29.27-0.813c-10.942-2.334-20.231-10.883-22.358-21.139c-1.349-6.498-0.407-14.875-0.407-22.764 c0-46.528,0-90.371,0-137.405c0-10.514-0.845-21.152,2.439-28.049c3.64-7.646,11.651-14.358,22.358-15.854 c17.026-2.38,39.482-0.407,58.133-0.407c21.264,0,40.268,0,58.539,0c5.924,0,17.312-14.872,21.139-18.7 c38.748-38.748,76.943-76.537,116.265-115.858C320.443,143.423,326.955,132.366,342.417,131.613z"></path>
+                </svg>
+            </div>
+            <div id="myradiodivcontainervolumetext" style="position: absolute; font-family: Oswald; color: rgb(255, 255, 255); white-space: nowrap; text-align: center; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); font-size: 16.25px; line-height: 16.25px; height: 16.25px; width: 65px; top: 43.875px; left: 0px; transform: rotate(0rad);">10%</div><img id="myradiodivcontainervolumehit" src="data:image/gif;base64,R0lGODlhAQABAJEAAAAAAP///////wAAACH5BAEAAAIALAAAAAABAAEAAAICVAEAOw%3D%3D" style="position: absolute; cursor: pointer; z-index: 24; padding: 0px; margin: 0px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); width: 65px; height: 65px; left: 0px; top: 0px;"></div><img id="myradiodivcontainervolumegrab" src="data:image/gif;base64,R0lGODlhAQABAJEAAAAAAP///////wAAACH5BAEAAAIALAAAAAABAAEAAAICVAEAOw%3D%3D" style="position: absolute; z-index: 44; padding: 0px; margin: 0px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); top: 0px; left: 65px; width: 146.984px; height: 65px; cursor: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNAay06AAAALlSURBVEiJxZe9bhNBEMd/5zsSkhjs0Fi0SYG7CAmltQUpeAGeISmTB6CFSOQFkoKOwqJAQAQNCCHyIUs0KYAiEmUaQ2GshORuPyhu196c95wLSHik0a3v7P3Nf2Zudx1orRmHlcZCHSc48t0MgqDIbwPjANr4SHPL6gWPsJIDe2k+PwAUIIwXaxqt9ZB7LAC2gTfANeCtNga8A24CVeAqEDrB5bKKgrctaHNzU5fLZe2Aj42/B2omsEkTQC64SHOVgMaI54GUcjqO47vAd+AFcB2YAq7kqS8K9ppSCiAQQiCEAAi63e494DkwC0yT9tEQvAjY7V7m5+cBkFJaGEmS9MFCCDqdTgN4Rlr3aTxpLwLWwMOtrS0Ams0mjUZjCGaDcMZ3gBvADJ6UFwU/XV5ePraTKqXIgbnjgLTWFnyOVeQ91qTvJ0mSoJSi1Wr1A7AwKWVfvRlD2t0TeFI9Cmxr238vLUwphZQSKSVHR0eTLiwDDo1Sd+GBrPyMvQa6wCvSBumn0dbXNpj1w8PDSaf2Nniv5SkuAY1er1dWSt2vVCotTBqtWt/VHRvLXT7zFAfAjlXU6XSaFmwV+dw+29vbA/hGuoYrPJtIbqqjKFqvVqsf7KRLS0tTPojPV1ZWDhg0pTTwQoq1EOJzGIYbtVrtU5IkrK6uemG+e8At4BEQG5dZxXk1VkAipWwDQghBvV4nW2Nfndvttp0jBk6BMzzb5aiuFsBJFEXrc3NzH0fV1PW1tbUD4Ou/gBUQCyH2wzB8Uq/Xdy5qKifNjw30FEi4RI1d+JmUcj8Mw42FhYVdC8mrt7EY+G089oEvWjJtZ55IKXfDMAwWFxdvk9mxMvbFAE/ISTNA4DtxeA57JdJ1d4Z0n50FyqTrsJs1TarwF/AD+El6OpHwd4c9ZaLXzthu8lmwIFXcM98bSjMUV2ytZGAT5jq06zA4ccYMFpA0Kod1WTAM6juqzjYz5ya/EPw/bGx/Yf4AHxykPX4eCXQAAAAASUVORK5CYII%3D&quot;), auto;">
+        <div id="myradiodivcontainerplaystopcontainer" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: absolute; left: 0px; top: 0px; background-color: rgb(173, 212, 255); cursor: pointer; height: 65px; width: 65px;">
+            <div id="myradiodivcontainerplayer" style="position: absolute; top: 0px; left: 0px; width: 0px; height: 0px;"></div>
+            <div id="myradiodivcontainerplaybutton" style="position: absolute; z-index: 43; fill: rgb(255, 255, 255); user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); inset: 8.125px;">
+                <svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 800 800" enable-background="new 0 0 800 800" xml:space="preserve">
+					<path d="M226.928,725.51c-5.258,3.01-94.982,65.39-94.98,0l-0.001-647.112c0-75.341,92.9-0.739,94.982,0l421.455,285.66 c26.227,26.226,26.229,68.752,0,94.981L226.928,725.51z"></path>
+				</svg>
+            </div>
+            <div id="myradiodivcontainerstopbutton" style="position: absolute; z-index: 44; visibility: hidden; fill: rgb(255, 255, 255); user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); inset: 8.125px;">
+                <svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 800 800" style="enable-background:new 0 0 800 800;" xml:space="preserve">
+					<g>
+						<path d="M719.4,772H517.8c-27.5,0-50.1-22.5-50.1-50.1V82.1c0-27.5,22.5-50.1,50.1-50.1h201.6c27.5,0,50.1,22.5,50.1,50.1v639.8 C769.5,749.5,747,772,719.4,772z"></path>
+					</g>
+                    <g>
+						<path d="M280.7,772H79.1C51.5,772,29,749.5,29,721.9V82.1C29,54.5,51.5,32,79.1,32h201.6c27.5,0,50.1,22.5,50.1,50.1v639.8 C330.8,749.5,308.3,772,280.7,772z"></path>
+					</g>
+				</svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+</body>
+</html>
+
+
+

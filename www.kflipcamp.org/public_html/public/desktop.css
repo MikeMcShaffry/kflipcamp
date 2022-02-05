@@ -298,5 +298,11 @@ div.column-content .livelinkarea a:visited {
     padding-bottom: 5px;
 }
 
+.patreon-column {
+    float: left;
+    width: 50%;
+    padding: 5px;
+}
+
 
 

@@ -2,59 +2,131 @@
 // events.js - Grabs a google calenadar and emits events to connected browsers
 //
 // COPYRIGHT (c) 2020 by Michael L. McShaffry - All rights reserved
+//   NOTE: COPYRIGHT will be assigned to KFLIPCAMP as soon as the legal entity is created! 
 //
 // The source code contained herein is open source under the MIT licence, with the EXCEPTION of embedded passwords and authentication keys.
 
 // Here we load the config.json file that contains our token and our prefix values. 
 
 const config = require("./config.json").googlecalendar;			// <<<<<<< I added a google calendar section to the config file
-const moment = require("moment");
-
 const { google } = require('googleapis');
+
+let knownBadEvents = {}
 
 const auth = new google.auth.GoogleAuth({
     keyFile: config.auth_keyfile,
     scopes: ['https://www.googleapis.com/auth/calendar']
 });
 
-
-
 const cal = google.calendar({
     version: 'v3',
     auth: auth
 });
 
-async function getEventList() {
-
-    // Set beginning of query to now minus three hours - a typical long show)
-    let startDate = new Date().getTime() - (3 * 60 * 60 * 1000);
-
-    let list = await cal.events.list({
-        // Set times to ISO strings as such
-        timeMin: new Date(startDate).toISOString(),
-        calendarId: config.calendarId
-    });
-
-    list.data.items.forEach(function(event) {
-        event.startDate = new Date(event.start.dateTime);
-    });
-
-    let sortedItems = list.data.items.sort(function (a, b) { return a.startDate - b.startDate; });
-    list.data.items = sortedItems;
-    return list;
+class BadEventError extends Error {
+    constructor(message, event) {
+        super(message);
+        this.name = "BadEventError";
+        this.event = event;
+    }
 }
 
-async function getEventArchive(start, end) {
+
+function checkIfBadEventsAreFixed(sortedEvents)
+{
+    try {
+        Object.keys(knownBadEvents).forEach(function (key) {
+            let badEventIsGone = true;
+            sortedEvents.forEach((event) => {
+                if (event.id === key) {
+                    badEventIsGone = false;
+                }
+            });
+
+            if (badEventIsGone) {
+                if (addToEngineeringLog) {
+                    addToEngineeringLog("INFO - A bad event has been fixed")
+                }
+                delete knownBadEvents[key];
+            }
+        })
+    }
+    catch(error) {
+        console.log(`ERROR - events - checkIfBadEventsAreFixed - ${error.message}`)
+    }
+}
+
+async function getEventList() {
+    try {
+        // Set beginning of query to now minus six hours - longer than our longest show)
+        let startDate = new Date().getTime() - (6 * 60 * 60 * 1000);
+        
+        let list = await cal.events.list({
+            timeMin: new Date(startDate).toISOString(),
+            calendarId: config.calendarId
+        });
+
+        // process the return list by converting dates, checking for repeating shows (they don't work!)
+        let processedList = [];
+        list.data.items.forEach(function (event) {
+            try {
+                if (event.recurrence) {
+                    throw new BadEventError("Recurring event detected", event);
+                } else if (event.start && event.start.dateTime) {
+                    event.startDate = new Date(event.start.dateTime);
+                    processedList.push(event);
+                }
+            }
+            catch (error) {
+                if (error instanceof BadEventError) {
+                    if (!knownBadEvents[error.event.id]) {
+                        knownBadEvents[error.event.id] = error.event;
+                        if (error.event) {
+                            if (error.event.summary) {
+                                error.message += ` - Summary: ${error.event.summary}`;
+                            }
+                            if (error.event.creator && error.event.creator.email) {
+                                error.message += ` - Created By: ${error.event.creator.email}`;
+                            }
+                            if (error.event.start && error.event.start.dateTime) {
+                                error.message += ` - Starting: ${error.event.start.dateTime}`
+                            }
+                            if (error.event.htmlLink) {
+                                error.message += ` - ${error.event.htmlLink}`
+                            }
+                        }
+                        console.log(`ERROR - events - Invalid event in calendar - ${error.message}`)
+                        if (addToEngineeringLog) {
+                            addToEngineeringLog(`ERROR - events - Invalid event in calendar - ${error.message}`)
+                        }
+                    }
+                }
+                else {
+                    console.log(`ERROR - events - Exception in getEventList - ${error.message}`);
+                }
+            }            
+        });
+        
+        let sortedItems = processedList.sort(function (a, b) {
+            return a.startDate - b.startDate;
+        });
+        checkIfBadEventsAreFixed(list.data.items);
+        list.data.items = sortedItems;
+        return list;
+    }
+    catch (error) {
+        console.log(`ERROR - events - Exception in getEventList - ${error.message}`);
+    }
+}
+
+async function getEventsByDate(startISOString, endISOString) {
 
     try {
         // Set beginning of query to now minus three hours - a typical long show)
-        let startDate = moment(start);
-        let endDate = moment(end);
-
         let list = await cal.events.list({
             // Set times to ISO strings as such
-            timeMin: startDate.toISOString(),
-            timeMax: endDate.toISOString(),
+            timeMin: startISOString,
+            timeMax: endISOString,
             calendarId: config.calendarId
         });
 
@@ -62,14 +134,13 @@ async function getEventArchive(start, end) {
             event.startDate = new Date(event.start.dateTime);
         });
 
-        let sortedItems = list.data.items.sort(function (a, b) {
+        list.data.items = list.data.items.sort(function (a, b) {
             return a.startDate - b.startDate;
         });
-        list.data.items = sortedItems;
         return list;
     }
     catch(error) {
-        console.log("Something bad happened");
+        console.log(`ERROR - events - Exception in getEventsByDate - ${error.message}`);
     }
     return [];
 }
@@ -85,15 +156,15 @@ async function getEvent(id) {
 
 async function updateEventDescription(event) {
     try {
-        const results = await cal.events.patch({
+        await cal.events.patch({
             calendarId: config.calendarId,
             eventId: event.data.id,
             requestBody: { description: event.data.description },
             auth: auth
         });
-        console.log('Event updated - ' + event.data.summary);
+        console.log('INFO - events - event updated - ' + event.data.summary);
     } catch (err) {
-        console.log('Exception in updateEventDescription -' + err.message);
+        console.log('ERROR - events - exception in updateEventDescription -' + err.message);
     }
 }
 
@@ -108,6 +179,7 @@ let currentEvents = {};                             // events where the start an
 
 let onEventStart = null;                            // callback for event start
 let onEventEnd = null;                              // callback for event end
+let addToEngineeringLog = null;                     // callback for reporting something important to the engineering log)
 
 //
 // getEventsAsync() -  Grab the KFLIP calendar and if there are any changes, emit them to any connected browsers
@@ -123,7 +195,7 @@ async function getEventsAsync() {
             lastScheduleSentWasUpdated < currentUpdated ||
             lastScheduleItemCount !== itemCount) {
             //if (true) {
-            console.log('A new schedule for everyone! Sending the latest schedule with ' +
+            console.log('INFO - events - a calendar has an update - sending ' +
                 eventList.data.items.length +
                 ' events');
             lastScheduleSentWasUpdated = currentUpdated;
@@ -139,11 +211,11 @@ async function getEventsAsync() {
 
             let event = eventList.data.items[n];
             if (!event.start || !event.start.dateTime) {
-                console.log('No start time - ' + event.summary);
+                console.log('WARNING - events - missing start time - ' + event.summary);
                 continue;
             }
             if (!event.end || !event.end.dateTime) {
-                console.log('No end time - ' + event.summary);
+                console.log('WARNING - events - missing end time - ' + event.summary);
                 continue;
             }
             var start = new Date(event.start.dateTime).getTime();
@@ -158,7 +230,6 @@ async function getEventsAsync() {
 
             if (!currentEvents[event.id] && eventIsHappening) {
                 // The event isn't listed as current, so lets check to see if it is happening now!
-
                 currentEvents[event.id] = event;
                 if (onEventStart) {
                     await onEventStart(event);
@@ -194,10 +265,8 @@ async function getEventsAsync() {
                 delete currentEvents[eventId];
             }
         }
-
-
     } catch (err) {
-        console.log('Exception in getEventsAsync -' + err.message);
+        console.log('ERROR - events - exception in getEventsAsync -' + err.message);
     }
 }
 
@@ -225,16 +294,16 @@ async function addDetails(id, details) {
 }
 
 
-
-function start(scheduleChangeCallback, onStartCallback, onEndCallback) {
+function start(scheduleChangeCallback, onStartCallback, onEndCallback, addToEngineeringLogCallback) {
 
     onScheduleChange = scheduleChangeCallback;
     if (!onScheduleChange) {
-        console.log('WARNING - events.js would be more useful if there was a handler for schedule change events');
+        console.log('WARNING - events - this module has no onScheduleChange handler');
     }
 
     onEventStart = onStartCallback;
     onEventEnd = onEndCallback;
+    addToEngineeringLog = addToEngineeringLogCallback
 
     // Call it once to get the latest schedule upon startup
     getEvents();
@@ -253,6 +322,6 @@ if (!module.exports.Start) {
     module.exports.GetEventDescription = getEvent;
     module.exports.UpdateEventDescription = updateEventDescription;
     module.exports.AddDetails = addDetails;
-    module.exports.GetEventArchive = getEventArchive;
+    module.exports.GetEventsByDate = getEventsByDate;
 }
 

@@ -2,10 +2,11 @@
 // library.js - Open and search a SQLLite database used by MediaMonkey
 //
 // COPYRIGHT (c) 2020 by Michael L. McShaffry - All rights reserved
+//   NOTE: COPYRIGHT will be assigned to KFLIPCAMP as soon as the legal entity is created! 
 //
 // The source code contained herein is open source under the MIT licence
 
-const sqlite = require('sqlite-async');
+//const sqlite = require('sqlite-async');
 const fs = require('fs');
 
 const databaseFile = './data/MM.DB';
@@ -17,14 +18,14 @@ let mmDb = null;
 async function Start() {
 
     if (fs.existsSync(databaseFile) == false) {
-        console.log('Find the MediaMonkey MM.DB file in AppData/Roaming/MediaMonkey and copy it to a data directory to enable searching');
+        console.log('WARNING - library - database file does not exist - find the MediaMonkey MM.DB file in AppData/Roaming/MediaMonkey and copy it to a data directory to enable searching');
         return;
     }
 
-    sqlite.open(databaseFile).then(_db => {
-        mmDb = _db
-        console.log('Connected to the MM.DB database.');
-    });
+//    sqlite.open(databaseFile).then(_db => {
+//        mmDb = _db
+//        console.log('INFO - library - connected to the MM.DB database.');
+//    });
 }
 
 //
@@ -46,7 +47,7 @@ async function SearchByArtist(artist) {
         return results;
     }
     catch (err) {
-        console.log('Exception in library SearchByArtist', err);
+        console.log(`ERROR - library - exception in library SearchByArtist - ${err.message}`);
         res.end(JSON.stringify(results));
     }
 }

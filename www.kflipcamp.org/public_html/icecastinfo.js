@@ -2,9 +2,11 @@
 // icecastinfo.js - Can grab now player and listener count information from an icecast server
 //
 // COPYRIGHT (c) 2020 by Michael L. McShaffry - All rights reserved
+//   NOTE: COPYRIGHT will be assigned to KFLIPCAMP as soon as the legal entity is created! 
 //
 // The source code contained herein is open source under the MIT licence
 
+const { decode } = require('html-entities');
 
 // Variables that hold listener counts and broadcast stream
 let lastReportedShoutingFireListeners = 0;
@@ -44,11 +46,12 @@ function checkForSomethingNew(newIcecastStatsJson) {
         if (newIcecastStatsJson.includes(': - ,')) {
             newIcecastStatsJson = newIcecastStatsJson.replace(': - ,', ': "-" ,');
         }
-
+ 
+        newIcecastStatsJson = decode(newIcecastStatsJson);
         var newIcecastStats = JSON.parse(newIcecastStatsJson);
 
         if (icecastStatsParseError) {
-            console.log('Icecast stats parse error is gone.');
+            console.log('INFO - icecastinfo - stats parse error is gone.');
             icecastStatsParseError = false;
         }
 
@@ -57,15 +60,13 @@ function checkForSomethingNew(newIcecastStatsJson) {
     }
     catch (err) {
         if (icecastStatsParseError === false) {
-            console.log('Exception in icecast stats - ' + err.message + ' with ' + newIcecastStatsJson);
+            console.log('ERROR - icecastinfo - Exception in checkForSomethingNew - ' + err.message + ' with ' + newIcecastStatsJson);
             icecastStatsParseError = true;
         }
-
         return;
     }
 
     try {
-
         let sameOldSong = true;
         let newTitle = '';
         let listeners = 0;
@@ -112,19 +113,19 @@ function checkForSomethingNew(newIcecastStatsJson) {
                 newTitle = 'Dead air';
                 sameOldSong = false;
                 listeners = 0;
-                console.log('Stream has changed - We are off the air!');
+                console.log('INFO - icecastinfo - stream has changed - the station is not broadcasting');
             } else {
                 sameOldSong = false;
               
                 // TODO CONFIGURATION - these streams should be in a configuration file somewhere
                 if (firstStreamBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip') {
-                    console.log('Stream has changed - A live DJ is broadcasting');
+                    console.log('INFO - icecastinfo - stream has changed - A live DJ is broadcasting');
                 } else if (firstStreamBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/kflip_auto') {
-                    console.log('Stream has changed - Otto has the KFLIP stream');
+                    console.log('INFO - icecastinfo - stream has changed - Otto has the KFLIP stream');
                 } else if (firstStreamBroadcasting.listenurl === 'http://www.kflipcamp.org:8000/shoutingfire') {
-                    console.log('Stream has changed - KFLIP is broadcasting ShoutingFire');
+                    console.log('INFO - icecastinfo - stream has changed - KFLIP is broadcasting ShoutingFire');
                 } else {
-                    console.log('Stream has changed - but I have no idea what stream is broadcasting');
+                    console.log('ERROR - icecastinfo - stream has changed - but the listenUrl is not recognized');
                 }
                 
             }
@@ -155,7 +156,7 @@ function checkForSomethingNew(newIcecastStatsJson) {
 
 
     } catch (err) {
-        console.log('Exception in checkForSomethingNew - ' + err.message + ' with ' + newIcecastStatsJson);
+        console.log('ERROR - icecastinfo - Exception in checkForSomethingNew - ' + err.message + ' with ' + newIcecastStatsJson);
     }
 }
 
@@ -187,10 +188,10 @@ async function getNowPlayingAsync() {
 
         req.on('error',
             function (e) {
-                console.log('Error calling GET kflipstatus - ' + e.message);
+                console.log('ERROR - icecastinfo - Error calling GET kflipstatus - ' + e.message);
             });
     } catch (err) {
-        console.log('Exception in getNowPlayingAsync - ' + err.message);
+        console.log('ERROR - icecastinfo - Exception in getNowPlayingAsync - ' + err.message);
     }
 
 }
@@ -268,7 +269,7 @@ function checkShoutingFire() {
                                 if (h3) {
                                     const parents = h3.parentsUntil('.newscontent');
                                     if (parents.length) {
-                                        const divStreamHeader = parents[parents.length - 1];
+                                        const divStreamHeader = parents[4];
                                         const infoTable = divStreamHeader.nextSibling;
 
                                         $('td', infoTable).each(function (i, e) {
@@ -294,17 +295,17 @@ function checkShoutingFire() {
                                 //console.log('ShoutingFire has ' + shoutingFireListeners + ' listeners');
 
                             } catch (err) {
-                                console.log('There was a problem finding ShoutingFire listener count - ' + err.message);
+                                console.log('ERROR - icecastinfo - Exception parsing ShoutingFire listener count - ' + err.message);
                             }
                         });
             });
 
         req.on('error',
             function (e) {
-                console.log('ERROR: ' + e.message);
+                console.log('ERROR - icecastinfo - error retrieving ShoutingFire listener count: ' + e.message);
             });
     } catch (err) {
-        console.log('Exception in checkShoutingFire - ' + err);
+        console.log('ERROR - icecastinfo - exception in checkShoutingFire - ' + err);
     }
 }
 
@@ -312,12 +313,12 @@ function checkShoutingFire() {
 function Start(_onSomethingNewPlaying, _onListenerCountChanged) {
     onSomethingNewPlaying = _onSomethingNewPlaying;                   // a callback for when the stream changes or the song playing changes
     if (!onSomethingNewPlaying) {
-        console.log('WARNING - icecastinfo.js would be more useful if there was a handler for new now playing events');
+        console.log('WARNING - icecastinfo - onSomethingNewPlaying is not set');
     }
 
     onListenerCountChanged = _onListenerCountChanged;                   // a callback for when the stream changes or the song playing changes
     if (!onListenerCountChanged) {
-        console.log('WARNING - icecastinfo.js would be more useful if there was a handler for new listener count update events');
+        console.log('WARNING - icecastinfo - onListenerCountChanged is not set');
     }
     setInterval(updateNowPlaying, 5000);
 }
@@ -326,7 +327,7 @@ function CheckShoutingFire(_onShoutingFireUpdated) {
 
     onShoutingFireUpdated = _onShoutingFireUpdated;
     if (!onSomethingNewPlaying) {
-        console.log('WARNING - icecastinfo.js would be more useful if there was a handler for new now playing events');
+        console.log('WARNING - icecastinfo - onSomethingNewPlaying is not set');
     }
 
     checkShoutingFire();

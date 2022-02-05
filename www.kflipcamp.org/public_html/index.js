@@ -2,20 +2,24 @@
 // index.js - Entry point for the kflipcamp.org web site
 //
 // COPYRIGHT (c) 2020 by Michael L. McShaffry - All rights reserved
+//   NOTE: COPYRIGHT will be assigned to KFLIPCAMP as soon as the legal entity is created! 
 //
 // The source code contained herein is open source under the MIT license, with the EXCEPTION of embedded passwords and authentication keys.
 
 
 // Setup basic express server
 const express = require('express');
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
+const moment = require('moment');
 const app = express();
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 
 const path = require('path');
 const server = require('http').createServer(app);
 
 // Socket.io listens on port 3000 (or configured environment variable) for events like the song or DJ calendar changing
-const io = require('.')(server);
+const io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
 
 const config = require('./config.json').studio;
@@ -26,7 +30,8 @@ const otto = require('./otto.js');
 const library = require('./library.js');
 const lastfm = require('./lastfm.js');
 const archive = require('./archive.js');
-
+const twitter = require('./twitter.js');
+const patreon = require('./patreon.js');
 
 // Stores the last title information from icecast stats - it is in the form of artist - song - album
 let streamInfo = null;
@@ -51,17 +56,11 @@ var albumInfo = null;
 function onAlbumInfoChange(albumSummary, albumImage) {
 
     albumInfo = { summary: albumSummary, image: albumImage };
-
-    let keys = Object.keys(io.sockets.sockets);
-
-    keys.forEach(function (key) {
-        const connectedSocket = io.sockets.sockets[key];
-        connectedSocket.emit('albuminfo',
-            {
-                username: 'KFLIP',
-                message: albumInfo
-            });
-    });
+    io.emit('albuminfo',
+        {
+            username: 'KFLIP',
+            message: albumInfo
+        });
 }
 
 
@@ -73,29 +72,40 @@ var kflipShowString = null;
 function onScheduleChange(calendarId, eventList) {
 
     kflipShowString = JSON.stringify(eventList);
+    io.emit('schedule',
+        {
+            username: 'KFLIP',
+            calendarId: calendarId,
+            message: kflipShowString
+        });
+}
 
-    let keys = Object.keys(io.sockets.sockets);
+function onStartEvent(event) {
+    archive.OnStartEvent(event);
+    twitter.OnStartEvent(event);
+    otto.EngineeringLogEntry(`Recording just started for ${event.summary}`)
+}
 
-    keys.forEach(function (key) {
-        const connectedSocket = io.sockets.sockets[key];
-        connectedSocket.emit('schedule',
-            {
-                username: 'KFLIP',
-                calendarId: calendarId,
-                message: kflipShowString
-            });
-    });
+function onEndEvent(event) {
+    archive.OnEndEvent(event);
+    otto.EngineeringLogEntry(`Recording ended for ${event.summary}`)
+}
+
+function addToEngineeringLog(logMessage) {
+    otto.EngineeringLogEntry(logMessage)
 }
 
 
+
 // onSomethingNewPlaying() - called by icecastinfo.js whenever a stream change happens or something new is playing
+//
 function onSomethingNewPlaying(newStreamInfo, listenerCount, streamChanged) {
 
     streamInfo = newStreamInfo;
 
     archive.AddToLog(streamInfo.title);
 
-    console.log('Now playing: ' + streamInfo.title + ' (' + listenerCount + ') listeners');
+    console.log('INFO - Now playing [' + streamInfo.title + '] Listeners [' + listenerCount + ']');
     io.emit('nowplaying', { stream: streamInfo });
 
     if (otto.Enabled) {
@@ -127,6 +137,10 @@ function onPhoneDisplayChanged(phoneOn) {
     io.emit('phone', { displayed: phoneDisplayed, number: config.phone });
 };
 
+function delay(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
 //
 // server.listen - launches the listen port for the website
 //
@@ -135,15 +149,27 @@ server.listen(port, async () => {
     try {
 
         await archive.Start(events.AddDetails);
-        otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
+        await otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
+        
+        let waitingLoops = 0;
+        while (!otto.IsReady()) {
+            await delay(1000);
+            if (waitingLoops > 5) {
+                console.log(`ERROR - Otto could not initialize`);
+                break;
+            }
+            ++waitingLoops;
+        } 
+        
         currentDj = otto.CurrentDJ;
-        events.Start(onScheduleChange, archive.OnStartEvent, archive.OnEndEvent);
+        events.Start(onScheduleChange, onStartEvent, onEndEvent, addToEngineeringLog);
         icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
         icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
         await library.Start();
         await lastfm.Start(onAlbumInfoChange);
-
-        console.log('Server listening at port %d', port);
+        await twitter.Start(config.site_url, config.tz);
+        console.log('INFO - server listening at port %d', port);
+        addToEngineeringLog('INFO - KFLIP server has started');
     }
     catch (err) {
         console.log('CRITICAL ERROR - Exception in server.listen', err);
@@ -158,6 +184,25 @@ app.use('/js', express.static(path.join(__dirname, 'public/js')));
 // Add a parser to manage POST data
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+//app.use(cookieParser());
+//app.use(session({
+//    secret: config.session_secret,
+//    resave: false,
+//    saveUninitialized: true
+//}))
+
+//patreon.ConfigureApp(app);
+
+//
+// Middleware for checking if a user has been authenticated as a Patreon user
+// via Passport and OneLogin OpenId Connect
+//function checkAuthentication(req,res,next){
+//    if(req.isAuthenticated()){
+//        next();
+//    } else{
+//        res.redirect("/");
+//    }
+//}
 
 
 //
@@ -206,7 +251,7 @@ app.get('/search', async function (req, res) {
         }
     }
     catch (err) {
-        console.log('Error detected in POST /search: ' + err.message);
+        console.log('ERROR - POST /search: ' + err.message);
     }
 
     res.end(JSON.stringify(results));
@@ -219,14 +264,51 @@ app.get('/search', async function (req, res) {
 app.get('/archive/:start/:end', async function (req, res) {
     let results = [];
     try {
-        // TODO validate parameters!
-        results = await events.GetEventArchive(req.params.start, req.params.end);
+        if ( (moment(req.params.start, moment.ISO_8601).isValid() === false) ||
+             (moment(req.params.end, moment.ISO_8601).isValid() === false) ) {
+            res.status(400).send({message:'Invalid parameters'});         
+        }
+        results = await events.GetEventsByDate(req.params.start, req.params.end);
     }
     catch (err) {
-        console.log('Error detected in POST /search: ' + err.message);
+        console.log('ERROR - GET /archive/:start/:end - ' + err.message);
     }
 
     res.end(JSON.stringify(results));
+});
+
+//
+// GET /auth/patreon - called when someone clicks the "I'm a patreon person" button
+//
+//app.get('/auth/patreon', patreon.passport.authenticate('patreon', {
+//    successReturnToOrRedirect: "/"
+//}));
+
+//
+// GET /auth/patreon/redirect - Patreon calls this redirect after a person attempts to auth via Patreon
+//app.get('/oauth/callback', patreon.passport.authenticate('patreon', {
+//    callback: true,
+//    successReturnToOrRedirect: '/',
+//    failureRedirect: '/'
+//}))
+
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+    // render the error page
+    res.status(err.status || 500);
+    //res.render('error');
 });
 
 
@@ -274,12 +356,12 @@ io.on('connection',
 // Avoids the process shutting down due to an unhandled promise rejection or unhandled exceptions
 //
 process.on('unhandledRejection', error => {
-    console.log('unhandledRejection', error);
+    console.log('CRITICAL ERROR - unhandledRejection', error);
 });
 
 
 process.on('uncaughtException', error => {
-    console.log('unchaughtException ', error);
+    console.log('CRITICAL ERROR - unchaughtException ', error);
 });
 
 

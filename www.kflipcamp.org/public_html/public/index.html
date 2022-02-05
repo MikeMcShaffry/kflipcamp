@@ -5,23 +5,20 @@
     <title>KFLiP Camp</title>
     <meta name="description" content="Listen to KFLiP's eclectic music library anytime, or listen to real humans Friday 9pm US Central or Monday 9pm US Central time.">
     <meta name="robots" content="index, nofollow">
-    <link href="//fonts.googleapis.com/css?family=PT+Sans:400,400i,700,700i" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700,700i" rel="stylesheet">
 
     <link rel="stylesheet" href="desktop.css" type="text/css">
 
 
     <link rel="stylesheet" href="event_calendar.css" type="text/css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.min.js" type="text/javascript"></script>
+
     <script src="/socket.io/socket.io.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.min.js" type="text/javascript"></script>
-
     <script src="/main_event.js"></script>
-
     <!-- and new html5 audio player -->
     <script src="js/nativeflashradiov4.js" type="text/javascript"></script>
-
-
 
 </head>
 <body>
@@ -37,20 +34,33 @@
 <div class="column">
     <div class="chat-window">
 
-        <iframe src="//titanembeds.com/embed/182283804726001664?theme=DiscordDark&scrollbartheme=3d-dark" height="90%" width="100%" frameborder="0"></iframe>
+        <iframe src="https://titanembeds.com/embed/182283804726001664?theme=DiscordDark&scrollbartheme=3d-dark" height="90%" width="100%" frameborder="0"></iframe>
         
         <div class="patreon-area">
-        <a href="//www.patreon.com/bePatron?u=35895226" data-patreon-widget-type="become-patron-button">Become a Patron!</a>
-        <script async src="//c6.patreon.com/becomePatronButton.bundle.js"></script>
+            <div class="patreon-column">
+                <a href="https://www.patreon.com/bePatron?u=35895226" data-patreon-widget-type="become-patron-button">Become a Patron!</a>
+                <script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
+            </div>
+            <!--
+            <div class="patreon-column">
+                <a href="auth/patreon"><img src="images/patreon_login.png" /></a>
+            </div>
+            -->
         </div>
-
     </div>
-
-
 </div>
 
 
 <div class="column">
+    <!--
+    <div class="column-content">
+      <div class="fundraising_banner">
+          <a href="https://www.classy.org/fundraiser/3092219">
+              <img src="bbbs2020.png" style='height: 100%; width: 100%; object-fit: contain'>
+          </a>
+      </div>
+    </div>
+-->
     <div class="column-content">
         <div class="albumarea">
             <img class="albumimage" src="logo.png">
@@ -127,75 +137,79 @@
     </div>
 
 
+
+<script>
+    let nowplayingUrl = window.location.href +"nowplaying/title";
+    console.log('nowplayingurl is ' + nowplayingUrl);
+    $("#myradiodivcontainer").flashradio({
+    token: "eHh4L2xnbWpxZGJucS9wc2gB",
+    userinterface: "small",
+    bigcoverstyle: "circle",
+    backgroundcolor: "",
+    themecolor: "#add4ff",
+    themefontcolor: "#ffffff",
+    startvolume: "100",
+    radioname: "KFLiP",
+    scroll: "auto",
+    autoplay: "false",
+    useanalyzer: "fake",
+    analyzertype: "6",
+    usecover: "false",
+    usestreamcorsproxy: "false",
+    getcoveroverradioco: "false",
+    affiliatetoken: "1000lIPN",
+    debug: "false",
+    ownsongtitleurl: nowplayingUrl,
+    radiocover: "",
+    songgooglefontname: "Oswald:wght@300",
+    songfontname: "Oswald",
+    titlegooglefontname: "Oswald:400",
+    titlefontname: "Oswald",
+    corsproxy: "none",
+    streamprefix: "",
+    mountpoint: "/kflip",
+    radiouid: "",
+    apikey: "",
+    radiojar: "",
+    radioco: "",
+    streamid: "1",
+    streampath: "/live",
+    streamtype: "icecast2",
+    streamurl: "https://www.kflipcamp.org:8343",
+    songinformationinterval: "5000"
+    });
+    
+    
+    // Get the modal
+    var modal = document.getElementById("myModal");
+    
+    // Get the button that opens the modal
+    var btn = document.getElementById("helpButton");
+    
+    // Get the <span> element that closes the modal
+            var span = document.getElementsByClassName("close")[0];
+    
+            // When the user clicks the button, open the modal
+            btn.onclick = function () {
+                modal.style.display = "block";
+            }
+    
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function () {
+                modal.style.display = "none";
+            }
+    
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        </script>
+
 </body>
 
 
-<script>
-    $("#myradiodivcontainer").flashradio({
-        token: "eHh4L2xnbWpxZGJucS9wc2gB",
-        userinterface: "small",
-        bigcoverstyle: "circle",
-        backgroundcolor: "",
-        themecolor: "#add4ff",
-        themefontcolor: "#ffffff",
-        startvolume: "100",
-        radioname: "KFLiP",
-        scroll: "auto",
-        autoplay: "false",
-        useanalyzer: "fake",
-        analyzertype: "6",
-        usecover: "false",
-        usestreamcorsproxy: "false",
-        getcoveroverradioco: "false",
-        affiliatetoken: "1000lIPN",
-        debug: "false",
-        ownsongtitleurl: "//www.kflipcamp.org/nowplaying/title",
-        radiocover: "",
-        songgooglefontname: "Oswald:wght@300",
-        songfontname: "Oswald",
-        titlegooglefontname: "Oswald:400",
-        titlefontname: "Oswald",
-        corsproxy: "none",
-        streamprefix: "",
-        mountpoint: "/kflip",
-        radiouid: "",
-        apikey: "",
-        radiojar: "",
-        radioco: "",
-        streamid: "1",
-        streampath: "/live",
-        streamtype: "icecast2",
-        streamurl: "//www.kflipcamp.org:8000",
-        songinformationinterval: "5000"
-    });
-
-
-    // Get the modal
-    var modal = document.getElementById("myModal");
-
-    // Get the button that opens the modal
-    var btn = document.getElementById("helpButton");
-
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
-
-    // When the user clicks the button, open the modal
-    btn.onclick = function () {
-        modal.style.display = "block";
-    }
-
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function () {
-        modal.style.display = "none";
-    }
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function (event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
-
-</script>
 
 </html>
+

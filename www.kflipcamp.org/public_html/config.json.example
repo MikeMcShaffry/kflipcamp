@@ -14,7 +14,8 @@
     "enabled": false,
     "token": "--YOUR DISCORD TOKEN--",
     "prefix": "!",
-    "mychannelID": "--YOUR CHANNEL ID--",
+    "listener_channel_id": "--YOUR LISTENER CHANNEL ID--",
+    "engineering_channel_id": "--YOUR ENGINEERING CHANNEL ID--",
     "use_nowplayingfile": false,
     "nowplayingfile": "C:/temp/MediaMonkey_NowPlaying.txt"
   },
@@ -27,7 +28,8 @@
     "extraEndTime": 300
   },
   "studioinfo": {
-    "phone": "+1-999-867-5309"
+    "phone": "+1-999-867-5309",
+    "site_url": "https://www.MYSITE.org/"
   },
   "archive": {
     "enabled": true,
@@ -35,5 +37,15 @@
     "tmpDir": "/tmp/",
     "s3bucket": "S3BUCKET",
     "url": "https://S3BUCKET.s3-REGION.amazonaws.com/"
+  },
+  "twitterapp_otto": {
+    "auth": {
+      "apiKey": "YOUR_TWITTER_APP_API_KEY",
+      "apiSecret": "YOUR_TWITTER_APP_API_SECRET",
+      "accessToken": "YOUR_TWITTER_APP_ACCESS_TOKEN",
+      "accessTokenSecret": "YOUR_TWITTER_APP_ACCESS_TOKEN_SECRET"
+    },
+    "dailyAnnnouncementHourUTC": "13",
+    "enabled": true      
   }
 }
