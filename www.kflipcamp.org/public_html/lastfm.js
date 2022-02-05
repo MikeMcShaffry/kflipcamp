@@ -1,5 +1,5 @@
 //
-// library.js - Open and search a SQLLite database used by MediaMonkey
+// lastfm.js - Query LastFM to find album art
 //
 // COPYRIGHT (c) 2020 by Michael L. McShaffry - All rights reserved
 //   NOTE: COPYRIGHT will be assigned to KFLIPCAMP as soon as the legal entity is created! 
