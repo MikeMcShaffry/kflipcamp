@@ -19,7 +19,7 @@ passport.use(new PatreonStrategy(
     {
         clientID: config.auth.clientID,
         clientSecret: config.auth.clientSecret,
-        callbackURL: "http://localhost:3000/oauth/callback",
+        callbackURL: config.auth.callbackUrl,
         scope: "users"
     },
     (accessToken, refreshToken, profile, cb) => {

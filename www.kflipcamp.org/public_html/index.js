@@ -184,25 +184,25 @@ app.use('/js', express.static(path.join(__dirname, 'public/js')));
 // Add a parser to manage POST data
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-//app.use(cookieParser());
-//app.use(session({
-//    secret: config.session_secret,
-//    resave: false,
-//    saveUninitialized: true
-//}))
+app.use(cookieParser());
+app.use(session({
+    secret: config.session_secret,
+    resave: false,
+    saveUninitialized: true
+}))
 
-//patreon.ConfigureApp(app);
+patreon.ConfigureApp(app);
 
 //
 // Middleware for checking if a user has been authenticated as a Patreon user
 // via Passport and OneLogin OpenId Connect
-//function checkAuthentication(req,res,next){
-//    if(req.isAuthenticated()){
-//        next();
-//    } else{
-//        res.redirect("/");
-//    }
-//}
+function checkAuthentication(req,res,next){
+    if(req.isAuthenticated()){
+        next();
+    } else{
+        res.redirect("/");
+    }
+}
 
 
 //
@@ -280,17 +280,17 @@ app.get('/archive/:start/:end', async function (req, res) {
 //
 // GET /auth/patreon - called when someone clicks the "I'm a patreon person" button
 //
-//app.get('/auth/patreon', patreon.passport.authenticate('patreon', {
-//    successReturnToOrRedirect: "/"
-//}));
+app.get('/auth/patreon', patreon.passport.authenticate('patreon', {
+    successReturnToOrRedirect: "/"
+}));
 
 //
 // GET /auth/patreon/redirect - Patreon calls this redirect after a person attempts to auth via Patreon
-//app.get('/oauth/callback', patreon.passport.authenticate('patreon', {
-//    callback: true,
-//    successReturnToOrRedirect: '/',
-//    failureRedirect: '/'
-//}))
+app.get('/oauth/callback', patreon.passport.authenticate('patreon', {
+    callback: true,
+    successReturnToOrRedirect: '/',
+    failureRedirect: '/'
+}))
 
 
 // catch 404 and forward to error handler

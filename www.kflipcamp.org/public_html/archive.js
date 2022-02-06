@@ -12,8 +12,10 @@
 //
 // OTHER NOTES:
 //
-//   - scripts/kflip_cron is a cronjob that runs every five minutes to copy the recorded MP3 files up to the S3 bucket
+//   - scripts/kflip_cron is a cronjob in /etc/cron.d that runs every five minutes to copy the recorded MP3 files up to the S3 bucket
 //   - scripts.postinstall.sh  - runs after the app is installed to start the service and install kflip_cron
+//
+//   AWS IAM access to S3 is given to the server through the popcorn-net-server IAM role
 
 
 const spawn = require('child_process').spawn;
