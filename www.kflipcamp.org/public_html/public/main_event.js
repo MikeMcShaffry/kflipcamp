@@ -41,7 +41,11 @@ $(function() {
     var $archiveList = $(".event-archive");
     var $archiveEnd = moment().endOf("day").toISOString();
     var $archiveStart = moment().subtract(7, "day").endOf("day").toISOString();
-    
+
+    var $patreonButtons = $(".patreon-area .patreon-buttons");
+    var $patreonSupporter = $(".patreon-area .patreon-supporter");
+    var $welcomeBack = $(".patreon-area .patreon-supporter .welcome");
+
     $btnPlayPause.click(function () {
         if ($player.paused || $player.ended) {
             // Change the button to a pause button
@@ -363,6 +367,18 @@ $(function() {
 
     }
     
+    const isPatreonSupporter = () => {
+        $.get(`/auth/user`, function(data) {
+            if (data && data.supporter) {
+                console.log(`INFO - /auth/user returned ${data.name}`);
+                $patreonSupporter.css({ display: "block" });
+                $welcomeBack.text(`Welcome back, ${data.name}!`);
+            }
+            else {
+                $patreonButtons.css({display: "block"});
+            }
+        })
+    }
     
     const updateEventArchive = (start, end) => {
         
@@ -528,6 +544,8 @@ $(function() {
 
   });
 
+  isPatreonSupporter();
   updateEventArchive($archiveStart, $archiveEnd);
+  
   
 });

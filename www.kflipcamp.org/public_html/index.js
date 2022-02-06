@@ -193,17 +193,6 @@ app.use(session({
 
 patreon.ConfigureApp(app);
 
-//
-// Middleware for checking if a user has been authenticated as a Patreon user
-// via Passport and OneLogin OpenId Connect
-function checkAuthentication(req,res,next){
-    if(req.isAuthenticated()){
-        next();
-    } else{
-        res.redirect("/");
-    }
-}
-
 
 //
 // GET /nowplaying/albumimage
@@ -292,6 +281,14 @@ app.get('/oauth/callback', patreon.passport.authenticate('patreon', {
     failureRedirect: '/'
 }))
 
+app.get('/auth/user', function(req, res){
+
+    if(req.isAuthenticated()){
+        res.status(200).json({ supporter: true, name: req.user.name, avatar: req.user.avatar});
+    } else {
+        res.status(200).json({ supporter: false });
+    }
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
