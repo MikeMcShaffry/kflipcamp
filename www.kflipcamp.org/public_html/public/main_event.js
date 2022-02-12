@@ -373,6 +373,7 @@ $(function() {
                 console.log(`INFO - /auth/user returned ${data.name}`);
                 $patreonSupporter.css({ display: "block" });
                 $welcomeBack.text(`Welcome back, ${data.name}!`);
+                $patreonButtons.css({display: "none"});
             }
             else {
                 $patreonButtons.css({display: "block"});
