@@ -282,10 +282,12 @@ app.get('/oauth/callback', patreon.passport.authenticate('patreon', {
 }))
 
 app.get('/auth/user', function(req, res){
-
+    console.log('INFO - GET /auth/user');
     if(req.isAuthenticated()){
+        console.log(`INFO - /auth/user sees ${req.user.name}`);
         res.status(200).json({ supporter: true, name: req.user.name, avatar: req.user.avatar});
     } else {
+        console.log(`INFO - /auth/user sees an unauthenticated listener`);
         res.status(200).json({ supporter: false });
     }
 });
