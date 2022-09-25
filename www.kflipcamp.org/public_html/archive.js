@@ -28,6 +28,7 @@ const handlebars = require('handlebars');
 let eventProcesses = {};
 let eventDetails = {};
 let addDetails = null;
+let messageListenerChannel = null;
 
 const archiveConfig = require('./config.json').archive;
 
@@ -124,6 +125,10 @@ async function finalizeRecording(event) {
             await addDetails(event.id, eventDetails[event.id]);
         }
 
+        if (messageListenerChannel) {
+            messageListenerChannel(`A recording of this show will be available here: ${link}\n(give it 30 mins or so)`);    
+        }
+        
         console.log(eventDetails[event.id]);
     }
     catch (error) {
@@ -170,8 +175,9 @@ function addToLog(detail) {
 }
 
 
-async function start(addDetailsCallback) {
+async function start(addDetailsCallback, messageListenerChannelCallback) {
     addDetails = addDetailsCallback;
+    messageListenerChannel = messageListenerChannelCallback
 }
 
 async function postInstall() {

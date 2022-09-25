@@ -281,9 +281,8 @@ function localFileNowPlaying() {
                     // TODO: handle the error of edit failure due to the message not actually existing anymore
                 }
 				// If I do NOT have an active message, send a new one and save it.
-				else if (listenerChannel) {
-					listenerChannel.send(currentIntro + ' ' + newfiledata)
-						.then((sentMessage) => { my_message = sentMessage });
+				else {
+					SendToListenerChannel(currentIntro + ' ' + newfiledata);
 				}
 			}
 
@@ -327,9 +326,8 @@ function UpdateNowPlaying(newsong, streamChanged) {
                     // TODO: handle the error of edit failure due to the message not actually existing anymore
                 }
 				// If I do NOT have an active message, send a new one and save it.
-				else if (listenerChannel) {
-					listenerChannel.send(currentIntro + ' ' + newfiledata)
-						.then((sentMessage) => { my_message = sentMessage });
+				else {
+					SendToListenerChannel(currentIntro + ' ' + newfiledata);
 				}
 			}
 
@@ -357,6 +355,13 @@ function EngineeringLogEntry(message) {
 	if (engineeringChannel) {
 		engineeringChannel.send(message);
 	}
+}
+
+function SendToListenerChannel(message) {
+	if (listenerChannel) {
+		listenerChannel.send(message);
+	}
+	my_message = message;
 }
 
 function start(onCurrentDJChangedCallback, onPhoneDisplayedCallback) {
@@ -406,6 +411,7 @@ if (!module.exports.UpdateNowPlaying) {
 	module.exports.Start = start;
     module.exports.UpdateNowPlaying = UpdateNowPlaying;
     module.exports.EngineeringLogEntry = EngineeringLogEntry;
+    module.exports.SendToListnerChannel = SendToListenerChannel;
     module.exports.CurrentDJ = currentDJ;
     module.exports.DefaultDJ = defaultDJ;
     module.exports.IsReady = IsReady;

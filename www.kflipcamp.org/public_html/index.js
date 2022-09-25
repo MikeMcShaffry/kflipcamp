@@ -95,6 +95,9 @@ function addToEngineeringLog(logMessage) {
     otto.EngineeringLogEntry(logMessage)
 }
 
+function messageListenerChannel(message) {
+    otto.SendToListnerChannel(message);
+}
 
 
 // onSomethingNewPlaying() - called by icecastinfo.js whenever a stream change happens or something new is playing
@@ -148,7 +151,6 @@ server.listen(port, async () => {
 
     try {
 
-        await archive.Start(events.AddDetails);
         await otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
         
         let waitingLoops = 0;
@@ -162,6 +164,7 @@ server.listen(port, async () => {
         } 
         
         currentDj = otto.CurrentDJ;
+        await archive.Start(events.AddDetails, messageListenerChannel);
         events.Start(onScheduleChange, onStartEvent, onEndEvent, addToEngineeringLog);
         icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
         icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
