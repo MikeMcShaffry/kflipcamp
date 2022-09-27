@@ -359,9 +359,8 @@ function EngineeringLogEntry(message) {
 
 function SendToListenerChannel(message) {
 	if (listenerChannel) {
-		listenerChannel.send(message);
+		listenerChannel.send(message).then((sentMessage) => { my_message = sentMessage });
 	}
-	my_message = message;
 }
 
 function start(onCurrentDJChangedCallback, onPhoneDisplayedCallback) {
