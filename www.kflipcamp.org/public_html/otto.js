@@ -99,8 +99,10 @@ Otto.on("message", async message => {
 		// Any message w/o our command prefix resets the message ID,
 		// so it won't delete the most recent song announcement, because it was talked about.
 		if (message.content.indexOf(config.prefix) !== 0) {
-			if (message.channel === listenerChannel) { // ONLY if the message was in the now-talking channel
-				my_message = 0;		// set this to 0, so it won't delete the most recent song announcement, because it was talked about.
+			if (message.channel === listenerChannel) { 
+				if (my_message !== 0 && my_message.author.id != message.author.id) {
+					my_message = 0;		// set this to 0, so it won't delete the most recent song announcement, because it was talked about.
+				}
 			}
 			return;
 		}
@@ -359,7 +361,9 @@ function EngineeringLogEntry(message) {
 
 function SendToListenerChannel(message) {
 	if (listenerChannel) {
-		listenerChannel.send(message).then((sentMessage) => { my_message = sentMessage });
+		listenerChannel.send(message).then((sentMessage) => {
+			my_message = sentMessage 
+		});
 	}
 }
 
