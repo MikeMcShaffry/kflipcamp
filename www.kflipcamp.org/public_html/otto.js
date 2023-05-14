@@ -99,8 +99,10 @@ Otto.on("message", async message => {
 		// Any message w/o our command prefix resets the message ID,
 		// so it won't delete the most recent song announcement, because it was talked about.
 		if (message.content.indexOf(config.prefix) !== 0) {
-			if (message.channel === listenerChannel) { // ONLY if the message was in the now-talking channel
-				my_message = 0;		// set this to 0, so it won't delete the most recent song announcement, because it was talked about.
+			if (message.channel === listenerChannel) { 
+				if (my_message !== 0 && my_message.author.id != message.author.id) {
+					my_message = 0;		// set this to 0, so it won't delete the most recent song announcement, because it was talked about.
+				}
 			}
 			return;
 		}
@@ -281,9 +283,8 @@ function localFileNowPlaying() {
                     // TODO: handle the error of edit failure due to the message not actually existing anymore
                 }
 				// If I do NOT have an active message, send a new one and save it.
-				else if (listenerChannel) {
-					listenerChannel.send(currentIntro + ' ' + newfiledata)
-						.then((sentMessage) => { my_message = sentMessage });
+				else {
+					SendToListenerChannel(currentIntro + ' ' + newfiledata);
 				}
 			}
 
@@ -327,9 +328,8 @@ function UpdateNowPlaying(newsong, streamChanged) {
                     // TODO: handle the error of edit failure due to the message not actually existing anymore
                 }
 				// If I do NOT have an active message, send a new one and save it.
-				else if (listenerChannel) {
-					listenerChannel.send(currentIntro + ' ' + newfiledata)
-						.then((sentMessage) => { my_message = sentMessage });
+				else {
+					SendToListenerChannel(currentIntro + ' ' + newfiledata);
 				}
 			}
 
@@ -356,6 +356,14 @@ function UpdateNowPlaying(newsong, streamChanged) {
 function EngineeringLogEntry(message) {
 	if (engineeringChannel) {
 		engineeringChannel.send(message);
+	}
+}
+
+function SendToListenerChannel(message) {
+	if (listenerChannel) {
+		listenerChannel.send(message).then((sentMessage) => {
+			my_message = sentMessage 
+		});
 	}
 }
 
@@ -406,6 +414,7 @@ if (!module.exports.UpdateNowPlaying) {
 	module.exports.Start = start;
     module.exports.UpdateNowPlaying = UpdateNowPlaying;
     module.exports.EngineeringLogEntry = EngineeringLogEntry;
+    module.exports.SendToListnerChannel = SendToListenerChannel;
     module.exports.CurrentDJ = currentDJ;
     module.exports.DefaultDJ = defaultDJ;
     module.exports.IsReady = IsReady;
