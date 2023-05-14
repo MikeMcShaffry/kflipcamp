@@ -253,7 +253,7 @@ ss {
 .openEv {
     font-size: 1em;
     color: #131313;
-    background-image: url(images/event_calendar_bg.png);
+    background-color: #efefef;
     padding-top: 20px;
     padding-left: 10px;
     padding-bottom: 20px;
