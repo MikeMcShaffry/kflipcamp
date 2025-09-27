@@ -1,8 +1,49 @@
-.vs/
-.nyc_output/
+# Configuration files with secrets
+config.json
+kflip_show_calendar.json
+
+
+# Node.js dependencies
 node_modules/
+package-lock.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# Build output
+dist/
+build/
 obj/
 bin/
 data/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# IDE files
+**/.vscode/
+**/.idea/
+public_html/.idea/
+**/.vs/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+
+# Debug files
+*.stackdump
+
+# Generated files
 config.json
-kflip_show_calendar.json

@@ -128,7 +128,7 @@ async function finalizeRecording(event) {
         }
 
         if (messageListenerChannel) {
-            messageListenerChannel(`A recording of this show will be available here: ${link}\n(give it 30 mins or so)`);    
+            messageListenerChannel(`A recording of this show will be available here: ${link}\n(give it 5 mins or so)`, true);    
         }
         
         console.log(eventDetails[event.id]);

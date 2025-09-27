@@ -95,8 +95,8 @@ function addToEngineeringLog(logMessage) {
     otto.EngineeringLogEntry(logMessage)
 }
 
-function messageListenerChannel(message) {
-    otto.SendToListnerChannel(message);
+function messageListenerChannel(message, important) {
+    otto.SendToListnerChannel(message, important);
 }
 
 

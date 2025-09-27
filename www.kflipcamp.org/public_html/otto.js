@@ -284,7 +284,7 @@ function localFileNowPlaying() {
                 }
 				// If I do NOT have an active message, send a new one and save it.
 				else {
-					SendToListenerChannel(currentIntro + ' ' + newfiledata);
+					SendToListenerChannel(currentIntro + ' ' + newfiledata, false);
 				}
 			}
 
@@ -329,7 +329,7 @@ function UpdateNowPlaying(newsong, streamChanged) {
                 }
 				// If I do NOT have an active message, send a new one and save it.
 				else {
-					SendToListenerChannel(currentIntro + ' ' + newfiledata);
+					SendToListenerChannel(currentIntro + ' ' + newfiledata, false);
 				}
 			}
 
@@ -359,10 +359,11 @@ function EngineeringLogEntry(message) {
 	}
 }
 
-function SendToListenerChannel(message) {
+function SendToListenerChannel(message, important) {
 	if (listenerChannel) {
 		listenerChannel.send(message).then((sentMessage) => {
-			my_message = sentMessage 
+			// important messages will not be overwritten
+			my_message = (important) ? 0 : sentMessage
 		});
 	}
 }
@@ -397,6 +398,15 @@ function start(onCurrentDJChangedCallback, onPhoneDisplayedCallback) {
 
 }
 
+function IsReady() {
+	return isReady;
+}
+
+// Clear the message ID, so the next song announcement will be a new message.
+function NextLine() {
+	my_message = 0;
+}
+
 //
 // Running otto locally - node otto.js will execute this code and check the use_nowplayingfile config setting
 //
@@ -406,9 +416,6 @@ if (config.use_nowplayingfile) {
 }
 
 
-function IsReady() {
-	return isReady;
-}
 
 if (!module.exports.UpdateNowPlaying) {
 	module.exports.Start = start;
