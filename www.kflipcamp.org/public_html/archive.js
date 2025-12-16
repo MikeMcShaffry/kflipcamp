@@ -122,13 +122,13 @@ async function finalizeRecording(event) {
 
         const link = encodeURI(`${archiveUrl}/${datestamp}-${event.summary}-${seconds}.mp3`);
 
-        eventDetails[event.id] = `${divider}Click here to listen to this show: ${link}\n${eventDetails[event.id]}`;
+        eventDetails[event.id] = `${divider}Click here to replay this show: ${link}\n${eventDetails[event.id]}`;
         if (addDetails) {
             await addDetails(event.id, eventDetails[event.id]);
         }
 
         if (messageListenerChannel) {
-            messageListenerChannel(`A recording of this show will be available here: ${link}\n(give it 5 mins or so)`, true);    
+            messageListenerChannel(`Thanks for tuning in!\n[Click here to replay ${event.summary}](${link})\n(give it 5 mins or so)`, true);    
         }
         
         console.log(eventDetails[event.id]);
