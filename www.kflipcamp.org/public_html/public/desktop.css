@@ -43,7 +43,7 @@ div.column-content .albumarea .albumimage {
 
     border-radius: 5px;
     max-width:300px;
-    max-height:300px;
+    max-height:265px;
 
     display: block;
     margin-left: auto;
@@ -183,6 +183,7 @@ div.column-content .livelinkarea a:visited {
     padding-bottom: 15px;
 }
 
+
 .helptext a {
     color: #1ABC9C;
 }
@@ -197,6 +198,41 @@ div.column-content .livelinkarea a:visited {
     font-weight: 400;
     color: #1ABC9C;
 }
+
+
+.calendarlinkbox {
+    width: 100%;
+    padding-top: 5px;
+    background-color: rgb(0, 0, 0);
+    border-radius: 5px;
+    height: 35px;
+    margin: 0 0 5px;
+}
+
+.calendarlinkbox p {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #fff;
+    /*padding-bottom: 15px;*/
+    margin: 0px;
+    text-align: center;
+}
+
+.calendarlinkbox a {
+    font-family: 'Oswald';
+    font-size: 1em;
+    font-weight: 400;
+    color: #fff;
+    /*padding-bottom: 15px;*/
+    margin: 0px;
+    text-align: center;
+}
+
+.calendarlinkbox p:hover {
+    color: #7095D2;
+}
+
 
 
 /* The Modal (background) */
