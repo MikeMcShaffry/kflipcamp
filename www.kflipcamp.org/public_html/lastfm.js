@@ -109,9 +109,9 @@ async function UpdateNowPlaying(title) {
                 //console.log('Sending query ' + query);
             } else {
                 let hasOnlyTitle = title.match(/(.+) - (.+)$/);
-                if (hasOnlyTitle && hasOnlyTitle.length !== 3) {
-                    lastArtist = hasAlbum[1];
-                    lastTrack = hasAlbum[2];
+                if (hasOnlyTitle && hasOnlyTitle.length === 3) {
+                    lastArtist = hasOnlyTitle[1];
+                    lastTrack = hasOnlyTitle[2];
 
                     query = `http://ws.audioscrobbler.com/2.0/?method=track.getinfo&api_key=${config.apikey}&artist=${lastArtist}&track=${lastTrack}&format=json`;
                     //console.log('Sending query ' + query);
@@ -151,9 +151,17 @@ async function UpdateNowPlaying(title) {
                         });
             });
 
+        // Add timeout to prevent hanging requests
+        req.setTimeout(5000, function() {
+            console.log('WARNING - lastfm - Request timeout after 5 seconds');
+            req.destroy();
+            SetToUnknown();
+        });
+
         req.on('error',
             function (e) {
                 console.log('ERROR - lastfm - error returned from calling GET http://ws.audioscrobbler.com/ - ' + e.message);
+                SetToUnknown();
             });
     } catch (err) {
         console.log('ERROR - lastfm - exception in UpdateNowPlaying - ' + err.message);
@@ -241,12 +249,17 @@ function ParseLastFmAlbumInfo(lastFmJson) {
             return;
         }
 
-        if (!lastFmResults.album) {
+        let albumInfo = null;
+        
+        if (lastFmResults.album) {
+            albumInfo = lastFmResults.album;
+        } else if (lastFmResults.track && lastFmResults.track.album) {
+            albumInfo = lastFmResults.track.album;
+        } else {
             SetToUnknown();
             return;
         }
 
-        let albumInfo = lastFmResults.album;
 
         // See if there is a summary available
         if (albumInfo.wiki && albumInfo.wiki.summary) {
@@ -298,7 +311,15 @@ function ParseLastFmAlbumInfo(lastFmJson) {
 if (!module.exports.Start) {
     module.exports.Start = Start;
     module.exports.UpdateNowPlaying = UpdateNowPlaying;
-    module.exports.AlbumSummary = AlbumSummary;
-    module.exports.AlbumImage = AlbumImage;
+
+    // Use getters to return current values
+    Object.defineProperty(module.exports, 'AlbumSummary', {
+        get: function() { return AlbumSummary; }
+    });
+
+    Object.defineProperty(module.exports, 'AlbumImage', {
+        get: function() { return AlbumImage; }
+    });
+    
     module.exports.Enabled = config.enabled;
 }

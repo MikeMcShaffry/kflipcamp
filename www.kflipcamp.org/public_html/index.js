@@ -6,6 +6,8 @@
 //
 // The source code contained herein is open source under the MIT license, with the EXCEPTION of embedded passwords and authentication keys.
 
+console.log('INFO - Starting kflipcamp server...');
+
 
 // Setup basic express server
 const express = require('express');
@@ -16,13 +18,12 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
 const path = require('path');
-const server = require('http').createServer(app);
 
 // Socket.io listens on port 3000 (or configured environment variable) for events like the song or DJ calendar changing
-const io = require('socket.io')(server);
-var port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
 const config = require('./config.json').studio;
+const session_secret = require('./config.json').session_secret;
 
 const events = require('./events.js');
 const icecastInfo = require('./icecastinfo.js');
@@ -31,7 +32,10 @@ const library = require('./library.js');
 const lastfm = require('./lastfm.js');
 const archive = require('./archive.js');
 const twitter = require('./twitter.js');
-const patreon = require('./patreon.js');
+//const patreon = require('./patreon.js');
+
+// Tracks whether all background modules have finished initializing
+let modulesReady = false;
 
 // Stores the last title information from icecast stats - it is in the form of artist - song - album
 let streamInfo = null;
@@ -144,42 +148,6 @@ function delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));
 }
 
-//
-// server.listen - launches the listen port for the website
-//
-server.listen(port, async () => {
-
-    try {
-
-        await otto.Start(onCurrentDjChanged, onPhoneDisplayChanged);
-        
-        let waitingLoops = 0;
-        while (!otto.IsReady()) {
-            await delay(1000);
-            if (waitingLoops > 5) {
-                console.log(`ERROR - Otto could not initialize`);
-                break;
-            }
-            ++waitingLoops;
-        } 
-        
-        currentDj = otto.CurrentDJ;
-        await archive.Start(events.AddDetails, messageListenerChannel);
-        events.Start(onScheduleChange, onStartEvent, onEndEvent, addToEngineeringLog);
-        icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
-        icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
-        await library.Start();
-        await lastfm.Start(onAlbumInfoChange);
-        await twitter.Start(config.site_url, config.tz);
-        console.log('INFO - server listening at port %d', port);
-        addToEngineeringLog('INFO - KFLIP server has started');
-    }
-    catch (err) {
-        console.log('CRITICAL ERROR - Exception in server.listen', err);
-        process.exit();
-    }
-});
-
 // Routing API calls for the web site - first the static routes that serve files and directories of files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/js', express.static(path.join(__dirname, 'public/js')));
@@ -188,22 +156,60 @@ app.use('/js', express.static(path.join(__dirname, 'public/js')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+
 app.use(session({
-    secret: config.session_secret,
+    secret: session_secret,
     resave: false,
     saveUninitialized: true
 }))
 
-patreon.ConfigureApp(app);
 
+// Simple health check that bypasses Patreon/passport middleware
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'ok',
+        timestamp: new Date().toISOString()
+    });
+});
+
+//patreon.ConfigureApp(app);
 
 //
 // GET /nowplaying/albumimage
 //
 app.get('/nowplaying/albumimage',
     async function(req, res) {
-        res.set('Content-Type', 'text/html');
-        res.end(lastfm.AlbumImage);
+        try {
+            res.set('Content-Type', 'text/html');
+            
+            // Add timeout to prevent hanging requests
+            const timeoutId = setTimeout(() => {
+                if (!res.headersSent) {
+                    console.log('WARNING - /nowplaying/albumimage request timeout');
+                    res.status(504).end('Request timeout');
+                }
+            }, 5000); // 5 second timeout
+            
+            let imageUrl = '';
+            
+            // Check if lastfm module is ready and has data
+            if (lastfm && lastfm.AlbumImage) {
+                imageUrl = lastfm.AlbumImage;
+                // Convert HTTP URLs to HTTPS to avoid mixed content warnings
+                if (imageUrl.startsWith('http://')) {
+                    imageUrl = imageUrl.replace('http://', 'https://');
+                }
+            }
+            
+            clearTimeout(timeoutId);
+            res.end(imageUrl);
+            
+        } catch (err) {
+            console.log('ERROR - GET /nowplaying/albumimage: ' + err.message);
+            if (!res.headersSent) {
+                res.status(500).end('Internal server error');
+            }
+        }
     });
 
 //
@@ -211,25 +217,64 @@ app.get('/nowplaying/albumimage',
 //
 app.get('/nowplaying/albumsummary',
     async function(req, res) {
-        res.set('Content-Type', 'text/html');
-        res.end(lastfm.AlbumSummary);
+        try {
+            res.set('Content-Type', 'application/json');
+            
+            // Add timeout to prevent hanging requests
+            const timeoutId = setTimeout(() => {
+                if (!res.headersSent) {
+                    res.status(504).json({ error: 'Request timeout' });
+                }
+            }, 5000); // 5 second timeout
+            
+            // Check if lastfm module is ready and has data
+            if (!lastfm.Enabled || !lastfm.AlbumSummary) {
+                clearTimeout(timeoutId);
+                return res.status(200).json({ summary: null });
+            }
+            
+            clearTimeout(timeoutId);
+            res.json({ summary: lastfm.AlbumSummary });
+            
+        } catch (err) {
+            console.log('ERROR - GET /nowplaying/albumsummary: ' + err.message);
+            if (!res.headersSent) {
+                res.status(500).json({ error: 'Internal server error' });
+            }
+        }
     });
-
 
 //
 // GET /nowplaying/title
 //
 app.get('/nowplaying/title',
     async function(req, res) {
-        res.set('Content-Type', 'text/html');
-        if (streamInfo && streamInfo.title) {
-            res.end(streamInfo.title);
-        }
-        else {
-            res.end();
+        try {
+            res.set('Content-Type', 'text/html');
+            
+            // Add timeout to prevent hanging requests
+            const timeoutId = setTimeout(() => {
+                if (!res.headersSent) {
+                    console.log('WARNING - /nowplaying/title request timeout');
+                    res.status(504).end('Request timeout');
+                }
+            }, 5000); // 5 second timeout
+            
+            if (streamInfo && streamInfo.title) {
+                clearTimeout(timeoutId);
+                res.end(streamInfo.title);
+            } else {
+                clearTimeout(timeoutId);
+                res.end('');
+            }
+            
+        } catch (err) {
+            console.log('ERROR - GET /nowplaying/title: ' + err.message);
+            if (!res.headersSent) {
+                res.status(500).end('Internal server error');
+            }
         }
     });
-
 
 //
 // GET /search
@@ -244,14 +289,14 @@ app.get('/search', async function (req, res) {
     }
     catch (err) {
         console.log('ERROR - POST /search: ' + err.message);
+        return res.status(500).json({ error: 'Search failed' });        
     }
 
     res.end(JSON.stringify(results));
 });
 
-
 //
-// GET /search
+// GET /archive/:start/:end
 //
 app.get('/archive/:start/:end', async function (req, res) {
     let results = [];
@@ -272,12 +317,16 @@ app.get('/archive/:start/:end', async function (req, res) {
 //
 // GET /auth/patreon - called when someone clicks the "I'm a patreon person" button
 //
+/*
 app.get('/auth/patreon', patreon.passport.authenticate('patreon', {
     successReturnToOrRedirect: "/"
 }));
+*/
+
 
 //
 // GET /auth/patreon/redirect - Patreon calls this redirect after a person attempts to auth via Patreon
+/*
 app.get('/oauth/callback', patreon.passport.authenticate('patreon', {
     callback: true,
     successReturnToOrRedirect: '/',
@@ -294,7 +343,9 @@ app.get('/auth/user', function(req, res){
         res.status(200).json({ supporter: false });
     }
 });
+*/
 
+/* 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
@@ -312,6 +363,106 @@ app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     //res.render('error');
 });
+*/
+
+
+// Create HTTP server with Express app and Socket.io
+const server = require('http').createServer(app);
+const { Server } = require('socket.io');
+const io = new Server(server, {
+    path: '/socket.io/',
+    serveClient: true,
+    transports: ['websocket', 'polling'],
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+        credentials: false
+    },
+    pingTimeout: 60000,
+    pingInterval: 25000
+});
+
+//
+// initializeModules - Initialize all application modules before starting the server
+//
+async function initializeModules() {
+    try {
+        console.log('INFO - Starting server initialization...');
+
+        console.log('INFO - Starting otto...');
+        try {
+            // Add timeout for Otto startup
+            const ottoTimeout = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Otto startup timeout')), 10000)
+            );
+            
+            await Promise.race([
+                otto.Start(onCurrentDjChanged, onPhoneDisplayChanged),
+                ottoTimeout
+            ]);
+            
+            let waitingLoops = 0;
+            while (!otto.IsReady() && waitingLoops < 5) {
+                await delay(1000);
+                ++waitingLoops;
+            }
+            
+            if (!otto.IsReady()) {
+                console.log('WARNING - Otto could not initialize within timeout, continuing without Discord bot');
+            } else {
+                console.log('INFO - Otto started successfully');
+                currentDj = otto.CurrentDJ;
+            }
+        } catch (ottoError) {
+            console.log('WARNING - Otto startup failed:', ottoError.message, '- continuing without Discord bot');
+        }
+        
+        console.log('INFO - Starting archive...');
+        await archive.Start(events.AddDetails, messageListenerChannel);
+        
+        console.log('INFO - Starting events...');
+        events.Start(onScheduleChange, onStartEvent, onEndEvent, addToEngineeringLog);
+        
+        console.log('INFO - Starting icecast info...');
+        icecastInfo.Start(onSomethingNewPlaying, updateKflipListenerCount);
+        icecastInfo.CheckShoutingFire(onShoutingFireUpdated);
+        
+        console.log('INFO - Starting library...');
+        await library.Start();
+        
+        console.log('INFO - Starting lastfm...');
+        await lastfm.Start(onAlbumInfoChange);
+        
+        console.log('INFO - Starting twitter...');
+        await twitter.Start(config.site_url, config.tz);
+        
+        console.log('INFO - All modules initialized successfully');
+        modulesReady = true;
+    }
+    catch (err) {
+        console.log('CRITICAL ERROR - Exception during module initialization', err);
+        // Leave modulesReady as false; do not throw so the process stays up
+    }
+}
+
+//
+// startServer - Start the HTTP server and kick off module initialization in the background
+//
+async function startServer() {
+    console.log('INFO - Starting server startup sequence...');
+
+    // Start listening immediately so /health and static content work even if modules are still initializing
+    server.listen(port, () => {
+        console.log(`INFO - server listening - port ${port}`);
+        console.log('INFO - Server is now ready to accept connections (modules may still be initializing)');
+    });
+
+    // Fire-and-forget module initialization; errors are logged inside initializeModules
+    initializeModules();
+}
+
+// Start the application
+startServer();
 
 
 //

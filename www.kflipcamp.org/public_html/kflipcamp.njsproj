@@ -41,7 +41,6 @@
     <Content Include="public\mobile.html" />
     <Content Include="public\new.html" />
     <Content Include="public\tabs.css" />
-    <Content Include="Readme.md" />
     <Content Include="postinstall.js" />
     <Content Include="docs\API.md" />
     <Content Include="docs\emit.md" />
