@@ -282,8 +282,8 @@ app.get('/nowplaying/title',
 app.get('/search', async function (req, res) {
     let results = [];
     try {
-        if (req.body.by === 'artist') {
-            var artist = req.body.artist; 
+        if (req.query.by === 'artist') {
+            var artist = req.query.param; 
             results = await library.SearchByArtist(artist);
         }
     }

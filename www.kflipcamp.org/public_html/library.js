@@ -6,10 +6,12 @@
 //
 // The source code contained herein is open source under the MIT licence
 
-//const sqlite = require('sqlite-async');
+const sqlite3 = require('sqlite3');
+const { open } = require('sqlite');
+
 const fs = require('fs');
 
-const databaseFile = './data/MM.DB';
+const databaseFile = './data/MM5.DB';
 let mmDb = null;
 
 //
@@ -25,19 +27,15 @@ async function Start() {
         }
 
         if (!fs.existsSync(databaseFile)) {
-            console.log('WARNING - library - database file does not exist - find the MediaMonkey MM.DB file in AppData/Roaming/MediaMonkey and copy it to a data directory to enable searching');
-            console.log('INFO - library - continuing without database functionality');
+            console.log(`WARNING - library - database file does not exist - file: ${databaseFile}`);
             return Promise.resolve(); // Explicitly return resolved promise
         }
 
-        // Database connection code is commented out, so just return success
-        console.log('INFO - library - database file exists but connection is disabled');
-        return Promise.resolve();
-
-        //    sqlite.open(databaseFile).then(_db => {
-        //        mmDb = _db
-        //        console.log('INFO - library - connected to the MM.DB database.');
-        //    });
+        mmDb = await open({
+            filename: databaseFile,
+            driver: sqlite3.Database
+        });
+        console.log('INFO - library - database file is open');
     } catch (err) {
         console.log('ERROR - library - exception in Start:', err.message);
         // Don't throw the error, just log it and continue
