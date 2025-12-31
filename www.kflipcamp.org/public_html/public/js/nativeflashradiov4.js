@@ -1771,12 +1771,12 @@
 			for (e = 0; e < d.length; e++)
 				g += String.fromCharCode(d[e]);
 			//if ("" != dc && -1 != a.indexOf(b) && 4 < b.length || -1 != a.indexOf(f) || -1 != a.indexOf(g))
-			if (fc>0)
+			if (true)
 				W(),
-					ec(),
-					song_timer = setInterval(function() {
-						ec()
-					}, fc),
+					//ec(),
+					//song_timer = setInterval(function() {
+					//	ec()
+					//}, fc),
 					Ra = !0;
 			else {
 				a = [80, 76, 69, 65, 83, 69, 32, 71, 69, 84, 32, 84, 72, 69, 32, 84, 79, 75, 69, 78, 32, 79, 78, 32, 87, 87, 87, 46, 70, 76, 65, 83, 72, 82, 65, 68, 73, 79, 46, 73, 78, 70, 79, 47, 82, 69, 71, 73, 83, 84, 69, 82];
