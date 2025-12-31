@@ -175,14 +175,6 @@
 
     <fileserve>1</fileserve>
 
-    <!-- CORS headers to allow API requests from localhost during development -->
-    <http-headers>
-        <header name="Access-Control-Allow-Origin" value="http://localhost:3000" />
-        <header name="Access-Control-Allow-Methods" value="GET, OPTIONS" />
-        <header name="Access-Control-Allow-Headers" value="Content-Type" />
-        <header name="Access-Control-Max-Age" value="86400" />
-    </http-headers>
-
     <paths>
         <!-- basedir is only used if chroot is enabled -->
         <basedir>/usr/share/icecast</basedir>
