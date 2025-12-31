@@ -33,7 +33,7 @@ $(function() {
     var $albumimage = $(".albumimage");
     var $livelinkarea = $(".livelinkarea");
     var $livelink = $(".livelinkarea a");
-    var $nowPlayingBar = $(".nowplaying-bar .nowplaying-text");
+    var $nowPlayingBar = $("#myradiodivcontainerstatustext");
     
     var $player = $("#mobile_player")[0]; // id for audio element
     var $btnPlayPause = $("#btnPlayPause");
@@ -78,6 +78,71 @@ $(function() {
         btn.innerHTML = value;
         btn.className = value.toLowerCase();
     }
+
+    // Helper function to update the radio player's status text with animation if needed
+    let radioPlayerMarquee = null;
+    let currentSongTitle = ''; // Store current title to restore after resize
+    
+    function updateRadioPlayerStatus(text) {
+        const containerId = 'myradiodivcontainer';
+        const $statusText = $('#' + containerId + 'statustext');
+        const $tempSong = $('#' + containerId + 'temp_song');
+        
+        // Store the current title
+        currentSongTitle = text;
+        
+        // Set the text in the temporary element to measure width
+        $tempSong.html(text);
+        
+        // Get the container width to compare
+        const containerWidth = $('#' + containerId).width();
+        const textWidth = $tempSong.width();
+        
+        // If text is too long, use marquee animation
+        if (textWidth > containerWidth - 20) { // 20px padding buffer
+            try {
+                // Destroy existing marquee if any
+                if (radioPlayerMarquee) {
+                    radioPlayerMarquee.sodahmarquee("destroy");
+                }
+            } catch (err) {
+                // Ignore errors from destroying non-existent marquee
+            }
+            
+            // Set the text first
+            $statusText.html(text);
+            
+            // Create new marquee animation
+            const duration = 10 * (textWidth + containerWidth);
+            radioPlayerMarquee = $statusText.sodahmarquee({
+                duration: duration,
+                direction: "left",
+                gap: containerWidth / 2,
+                duplicated: true
+            });
+        } else {
+            // Text fits, just set it without animation
+            $statusText.html(text);
+        }
+    }
+
+    // Listen for window resize and restore the song title
+    // The radio player's resize handler clears the display, so we need to restore it
+    let resizeTimeout = null;
+    $(window).on('resize', function() {
+        // Clear any pending timeout to prevent multiple calls (debouncing)
+        if (resizeTimeout) {
+            clearTimeout(resizeTimeout);
+        }
+        // Use a short delay to ensure the radio player has finished its resize operations
+        resizeTimeout = setTimeout(function() {
+            if (currentSongTitle) {
+                updateRadioPlayerStatus(currentSongTitle);
+            }
+            resizeTimeout = null;
+        }, 250);
+    });
+
 
     let kflipListeners = 0;
     let shoutingFireListeners = 0;
@@ -491,7 +556,7 @@ $(function() {
 
     function updateNowPlaying(title) {
         console.log(`Now playing - ${title}`);
-        $nowPlayingBar.text(title);
+        updateRadioPlayerStatus(title);
     }
 
     socket.on('nowplaying', (data) => {
@@ -500,6 +565,7 @@ $(function() {
             whichStreamIsBroadcasting = null;
             updateListeners();
             updateNowPlaying("Now Playing - silence...");
+            // Update the radio player's status text
         } else {
 
             let mustUpdateListeners = false;
