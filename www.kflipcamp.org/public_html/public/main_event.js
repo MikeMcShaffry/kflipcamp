@@ -376,7 +376,7 @@ $(function() {
                 $patreonButtons.css({display: "none"});
             }
             else {
-                $patreonButtons.css({display: "block"});
+                $patreonButtons.css({display: "flex"});
             }
         })
     }
