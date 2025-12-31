@@ -1771,7 +1771,7 @@
 			for (e = 0; e < d.length; e++)
 				g += String.fromCharCode(d[e]);
 			//if ("" != dc && -1 != a.indexOf(b) && 4 < b.length || -1 != a.indexOf(f) || -1 != a.indexOf(g))
-			if (true)
+			if (fc>0)
 				W(),
 					ec(),
 					song_timer = setInterval(function() {
