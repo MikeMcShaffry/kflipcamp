@@ -32,7 +32,7 @@ const library = require('./library.js');
 const lastfm = require('./lastfm.js');
 const archive = require('./archive.js');
 const twitter = require('./twitter.js');
-//const patreon = require('./patreon.js');
+const patreon = require('./patreon.js');
 
 // Tracks whether all background modules have finished initializing
 let modulesReady = false;
@@ -172,7 +172,7 @@ app.get('/health', (req, res) => {
     });
 });
 
-//patreon.ConfigureApp(app);
+patreon.ConfigureApp(app);
 
 //
 // GET /nowplaying/albumimage
@@ -317,16 +317,14 @@ app.get('/archive/:start/:end', async function (req, res) {
 //
 // GET /auth/patreon - called when someone clicks the "I'm a patreon person" button
 //
-/*
+
 app.get('/auth/patreon', patreon.passport.authenticate('patreon', {
     successReturnToOrRedirect: "/"
 }));
-*/
-
 
 //
 // GET /auth/patreon/redirect - Patreon calls this redirect after a person attempts to auth via Patreon
-/*
+
 app.get('/oauth/callback', patreon.passport.authenticate('patreon', {
     callback: true,
     successReturnToOrRedirect: '/',
@@ -343,9 +341,9 @@ app.get('/auth/user', function(req, res){
         res.status(200).json({ supporter: false });
     }
 });
-*/
 
-/* 
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
@@ -360,10 +358,9 @@ app.use(function(err, req, res, next) {
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
     // render the error page
-    res.status(err.status || 500);
-    //res.render('error');
+    res.status(err.status || 500).send(err.message);
 });
-*/
+
 
 
 // Create HTTP server with Express app and Socket.io

@@ -42,8 +42,6 @@
     <Content Include="public\new.html" />
     <Content Include="public\tabs.css" />
     <Content Include="postinstall.js" />
-    <Content Include="docs\API.md" />
-    <Content Include="docs\emit.md" />
     <Content Include="docs\README.md" />
     <Content Include="public\index.html" />
     <Content Include="public\kflip_background.png" />
@@ -51,20 +49,12 @@
     <Content Include="public\main_event.js" />
     <Content Include="scripts\archive.sh.erb" />
     <Content Include="scripts\hasdedair.sh" />
-    <Content Include="test\socket.io.js" />
-    <Content Include="test\fixtures\big.jpg" />
-    <Content Include="test\fixtures\big.json" />
-    <Content Include="test\fixtures\server-close.js" />
-    <Content Include="test\support\doge.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="docs" />
-    <Folder Include="kflipcamp" />
+    <Folder Include="images\" />
     <Folder Include="public\js" />
     <Folder Include="scripts\" />
-    <Folder Include="test" />
-    <Folder Include="test\fixtures" />
-    <Folder Include="test\support" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="events.js" />
