@@ -24,12 +24,13 @@ const Library = require('./library.js');
 
 // Here we load the config.json file that contains our token and our prefix values. 
 const config = require("./config.json").otto;												// <<<<<<< I added an otto section to the config file
-
 // config.token - the bot's token
 // config.prefix - the message command prefix.
 // config.listener_channel_id - the ID of the channel the now playing song is posted
 // config.engineering_channel_id - the ID of the channel where Otto can post server messages
 // config.nowplayingfile	// full path & filename to NowPlaying file
+
+const MAX_DISCORD_MESSAGE_LENGTH = 2000;
 
 var fs = require('fs');
 
@@ -166,31 +167,39 @@ DJ Commands are\n\
         }
 
 		if (command === "search") {
-			results = "What do you want to search for? Use !help for command list.";
-			if (args.length !== 0) {
-				if (args[0] === "artist" && args.length >= 2) {
-					artist = args.slice(1).join(" ");
-					jsonResults = await Library.SearchByArtist(artist);
-					if (jsonResults.length === 0) {
-						results = `KFLIP doesn't seem to have anything matching "${artist}" in our library.`;
-					}
-					else {
-						results = "Here are the artists and albums I found:\n"
-						currentArtist = "";
-						for (let i=0; i<jsonResults.length; i++) {
-							if (jsonResults[i].Artist !== currentArtist) {
-								currentArtist = jsonResults[i].Artist;
-								results += `\n**${jsonResults[i].Artist}:** `;
+			try {
+				results = "What do you want to search for? Use !help for command list.";
+				if (args.length !== 0) {
+					if (args[0] === "artist" && args.length >= 2) {
+						artist = args.slice(1).join(" ");
+						jsonResults = await Library.SearchByArtist(artist);
+						if (jsonResults.length === 0) {
+							results = `KFLIP doesn't seem to have anything matching "${artist}" in our library.`;
+						} else {
+							results = "Here are the artists and albums I found:\n"
+							currentArtist = "";
+							for (let i = 0; i < jsonResults.length; i++) {
+								if (jsonResults[i].Artist !== currentArtist) {
+									currentArtist = jsonResults[i].Artist;
+									results += `\n**${jsonResults[i].Artist}:** `;
+								}
+								results += `${jsonResults[i].Album} `;
 							}
-							results += `${jsonResults[i].Album} `;
-						}
-						if (jsonResults.length === 50) {
-							results += "\n\n**There are more, but I stopped at 50*\n";
+							if (jsonResults.length === 50) {
+								results += "\n\n**There are more, but I stopped at 50**\n";
+							}
 						}
 					}
 				}
+			}catch (err) {
+				console.log('ERROR - otto - Exception in Otto search command - ' + err.message);
+				results = "Sorry - something went wrong trying to search the library.";
 			}
 			
+			if (results.length >= MAX_DISCORD_MESSAGE_LENGTH) {
+				const tooLongWarning = "\n\n*Message truncated - too long for Discord*";
+				results = results.substring(0, MAX_DISCORD_MESSAGE_LENGTH - tooLongWarning.length) + tooLongWarning;
+			}
 			return message.channel.send(results);	
 		}
 

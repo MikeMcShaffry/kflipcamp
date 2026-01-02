@@ -33,7 +33,8 @@ async function Start() {
 
         mmDb = await open({
             filename: databaseFile,
-            driver: sqlite3.Database
+            driver: sqlite3.Database,
+            mode: sqlite3.OPEN_READONLY
         });
         console.log('INFO - library - database file is open');
     } catch (err) {
@@ -62,7 +63,7 @@ async function SearchByArtist(artist) {
 
     try {
         // Do NOT ever forget to use LIMIT on these queries!
-        let byArtist = `SELECT Artist, Album from Songs WHERE Artist LIKE ? GROUP BY Album COLLATE NOCASE ORDER BY Artist COLLATE NOCASE, Album COLLATE NOCASE LIMIT 50`;
+        let byArtist = `SELECT Artist, Album from Albums WHERE Artist LIKE ? ORDER BY Artist COLLATE NOCASE, Album COLLATE NOCASE LIMIT 50`;
         let qArtist = '%' + artist + '%';
         results = await mmDb.all(byArtist, [qArtist]);
         return results;
