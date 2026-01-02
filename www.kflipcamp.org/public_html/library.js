@@ -47,7 +47,7 @@ async function Start() {
 // SearchByArtist - searches the database for an artist
 //
 async function SearchByArtist(artist) {
-    let results = [];
+    let results = "";
     
     if (!artist) {
         console.log('WARNING - library - SearchByArtist called with empty artist');
@@ -56,18 +56,20 @@ async function SearchByArtist(artist) {
 
     if (!mmDb) {
         console.log('WARNING - library - SearchByArtist called but database not available');
+        results = "Sorry - search isn't available at the moment."
         return results;
     }
 
     try {
         // Do NOT ever forget to use LIMIT on these queries!
-        let byArtist = `SELECT SongTitle, Artist, Album, ID from Songs WHERE Artist LIKE ? LIMIT 20`;
+        let byArtist = `SELECT Artist, Album from Songs WHERE Artist LIKE ? GROUP BY Album COLLATE NOCASE ORDER BY Artist COLLATE NOCASE, Album COLLATE NOCASE LIMIT 50`;
         let qArtist = '%' + artist + '%';
         results = await mmDb.all(byArtist, [qArtist]);
         return results;
     }
     catch (err) {
         console.log(`ERROR - library - exception in SearchByArtist: ${err.message}`);
+        results = "Sorry - an error occurred while searching the library."
         return results; // Return empty results instead of calling res.end
     }
 }

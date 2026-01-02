@@ -20,6 +20,7 @@
 // We're calling our new bot client ... Otto. Inventive. 
 const Discord = require('discord.js');
 const Otto = new Discord.Client();
+const Library = require('./library.js');
 
 // Here we load the config.json file that contains our token and our prefix values. 
 const config = require("./config.json").otto;												// <<<<<<< I added an otto section to the config file
@@ -143,7 +144,9 @@ Otto.on("message", async message => {
             `Commands are\n\
   !help shows commands\n\
   !np shows the currently playing track\n\
-  !last shows the last 10 songs played.`;
+  !last shows the last 10 songs played\n\
+  !search artist {artist}   searches the database for a band\n\
+  !search artist {album}    searches the database for an album`;
 
         if (kflipdj) {
             helpmsg +=
@@ -162,6 +165,34 @@ DJ Commands are\n\
             return message.channel.send(helpmsg);
         }
 
+		if (command === "search") {
+			results = "What do you want to search for? Use !help for command list.";
+			if (args.length !== 0) {
+				if (args[0] === "artist" && args.length >= 2) {
+					artist = args.slice(1).join(" ");
+					jsonResults = await Library.SearchByArtist(artist);
+					if (jsonResults.length === 0) {
+						results = `KFLIP doesn't seem to have anything matching "${artist}" in our library.`;
+					}
+					else {
+						results = "Here are the artists and albums I found:\n"
+						currentArtist = "";
+						for (let i=0; i<jsonResults.length; i++) {
+							if (jsonResults[i].Artist !== currentArtist) {
+								currentArtist = jsonResults[i].Artist;
+								results += `\n**${jsonResults[i].Artist}:** `;
+							}
+							results += `${jsonResults[i].Album} `;
+						}
+						if (jsonResults.length === 50) {
+							results += "\n\n**There are more, but I stopped at 50*\n";
+						}
+					}
+				}
+			}
+			
+			return message.channel.send(results);	
+		}
 
         //////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////// From here on down, ONLY DJs //////////////////////////////////////////////////////////
@@ -170,7 +201,7 @@ DJ Commands are\n\
         // TODO: Handle people saying "!!!!", or similar.
         if (!kflipdj) {
             return message.reply("You're not my real mom!!");
-        };
+        }
 
 
 
