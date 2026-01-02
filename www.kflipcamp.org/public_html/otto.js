@@ -177,16 +177,19 @@ DJ Commands are\n\
 						} else {
 							results = "Here are the artists and albums I found:\n"
 							currentArtist = "";
+							albumCount = 1;
 							for (let i = 0; i < jsonResults.length; i++) {
 								nextArtist = jsonResults[i].Artist.replace(/^(?:[\d]+\.\s*|[\-\*]+\s*)+/, '').trim();
 								if (nextArtist !== currentArtist) {
 									currentArtist = nextArtist;
 									results += `\n**${nextArtist}:** `;
+									albumCount = 1;
 								}
-								if (i > 1) {
+								if (albumCount > 1) {
 									results += ", ";
 								}
 								results += `${jsonResults[i].Album}`;
+								++albumCount;
 							}
 							if (jsonResults.length === 50) {
 								results += "\n\n**There are more, but I stopped at 50**\n";
