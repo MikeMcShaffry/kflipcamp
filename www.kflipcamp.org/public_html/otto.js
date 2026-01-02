@@ -146,8 +146,7 @@ Otto.on("message", async message => {
   !help shows commands\n\
   !np shows the currently playing track\n\
   !last shows the last 10 songs played\n\
-  !search artist {artist}   searches the database for a band\n\
-  !search artist {album}    searches the database for an album`;
+  !search artist {artist}   searches the database for a band or artist`;
 
         if (kflipdj) {
             helpmsg +=
@@ -179,11 +178,15 @@ DJ Commands are\n\
 							results = "Here are the artists and albums I found:\n"
 							currentArtist = "";
 							for (let i = 0; i < jsonResults.length; i++) {
-								if (jsonResults[i].Artist !== currentArtist) {
-									currentArtist = jsonResults[i].Artist;
-									results += `\n**${jsonResults[i].Artist}:** `;
+								nextArtist = jsonResults[i].Artist.replace(/^(?:[\d]+\.\s*|[\-\*]+\s*)+/, '').trim();
+								if (nextArtist !== currentArtist) {
+									currentArtist = nextArtist;
+									results += `\n**${nextArtist}:** `;
 								}
-								results += `${jsonResults[i].Album} `;
+								if (i > 1) {
+									results += ", ";
+								}
+								results += `${jsonResults[i].Album}`;
 							}
 							if (jsonResults.length === 50) {
 								results += "\n\n**There are more, but I stopped at 50**\n";
