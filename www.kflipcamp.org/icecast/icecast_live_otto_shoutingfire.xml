@@ -52,24 +52,17 @@
 	<location>Austin Texas</location>
     <admin>info@kflipcamp.org</admin>
 
-
-    <!-- You may have multiple <listener> elements -->
+    <!-- The unencrypted IceCast IPv4 & IPv6 port used to broadcast -->
     <listen-socket>
         <port>8000</port>
-        <bind-address>0.0.0.0</bind-address>
-        <!-- <shoutcast-mount>/stream</shoutcast-mount> -->
+        <bind-address>::</bind-address>
     </listen-socket>
+    <!-- The encrypted IceCast IPv4 & IPv6 port used for playback -->
     <listen-socket>
         <port>8343</port>
         <ssl>1</ssl>
-        <bind-address>0.0.0.0</bind-address>
-        <!-- <shoutcast-mount>/stream</shoutcast-mount> -->
+        <bind-address>::</bind-address>
     </listen-socket>
-    <!--
-    <listen-socket>
-        <port>8001</port>
-    </listen-socket>
-    -->
 
     <!--<master-server>127.0.0.1</master-server>-->
     <!--<master-server-port>8001</master-server-port>-->
