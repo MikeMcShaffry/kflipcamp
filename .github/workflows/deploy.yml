@@ -1,1 +1,35 @@
-﻿
+﻿name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'www.kflipcamp.org/public_html/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Configure git remote
+      run: |
+        git remote add ec2-repo ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/ubuntu/kflipcamp.git
+        echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
+        chmod 600 private_key.pem
+        export GIT_SSH_COMMAND="ssh -i private_key.pem -o StrictHostKeyChecking=no"
+        git push ec2-repo main
+
+    - name: Restart website
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          /usr/local/mgr5/sbin/ispmanager.sh website.restart --name kflipcamp.org
+
+
