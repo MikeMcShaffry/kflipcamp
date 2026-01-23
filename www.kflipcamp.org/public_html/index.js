@@ -8,14 +8,13 @@
 
 console.log('INFO - Starting kflipcamp server...');
 
-
 // Setup basic express server
-const express = require('express');
+const { createApp } = require('./app');
 const bodyParser = require('body-parser');
 const moment = require('moment');
-const app = express();
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const express = require('express');
 
 const path = require('path');
 
@@ -32,6 +31,32 @@ const library = require('./library.js');
 const lastfm = require('./lastfm.js');
 const archive = require('./archive.js');
 const patreon = require('./patreon.js');
+
+// Create express app using shared factory (routes/middleware are defined in app.js)
+const { app, setStreamInfo } = createApp({
+    config,
+    sessionSecret: session_secret,
+    library,
+    events,
+    lastfm,
+    patreon
+});
+
+// Create HTTP server with Express app and Socket.io
+const server = require('http').createServer(app);
+const { Server } = require('socket.io');
+const io = new Server(server, {
+    path: '/socket.io/',
+    serveClient: true,
+    transports: ['websocket', 'polling'],
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+        credentials: false
+    },
+    pingTimeout: 60000,
+    pingInterval: 25000
+});
 
 // Tracks whether all background modules have finished initializing
 let modulesReady = false;
@@ -108,6 +133,11 @@ function onSomethingNewPlaying(newStreamInfo, listenerCount, streamChanged) {
 
     streamInfo = newStreamInfo;
 
+    // keep app-level state in sync so /nowplaying/title works consistently
+    if (setStreamInfo) {
+        setStreamInfo(streamInfo);
+    }
+
     archive.AddToLog(streamInfo.title);
 
     console.log('INFO - Now playing [' + streamInfo.title + '] Listeners [' + listenerCount + ']');
@@ -146,236 +176,8 @@ function delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));
 }
 
-// Routing API calls for the web site - first the static routes that serve files and directories of files
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/js', express.static(path.join(__dirname, 'public/js')));
-
-// Add a parser to manage POST data
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(cookieParser());
-
-app.use(session({
-    secret: session_secret,
-    resave: false,
-    saveUninitialized: true
-}))
-
-
-// Simple health check that bypasses Patreon/passport middleware
-app.get('/health', (req, res) => {
-    res.status(200).json({
-        status: 'ok',
-        timestamp: new Date().toISOString()
-    });
-});
-
-patreon.ConfigureApp(app);
-
-//
-// GET /nowplaying/albumimage
-//
-app.get('/nowplaying/albumimage',
-    async function(req, res) {
-        try {
-            res.set('Content-Type', 'text/html');
-            
-            // Add timeout to prevent hanging requests
-            const timeoutId = setTimeout(() => {
-                if (!res.headersSent) {
-                    console.log('WARNING - /nowplaying/albumimage request timeout');
-                    res.status(504).end('Request timeout');
-                }
-            }, 5000); // 5 second timeout
-            
-            let imageUrl = '';
-            
-            // Check if lastfm module is ready and has data
-            if (lastfm && lastfm.AlbumImage) {
-                imageUrl = lastfm.AlbumImage;
-                // Convert HTTP URLs to HTTPS to avoid mixed content warnings
-                if (imageUrl.startsWith('http://')) {
-                    imageUrl = imageUrl.replace('http://', 'https://');
-                }
-            }
-            
-            clearTimeout(timeoutId);
-            res.end(imageUrl);
-            
-        } catch (err) {
-            console.log('ERROR - GET /nowplaying/albumimage: ' + err.message);
-            if (!res.headersSent) {
-                res.status(500).end('Internal server error');
-            }
-        }
-    });
-
-//
-// GET /nowplaying/albumsummary
-//
-app.get('/nowplaying/albumsummary',
-    async function(req, res) {
-        try {
-            res.set('Content-Type', 'application/json');
-            
-            // Add timeout to prevent hanging requests
-            const timeoutId = setTimeout(() => {
-                if (!res.headersSent) {
-                    res.status(504).json({ error: 'Request timeout' });
-                }
-            }, 5000); // 5 second timeout
-            
-            // Check if lastfm module is ready and has data
-            if (!lastfm.Enabled || !lastfm.AlbumSummary) {
-                clearTimeout(timeoutId);
-                return res.status(200).json({ summary: null });
-            }
-            
-            clearTimeout(timeoutId);
-            res.json({ summary: lastfm.AlbumSummary });
-            
-        } catch (err) {
-            console.log('ERROR - GET /nowplaying/albumsummary: ' + err.message);
-            if (!res.headersSent) {
-                res.status(500).json({ error: 'Internal server error' });
-            }
-        }
-    });
-
-//
-// GET /nowplaying/title
-//
-app.get('/nowplaying/title',
-    async function(req, res) {
-        try {
-            res.set('Content-Type', 'text/html');
-            
-            // Add timeout to prevent hanging requests
-            const timeoutId = setTimeout(() => {
-                if (!res.headersSent) {
-                    console.log('WARNING - /nowplaying/title request timeout');
-                    res.status(504).end('Request timeout');
-                }
-            }, 5000); // 5 second timeout
-            
-            if (streamInfo && streamInfo.title) {
-                clearTimeout(timeoutId);
-                res.end(streamInfo.title);
-            } else {
-                clearTimeout(timeoutId);
-                res.end('');
-            }
-            
-        } catch (err) {
-            console.log('ERROR - GET /nowplaying/title: ' + err.message);
-            if (!res.headersSent) {
-                res.status(500).end('Internal server error');
-            }
-        }
-    });
-
-//
-// GET /search
-//
-app.get('/search', async function (req, res) {
-    let results = [];
-    try {
-        if (req.query.by === 'artist') {
-            var artist = req.query.param; 
-            results = await library.SearchByArtist(artist);
-        }
-    }
-    catch (err) {
-        console.log('ERROR - POST /search: ' + err.message);
-        return res.status(500).json({ error: 'Search failed' });        
-    }
-
-    res.end(JSON.stringify(results));
-});
-
-//
-// GET /archive/:start/:end
-//
-app.get('/archive/:start/:end', async function (req, res) {
-    let results = [];
-    try {
-        if ( (moment(req.params.start, moment.ISO_8601).isValid() === false) ||
-             (moment(req.params.end, moment.ISO_8601).isValid() === false) ) {
-            res.status(400).send({message:'Invalid parameters'});         
-        }
-        results = await events.GetEventsByDate(req.params.start, req.params.end);
-    }
-    catch (err) {
-        console.log('ERROR - GET /archive/:start/:end - ' + err.message);
-    }
-
-    res.end(JSON.stringify(results));
-});
-
-//
-// GET /auth/patreon - called when someone clicks the "I'm a patreon person" button
-//
-
-app.get('/auth/patreon', patreon.passport.authenticate('patreon', {
-    successReturnToOrRedirect: "/"
-}));
-
-//
-// GET /auth/patreon/redirect - Patreon calls this redirect after a person attempts to auth via Patreon
-
-app.get('/oauth/callback', patreon.passport.authenticate('patreon', {
-    callback: true,
-    successReturnToOrRedirect: '/',
-    failureRedirect: '/'
-}))
-
-app.get('/auth/user', function(req, res){
-    console.log('INFO - GET /auth/user');
-    if(req.isAuthenticated()){
-        console.log(`INFO - /auth/user sees ${req.user.name}`);
-        res.status(200).json({ supporter: true, name: req.user.name, avatar: req.user.avatar});
-    } else {
-        console.log(`INFO - /auth/user sees an unauthenticated listener`);
-        res.status(200).json({ supporter: false });
-    }
-});
-
-
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-    // render the error page
-    res.status(err.status || 500).send(err.message);
-});
-
-
-
-// Create HTTP server with Express app and Socket.io
-const server = require('http').createServer(app);
-const { Server } = require('socket.io');
-const io = new Server(server, {
-    path: '/socket.io/',
-    serveClient: true,
-    transports: ['websocket', 'polling'],
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
-        credentials: false
-    },
-    pingTimeout: 60000,
-    pingInterval: 25000
-});
+// NOTE: Express routes (static, /health, /nowplaying/*, /search, /archive, /auth/*)
+// are now configured in app.js via createApp().
 
 //
 // initializeModules - Initialize all application modules before starting the server
@@ -508,7 +310,5 @@ process.on('unhandledRejection', error => {
 process.on('uncaughtException', error => {
     console.log('CRITICAL ERROR - unchaughtException ', error);
 });
-
-
 
 

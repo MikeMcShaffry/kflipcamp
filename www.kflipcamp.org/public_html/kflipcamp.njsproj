@@ -19,6 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Content Include="app.js" />
     <Content Include="archive.js" />
     <Content Include="config.json" />
     <Content Include="config.json.example" />

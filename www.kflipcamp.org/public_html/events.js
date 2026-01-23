@@ -23,6 +23,10 @@ const cal = google.calendar({
     auth: auth
 });
 
+// Test-time injection hooks (not used by production code)
+let __testCalendarListImpl = null;
+let __testNowMs = null;
+
 class BadEventError extends Error {
     constructor(message, event) {
         super(message);
@@ -61,7 +65,11 @@ async function getEventList() {
         // Set beginning of query to now minus six hours - longer than our longest show)
         let startDate = new Date().getTime() - (6 * 60 * 60 * 1000);
         
-        let list = await cal.events.list({
+        const listFn = (__testCalendarListImpl)
+            ? __testCalendarListImpl
+            : (args) => cal.events.list(args);
+
+        let list = await listFn({
             timeMin: new Date(startDate).toISOString(),
             calendarId: config.calendarId
         });
@@ -206,7 +214,7 @@ async function getEventsAsync() {
             }
         }
 
-        var now = new Date().getTime();
+        var now = (__testNowMs !== null && __testNowMs !== undefined) ? __testNowMs : new Date().getTime();
         for (let n = 0; n < itemCount; ++n) {
 
             let event = eventList.data.items[n];
@@ -323,5 +331,31 @@ if (!module.exports.Start) {
     module.exports.UpdateEventDescription = updateEventDescription;
     module.exports.AddDetails = addDetails;
     module.exports.GetEventsByDate = getEventsByDate;
-}
 
+    // Test hooks (not used by production code)
+    module.exports.__test = {
+        getEventList,
+        getEventsAsync,
+        setCalendarListImpl: function(fn) { __testCalendarListImpl = fn; },
+        setNowMs: function(ms) { __testNowMs = ms; },
+        setCallbacks: function(cbs) {
+            onScheduleChange = cbs.onScheduleChange;
+            onEventStart = cbs.onEventStart;
+            onEventEnd = cbs.onEventEnd;
+            addToEngineeringLog = cbs.addToEngineeringLog;
+        },
+        reset: function() {
+            eventList = null;
+            lastScheduleSentWasUpdated = null;
+            lastScheduleItemCount = 0;
+            currentEvents = {};
+            knownBadEvents = {};
+            __testCalendarListImpl = null;
+            __testNowMs = null;
+            onScheduleChange = null;
+            onEventStart = null;
+            onEventEnd = null;
+            addToEngineeringLog = null;
+        }
+    };
+}
