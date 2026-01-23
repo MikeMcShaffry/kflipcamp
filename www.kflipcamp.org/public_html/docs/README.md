@@ -55,7 +55,6 @@ into the config.json file.
 
 ## PostInstall
 
-## Twitter
 
 # Alexa
 

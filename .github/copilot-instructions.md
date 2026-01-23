@@ -6,7 +6,7 @@ These instructions help Copilot generate PRs and code that fit this repo.
 
 - `www.kflipcamp.org/public_html/` is the Node.js website/service.
   - Entry point: `index.js` (Express + Socket.IO).
-  - Modules: `archive.js`, `events.js`, `icecastinfo.js`, `otto.js`, `library.js`, `lastfm.js`, `twitter.js`, `patreon.js`, etc.
+  - Modules: `archive.js`, `events.js`, `icecastinfo.js`, `otto.js`, `library.js`, `lastfm.js`, `patreon.js`, etc.
   - Static assets: `public/`.
   - Server config: `config.json` (local/production), example: `config.json.example`.
   - Ops automation: `scripts/` (systemd unit + cron + postinstall).

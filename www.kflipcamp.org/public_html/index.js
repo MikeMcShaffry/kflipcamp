@@ -31,7 +31,6 @@ const otto = require('./otto.js');
 const library = require('./library.js');
 const lastfm = require('./lastfm.js');
 const archive = require('./archive.js');
-const twitter = require('./twitter.js');
 const patreon = require('./patreon.js');
 
 // Tracks whether all background modules have finished initializing
@@ -86,7 +85,6 @@ function onScheduleChange(calendarId, eventList) {
 
 function onStartEvent(event) {
     archive.OnStartEvent(event);
-    twitter.OnStartEvent(event);
     otto.EngineeringLogEntry(`Recording just started for ${event.summary}`)
 }
 
@@ -429,9 +427,6 @@ async function initializeModules() {
         
         console.log('INFO - Starting lastfm...');
         await lastfm.Start(onAlbumInfoChange);
-        
-        console.log('INFO - Starting twitter...');
-        await twitter.Start(config.site_url, config.tz);
         
         console.log('INFO - All modules initialized successfully');
         modulesReady = true;
