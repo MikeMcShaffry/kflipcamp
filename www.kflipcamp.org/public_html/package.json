@@ -17,7 +17,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "nyc mocha --reporter spec --slow 200 --bail --timeout 10000 ./socket.io/test/*.js",
+    "test": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\run-tests.ps1",
+    "test:cmd": "set NODE_ENV=test && node .\\node_modules\\mocha\\bin\\mocha.js --reporter spec --slow 200 --bail --timeout 10000 .\\test\\unit\\*.test.js",
     "postinstall": "run-script-os",
     "postinstall:nix": "scripts/postinstall.sh"
   },

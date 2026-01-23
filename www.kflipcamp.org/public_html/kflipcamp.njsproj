@@ -49,12 +49,12 @@
     <Content Include="public\main_event.js" />
     <Content Include="scripts\archive.sh.erb" />
     <Content Include="scripts\hasdedair.sh" />
+    <Content Include="scripts\run-tests.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="docs" />
     <Folder Include="images\" />
     <Folder Include="public\js" />
-    <Folder Include="scripts\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="events.js" />

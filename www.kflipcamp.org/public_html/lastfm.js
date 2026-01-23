@@ -126,10 +126,8 @@ async function UpdateNowPlaying(title) {
         
         var url = encodeURI(query);
 
-    //console.log(`Asking LastFM about ${lastArtist} - ${allParts[2]} off *${lastAlbum}*`);
-    //console.log(url);
-
-        var req = http.get(url,
+        const get = httpGet || http.get;
+        var req = get(url,
             function (res) {
                 //console.log('STATUS: ' + res.statusCode);
                 //console.log('HEADERS: ' + JSON.stringify(res.headers));
@@ -308,18 +306,22 @@ function ParseLastFmAlbumInfo(lastFmJson) {
 }
 
 
+// Allow tests to replace http.get without stub libraries.
+let httpGet = null;
+
+
 if (!module.exports.Start) {
     module.exports.Start = Start;
     module.exports.UpdateNowPlaying = UpdateNowPlaying;
-
-    // Use getters to return current values
-    Object.defineProperty(module.exports, 'AlbumSummary', {
-        get: function() { return AlbumSummary; }
-    });
-
-    Object.defineProperty(module.exports, 'AlbumImage', {
-        get: function() { return AlbumImage; }
-    });
-    
     module.exports.Enabled = config.enabled;
+
+    module.exports.AlbumSummary = function() { return AlbumSummary; }
+    module.exports.AlbumImage = function() { return AlbumImage; }
+
+    // Test hooks (not used by production code)
+    module.exports.__test = {
+        ParseLastFmAlbumInfo,
+        setHttpGet: function(fn) { httpGet = fn; },
+        setEnabled: function(enabled) { config.enabled = enabled; }
+    };
 }

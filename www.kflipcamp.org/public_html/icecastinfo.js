@@ -33,6 +33,11 @@ function streamsAreDifferent(stream1, stream2) {
     if (!stream1 && stream2)
         return true;
 
+    // If both are null/undefined, they are not different.
+    if (!stream1 && !stream2) {
+        return false;
+    }
+
     return (stream1.listenurl !== stream2.listenurl);
 }
 
@@ -79,26 +84,31 @@ function checkForSomethingNew(newIcecastStatsJson) {
             ? 1
             : newIcecastStats.icestats.source.length;
 
-        let newSource = (newIcecastStats.icestats.source.length === undefined) ? newIcecastStats.icestats.source : newIcecastStats.icestats.source[0];
+        // If source is an empty array, nothing is broadcasting.
+        if (sources === 0) {
+            firstStreamBroadcasting = null;
+        } else {
+            let newSource = (newIcecastStats.icestats.source.length === undefined) ? newIcecastStats.icestats.source : newIcecastStats.icestats.source[0];
 
-        // Loops through the defined streams and chooses the first one with an audio_info object, which means someone is broadcasting to it
-        while (streamIndex < sources) {
+            // Loops through the defined streams and chooses the first one with an audio_info object, which means someone is broadcasting to it
+            while (streamIndex < sources) {
 
-            if (newSource.audio_info) {
-                firstStreamBroadcasting = newSource;
-                break;
+                if (newSource.audio_info) {
+                    firstStreamBroadcasting = newSource;
+                    break;
+                }
+
+                // If the icestats.source is an array, this will look at the next element
+                ++streamIndex;
+                if (streamIndex < sources) {
+                    newSource = newIcecastStats.icestats.source[streamIndex];
+                }
             }
 
-            // If the icestats.source is an array, this will look at the next element
-            ++streamIndex;
-            if (streamIndex < sources) {
-                newSource = newIcecastStats.icestats.source[streamIndex];
+            if (firstStreamBroadcasting) {
+                newTitle = firstStreamBroadcasting.title;
+                listeners = firstStreamBroadcasting.listeners;
             }
-        }
-
-        if (firstStreamBroadcasting) {
-            newTitle = firstStreamBroadcasting.title;
-            listeners = firstStreamBroadcasting.listeners;
         }
 
         let streamChanged = false;
@@ -133,7 +143,9 @@ function checkForSomethingNew(newIcecastStatsJson) {
             broadcastingStream = firstStreamBroadcasting;
 
         } else if (!broadcastingStream || (broadcastingStream.title !== newTitle)) {
-            broadcastingStream.title = newSource.title;
+            if (broadcastingStream) {
+                broadcastingStream.title = newTitle;
+            }
             sameOldSong = false;
         }
 
@@ -320,6 +332,12 @@ function Start(_onSomethingNewPlaying, _onListenerCountChanged) {
     if (!onListenerCountChanged) {
         console.log('WARNING - icecastinfo - onListenerCountChanged is not set');
     }
+
+    // In automated tests, avoid creating long-lived timers that keep the process alive.
+    if (process.env.NODE_ENV === 'test' || process.env.KFLIP_DISABLE_INTERVALS === 'true') {
+        return;
+    }
+
     setInterval(updateNowPlaying, 5000);
 }
 
@@ -331,6 +349,12 @@ function CheckShoutingFire(_onShoutingFireUpdated) {
     }
 
     checkShoutingFire();
+
+    // In automated tests, avoid creating long-lived timers that keep the process alive.
+    if (process.env.NODE_ENV === 'test' || process.env.KFLIP_DISABLE_INTERVALS === 'true') {
+        return;
+    }
+
     setInterval(checkShoutingFire, 60000);
 
 }
@@ -342,10 +366,18 @@ function GetCurrentStream() {
 
 
 if (!module.exports.Start) {
+    // Public API
     module.exports.Start = Start;
     module.exports.CheckShoutingFire = CheckShoutingFire;
+    module.exports.OnShoutingFire = onShoutingFire;
     module.exports.GetCurrentStream = GetCurrentStream;
+
+    // Back-compat: allow direct call if any callers used this name.
+    module.exports.checkShoutingFire = checkShoutingFire;
+
+    // Test hooks (not used by production code)
+    module.exports.__test = {
+        checkForSomethingNew,
+        streamsAreDifferent
+    };
 }
-
-
-
