@@ -165,6 +165,7 @@ DJ Commands are\n\
             return message.channel.send(helpmsg);
         }
 
+		// This is the search command - it will search the library for artists or albums matching the search term, and return a list of results.
 		if (command === "search") {
 			try {
 				results = "What do you want to search for? Use !help for command list.";

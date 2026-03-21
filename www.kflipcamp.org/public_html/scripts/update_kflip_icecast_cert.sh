@@ -43,13 +43,22 @@ if [ ! -f "$PEM_FILE" ] || [ "$CERT_FILE" -nt "$PEM_FILE" ]; then
     # Move temp file to final location atomically
     mv "$TEMP_PEM_FILE" "$PEM_FILE"
 
-    # Reload icecast2 to use new certificate
-    if systemctl reload icecast2; then
-        logger -s "INFO - update_kflip_icecast_cert.sh - Icecast2 service reloaded successfully"
+    # Restart icecast2 to use new certificate
+    # SSL certificate changes typically require a full restart rather than reload
+    logger -s "INFO - update_kflip_icecast_cert.sh - Restarting Icecast2 to load new certificate"
+    if systemctl restart icecast2; then
+        logger -s "INFO - update_kflip_icecast_cert.sh - Icecast2 service restarted successfully"
     else
-        logger -s "WARN - update_kflip_icecast_cert.sh - Failed to reload icecast2, trying restart"
-        systemctl restart icecast2
-        logger -s "INFO - update_kflip_icecast_cert.sh - Icecast2 service restarted"
+        logger -s "ERROR - update_kflip_icecast_cert.sh - Failed to restart icecast2 service"
+        exit 1
+    fi
+    
+    # Verify that icecast2 is running
+    if systemctl is-active --quiet icecast2; then
+        logger -s "INFO - update_kflip_icecast_cert.sh - Icecast2 is active and running with new certificate"
+    else
+        logger -s "ERROR - update_kflip_icecast_cert.sh - Icecast2 service is not active after certificate update"
+        exit 1
     fi
 else
     logger -s "INFO - update_kflip_icecast_cert.sh - Icecast2 PEM file is up to date"
